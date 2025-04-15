@@ -27,7 +27,6 @@ public class MainFrame extends JFrame implements LoginPanel.LoginCallback, Regis
     private TransactionPanel transactionPanel;
     private CategoryManagementPanel categoryManagementPanel;
     private StatisticsPanel statisticsPanel;
-    private AIFinanceAdvisorPanel aiFinanceAdvisorPanel;
     private ExpenseAlertPanel expenseAlertPanel;
     private LocalConsumptionPanel localConsumptionPanel;
     
@@ -90,7 +89,6 @@ public class MainFrame extends JFrame implements LoginPanel.LoginCallback, Regis
         transactionPanel = new TransactionPanel(transactionController);
         categoryManagementPanel = new CategoryManagementPanel(transactionController);
         statisticsPanel = new StatisticsPanel(transactionController);
-        aiFinanceAdvisorPanel = new AIFinanceAdvisorPanel(transactionController);
         expenseAlertPanel = new ExpenseAlertPanel(transactionController);
         localConsumptionPanel = new LocalConsumptionPanel(transactionController);
         
@@ -99,7 +97,6 @@ public class MainFrame extends JFrame implements LoginPanel.LoginCallback, Regis
         addStyledTab(tabbedPane, "Transaction Entry", transactionPanel, "Add and import transaction records");
         addStyledTab(tabbedPane, "Category Management", categoryManagementPanel, "View and manage transaction categories");
         addStyledTab(tabbedPane, "Statistics View", statisticsPanel, "View spending statistics and budget suggestions");
-        addStyledTab(tabbedPane, "AI Advisor", aiFinanceAdvisorPanel, "Get AI-powered financial analysis and recommendations");
         addStyledTab(tabbedPane, "Expense Alerts", expenseAlertPanel, "Monitor and get alerted when expenses exceed thresholds");
         addStyledTab(tabbedPane, "Local Consumption", localConsumptionPanel, "Analyze local consumption patterns");
         

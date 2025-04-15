@@ -5,7 +5,6 @@ A financial management system for recording and analyzing personal income and ex
 ## Features
 
 - Transaction Records: Add, import, and delete transaction records
-- AI Classification: Automatically categorize transactions with user correction support
 - Statistical Analysis: View monthly expense statistics and budget recommendations
 - Festival Detection: Automatically identify and tag consumption during Chinese New Year
 - CSV Storage: Use simple CSV files to store data
@@ -31,7 +30,6 @@ FinanceApp/
 │   │               │   └── TransactionController.java
 │   │               ├── model/         # Model classes
 │   │               │   ├── Transaction.java
-│   │               │   ├── AIClassifier.java
 │   │               │   ├── BudgetCalculator.java
 │   │               │   └── SimpleBudgetCalculator.java
 │   │               ├── service/       # Service classes
@@ -45,7 +43,6 @@ FinanceApp/
 │   │               │   ├── CategoryPanel.java      # Category panel
 │   │               │   ├── StatisticsPanel.java    # Statistics panel
 │   │               │   ├── DashboardPanel.java     # Dashboard panel
-│   │               │   ├── AIFinanceAdvisorPanel.java  # AI Finance Advisor panel
 │   │               │   ├── ExpenseAlertPanel.java  # Expense Alert panel
 │   │               │   ├── LocalConsumptionPanel.java  # Local Consumption panel
 │   │               │   └── LocalizedFinancePanel.java  # Localized Finance panel
@@ -55,11 +52,9 @@ FinanceApp/
 │       └── java/
 │           └── com/
 │               └── financeapp/       # Test classes
-│                   ├── TransactionTest.java
-│                   └── AIClassifierTest.java
+│                   └── TransactionTest.java
 ├── data/                          # Data directory
 │   ├── transactions.csv          # Transaction records
-│   ├── corrections.log           # Classification correction records
 │   ├── users.csv                 # User information
 │   └── test_import.csv           # Test import file
 ├── pom.xml                       # Maven project configuration (currently unused)
@@ -100,20 +95,18 @@ FinanceApp/
 
 1. Fill in the date, amount, category (optional), and notes in the "Transaction Records" tab
 2. Click the "Add" button to save the transaction record
-3. The system will automatically attempt to classify uncategorized transactions using AI
 
 ### Importing CSV Files
 
 1. Click the "Import CSV" button in the "Transaction Records" tab
 2. Select a CSV file in the correct format (format: date,category,amount,notes)
-3. The system will import all transaction records and perform AI classification
+3. The system will import all transaction records
 
-### Correcting Categories
+### Managing Categories
 
 1. Select the transaction to modify in the "Category Management" tab
 2. Enter the correct category in the "New Category" text box
-3. Click the "Update Category" button to save the correction
-4. The system will remember this correction for future similar transactions
+3. Click the "Update Category" button to save the changes
 
 ### Viewing Statistics
 
