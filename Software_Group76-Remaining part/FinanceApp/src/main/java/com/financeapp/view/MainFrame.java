@@ -29,6 +29,7 @@ public class MainFrame extends JFrame implements LoginPanel.LoginCallback, Regis
     private StatisticsPanel statisticsPanel;
     private ExpenseAlertPanel expenseAlertPanel;
     private LocalConsumptionPanel localConsumptionPanel;
+    private AIChatPanel aiChatPanel;
     
     private JPanel cardPanel;
     private CardLayout cardLayout;
@@ -91,6 +92,7 @@ public class MainFrame extends JFrame implements LoginPanel.LoginCallback, Regis
         statisticsPanel = new StatisticsPanel(transactionController);
         expenseAlertPanel = new ExpenseAlertPanel(transactionController);
         localConsumptionPanel = new LocalConsumptionPanel(transactionController);
+        aiChatPanel = new AIChatPanel();
         
         // Add to tabs
         addStyledTab(tabbedPane, "Dashboard", dashboardPanel, "Welcome to your financial dashboard");
@@ -99,6 +101,7 @@ public class MainFrame extends JFrame implements LoginPanel.LoginCallback, Regis
         addStyledTab(tabbedPane, "Statistics View", statisticsPanel, "View spending statistics and budget suggestions");
         addStyledTab(tabbedPane, "Expense Alerts", expenseAlertPanel, "Monitor and get alerted when expenses exceed thresholds");
         addStyledTab(tabbedPane, "Local Consumption", localConsumptionPanel, "Analyze local consumption patterns");
+        addStyledTab(tabbedPane, "AI Chat", aiChatPanel, "Chat with AI assistant for financial advice");
         
         // Add to main panel
         mainPanel.add(tabbedPane, BorderLayout.CENTER);
