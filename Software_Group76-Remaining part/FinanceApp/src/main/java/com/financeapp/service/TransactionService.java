@@ -7,19 +7,12 @@ import java.util.stream.Collectors;
 
 public class TransactionService {
     private List<Transaction> transactions;
-    private AIClassifier aiClassifier;
 
     public TransactionService() {
         transactions = new ArrayList<>();
-        aiClassifier = new AIClassifier();
     }
 
     public void addTransaction(Transaction transaction) {
-        // 如果交易没有分类，使用AI分类器进行分类
-        if (transaction.getCategory() == null || transaction.getCategory().isEmpty()) {
-            String category = aiClassifier.classify(transaction);
-            transaction.setCategory(category);
-        }
         transactions.add(transaction);
     }
 
@@ -80,9 +73,5 @@ public class TransactionService {
 
     public void deleteTransaction(Transaction transaction) {
         transactions.remove(transaction);
-    }
-
-    public void recordCorrection(String description, String category) {
-        aiClassifier.recordCorrection(description, category);
     }
 } 

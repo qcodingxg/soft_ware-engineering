@@ -657,10 +657,54 @@ public class DashboardPanel extends JPanel {
      */
     private void refreshTips() {
         // In a real application, this would fetch new tips from an AI service
-        JOptionPane.showMessageDialog(this,
-                "Financial tips refreshed!",
-                "Tips Updated",
-                JOptionPane.INFORMATION_MESSAGE);
+        // Silent refresh without showing popup dialog
+        // Refresh tips content here
+        updateTipsContent();
+    }
+    
+    /**
+     * Update the contents of the tips panel with new financial tips
+     */
+    private void updateTipsContent() {
+        try {
+            // Clear existing content in tips panel
+            JPanel tipsContent = (JPanel) ((JScrollPane) tipsPanel.getComponent(0)).getViewport().getView();
+            tipsContent.removeAll();
+            
+            // Add new financial tips
+            String[] tips = {
+                "Save at least 20% of your monthly income for future goals.",
+                "Track your expenses daily to stay aware of your spending habits.",
+                "Consider setting up an emergency fund covering 3-6 months of expenses.",
+                "Review your subscriptions regularly and cancel unused services.",
+                "When making large purchases, follow the 24-hour rule to avoid impulse buying."
+            };
+            
+            // Display a random selection of tips
+            Random random = new Random();
+            int numTips = Math.min(3, tips.length);
+            Set<Integer> selectedIndices = new HashSet<>();
+            
+            while (selectedIndices.size() < numTips) {
+                selectedIndices.add(random.nextInt(tips.length));
+            }
+            
+            boolean first = true;
+            for (Integer index : selectedIndices) {
+                if (!first) {
+                    tipsContent.add(Box.createVerticalStrut(10));
+                }
+                tipsContent.add(createTipPanel(tips[index]));
+                first = false;
+            }
+            
+            // Refresh UI
+            tipsContent.revalidate();
+            tipsContent.repaint();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     
     /**

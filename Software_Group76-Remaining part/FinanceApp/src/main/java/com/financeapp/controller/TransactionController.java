@@ -1,6 +1,5 @@
 package com.financeapp.controller;
 
-import com.financeapp.model.AIClassifier;
 import com.financeapp.model.SimpleBudgetCalculator;
 import com.financeapp.model.Transaction;
 import com.financeapp.util.CSVHandler;
@@ -19,7 +18,6 @@ public class TransactionController {
     
     private final List<Transaction> transactions;
     private final CSVHandler csvHandler;
-    private final AIClassifier aiClassifier;
     private final SimpleBudgetCalculator budgetCalculator;
     
     /**
@@ -28,7 +26,6 @@ public class TransactionController {
     public TransactionController() {
         this.transactions = new ArrayList<>();
         this.csvHandler = new CSVHandler();
-        this.aiClassifier = new AIClassifier();
         this.budgetCalculator = new SimpleBudgetCalculator();
     }
     
@@ -62,14 +59,6 @@ public class TransactionController {
      * @throws IOException if an IO error occurs during saving
      */
     public void addTransaction(Transaction transaction) throws IOException {
-        // Classify if category is not set
-        if (transaction.getCategory() == null || transaction.getCategory().isEmpty() || 
-                "Uncategorized".equals(transaction.getCategory())) {
-            Transaction classified = aiClassifier.classify(transaction);
-            transaction.setCategory(classified.getCategory());
-        }
-        
-        // Add to list and save
         transactions.add(transaction);
         saveTransactions();
     }
@@ -80,16 +69,6 @@ public class TransactionController {
      * @throws IOException if an IO error occurs during saving
      */
     public void addTransactions(List<Transaction> newTransactions) throws IOException {
-        // Classify transactions without categories
-        for (Transaction transaction : newTransactions) {
-            if (transaction.getCategory() == null || transaction.getCategory().isEmpty() || 
-                    "Uncategorized".equals(transaction.getCategory())) {
-                Transaction classified = aiClassifier.classify(transaction);
-                transaction.setCategory(classified.getCategory());
-            }
-        }
-        
-        // Add to list and save
         transactions.addAll(newTransactions);
         saveTransactions();
     }
@@ -101,13 +80,7 @@ public class TransactionController {
      * @throws IOException if an IO error occurs during saving
      */
     public void updateCategory(Transaction transaction, String newCategory) throws IOException {
-        // Update category in the transaction
         transaction.setCategory(newCategory);
-        
-        // Save category correction to AI classifier for future use
-        aiClassifier.recordCorrection(transaction, newCategory);
-        
-        // Save changes
         saveTransactions();
     }
     
