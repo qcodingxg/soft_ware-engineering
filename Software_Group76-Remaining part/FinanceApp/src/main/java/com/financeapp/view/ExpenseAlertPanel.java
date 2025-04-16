@@ -156,6 +156,8 @@ public class ExpenseAlertPanel extends JPanel {
         // Refresh button
         JButton refreshButton = new JButton("Refresh Alerts");
         refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        refreshButton.setForeground(Color.BLACK);
+        refreshButton.setBackground(Color.WHITE);
         refreshButton.setFocusPainted(false);
         refreshButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         refreshButton.addActionListener(e -> updateExpenseAlerts());
@@ -187,8 +189,8 @@ public class ExpenseAlertPanel extends JPanel {
         
         JButton refreshButton = new JButton("Refresh Alerts");
         refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        refreshButton.setBackground(SECONDARY_COLOR);
-        refreshButton.setForeground(Color.WHITE);
+        refreshButton.setBackground(Color.WHITE);
+        refreshButton.setForeground(Color.BLACK);
         refreshButton.setFocusPainted(false);
         refreshButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         refreshButton.addActionListener(e -> updateExpenseAlerts());
@@ -374,8 +376,8 @@ public class ExpenseAlertPanel extends JPanel {
         
         JButton saveButton = new JButton("Save Notification Settings");
         saveButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        saveButton.setBackground(PRIMARY_COLOR);
-        saveButton.setForeground(Color.WHITE);
+        saveButton.setBackground(Color.WHITE);
+        saveButton.setForeground(Color.BLACK);
         saveButton.setFocusPainted(false);
         saveButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         saveButton.addActionListener(e -> saveNotificationSettings());
@@ -434,8 +436,8 @@ public class ExpenseAlertPanel extends JPanel {
         
         saveSettingsButton = new JButton("Save Settings");
         saveSettingsButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        saveSettingsButton.setBackground(PRIMARY_COLOR);
-        saveSettingsButton.setForeground(Color.WHITE);
+        saveSettingsButton.setBackground(Color.WHITE);
+        saveSettingsButton.setForeground(Color.BLACK);
         saveSettingsButton.setFocusPainted(false);
         saveSettingsButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         saveSettingsButton.addActionListener(e -> saveSettings());
