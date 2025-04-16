@@ -132,6 +132,8 @@ public class LocalConsumptionPanel extends JPanel {
         
         JButton refreshButton = new JButton("Refresh Analysis");
         refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        refreshButton.setForeground(Color.BLACK);
+        refreshButton.setBackground(Color.WHITE);
         refreshButton.setFocusPainted(false);
         refreshButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         refreshButton.addActionListener(e -> updateAllPanels());
