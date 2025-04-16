@@ -1,13 +1,14 @@
 # Personal Finance Management Software
 
-A financial management system for recording and analyzing personal income and expenses.
+A comprehensive financial management system for recording and analyzing personal income and expenses.
 
 ## Features
 
-- Transaction Records: Add, import, and delete transaction records
-- Statistical Analysis: View monthly expense statistics and budget recommendations
-- Festival Detection: Automatically identify and tag consumption during Chinese New Year
-- CSV Storage: Use simple CSV files to store data
+- **Transaction Management**: Add, import, edit, and delete transaction records
+- **Statistical Analysis**: View monthly expense statistics and budget recommendations
+- **Festival Detection**: Automatically identify and tag consumption during Chinese New Year
+- **Data Persistence**: Use simple CSV files to store data securely
+- **User Authentication**: Support for multiple user accounts
 
 ## System Requirements
 
@@ -91,6 +92,11 @@ FinanceApp/
 
 ## Usage Instructions
 
+### User Authentication
+
+1. Register a new account or log in with existing credentials
+2. The system will automatically load your personal transaction data
+
 ### Adding Transaction Records
 
 1. Fill in the date, amount, category (optional), and notes in the "Transaction Records" tab
@@ -114,13 +120,21 @@ FinanceApp/
 2. Click the "Query" button to display the expense statistics for that month
 3. View the budget recommendations below
 
-## TODO List
+## Development Roadmap
 
 - Implement more complete lunar calendar conversion logic
-- Add more category rules
+- Add more category classification rules
 - Support chart export functionality
 - Implement budget setting functionality
 - Add multi-currency support
+- Create mobile application version
+
+## Contribution Guidelines
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Submit a pull request
 
 ## License
 
