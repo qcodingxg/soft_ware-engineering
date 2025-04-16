@@ -27,23 +27,23 @@ public class AIChatPanel extends JPanel {
     private JButton sendButton;
     private static final String API_KEY = "sk-92f9dba0310242988bafce610d4664be"; // 请替换为您的API密钥
     private static final String API_URL = "https://api.deepseek.com/v1/chat/completions";
-    private static final String SYSTEM_PROMPT = "你是一位专业的个人财务顾问，名为'财智助手'。你的专长包括：" +
-            "1. 个人预算规划与支出追踪\n" +
-            "2. 债务管理与清偿策略\n" +
-            "3. 储蓄目标设定与达成方法\n" +
-            "4. 基础投资建议（股票、基金、定期存款等）\n" +
-            "5. 税务规划与优化\n" +
-            "6. 退休规划\n" +
-            "7. 保险配置建议\n\n" +
-            "在回答用户问题时，请遵循以下原则：\n" +
-            "- 保持专业且易于理解的语言\n" +
-            "- 提供具体、可操作的建议\n" +
-            "- 解释财务概念时使用简单的类比\n" +
-            "- 尊重用户的财务状况，不做过度假设\n" +
-            "- 鼓励健康的财务习惯和长期规划\n" +
-            "- 提醒用户重要的财务决策应咨询专业人士\n" +
-            "- 所有回答均使用英文\n\n" +
-            "当用户提出非财务相关问题时，礼貌地将话题引导回财务领域。";
+    private static final String SYSTEM_PROMPT = "You are a professional personal financial advisor named 'Cai Zhi Zhu Shou'. Your expertise includes: " +
+            "1. Personal Budget Planning and Expense Tracking\n" +
+            "2. Debt Management and Repayment Strategy\n" +
+            "3. Savings Goal Setting and Achieving Method\n" +
+            "4. Basic Investment Advice (Stocks, Funds, Fixed Deposits, etc.)\n" +
+            "5. Tax Planning and Optimization\n" +
+            "6. Retirement Planning\n" +
+            "7. Insurance Configuration Advice\n\n" +
+            "When answering user questions, please follow these principles: \n" +
+            "- Use professional and easy-to-understand language\n" +
+            "- Provide specific and actionable advice\n" +
+            "- Explain financial concepts using simple analogies\n" +
+            "- Respect the user's financial situation, do not make excessive assumptions\n" +
+            "- Encourage healthy financial habits and long-term planning\n" +
+            "- Remind users that important financial decisions should be consulted with professionals\n" +
+            "- All answers are in English\n\n" +
+            "When users ask non-financial questions, politely guide the conversation back to the financial field.";
     
     // 用于存储当前的回复内容
     private StringBuilder currentResponse;
@@ -463,9 +463,49 @@ public class AIChatPanel extends JPanel {
     private void appendMessage(String message) {
         SwingUtilities.invokeLater(() -> {
             if (message.startsWith("User:")) {
-                // 为用户消息应用不同样式
-                chatArea.append(message + "\n\n");
+                // 为用户消息应用边框样式
+                String userMsg = message.substring(5).trim();
+                StringBuilder formattedMessage = new StringBuilder();
+                
+                // 添加用户消息边框
+                formattedMessage.append("┏━━━━━━━━━━━━━━━━━━ User Question ━━━━━━━━━━━━━━━━━━┓\n");
+                
+                // 分行处理用户消息
+                String[] lines = userMsg.split("\n");
+                for (String line : lines) {
+                    // 处理长行，进行换行
+                    if (line.length() > 40) {
+                        int i = 0;
+                        while (i < line.length()) {
+                            int end = Math.min(i + 40, line.length());
+                            if (end < line.length() && Character.isLetterOrDigit(line.charAt(end))) {
+                                int lastSpace = line.lastIndexOf(' ', end);
+                                if (lastSpace > i) {
+                                    end = lastSpace;
+                                }
+                            }
+                            formattedMessage.append("┃  ").append(line.substring(i, end))
+                                           .append(new String(new char[40 - (end - i)]).replace('\0', ' '))
+                                           .append("  ┃\n");
+                            i = end;
+                            if (i < line.length() && line.charAt(i) == ' ') {
+                                i++; // 跳过空格
+                            }
+                        }
+                    } else {
+                        // 短行直接添加
+                        formattedMessage.append("┃  ").append(line)
+                                       .append(new String(new char[40 - line.length()]).replace('\0', ' '))
+                                       .append("  ┃\n");
+                    }
+                }
+                
+                // 添加底部边框
+                formattedMessage.append("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n\n");
+                
+                chatArea.append(formattedMessage.toString());
             } else {
+                // 这里不处理AI回复，因为AI回复会在appendMessageWithoutNewline和appendStreamContent中处理
                 chatArea.append(message + "\n\n");
             }
             chatArea.setCaretPosition(chatArea.getDocument().getLength());
@@ -474,14 +514,23 @@ public class AIChatPanel extends JPanel {
     
     private void appendMessageWithoutNewline(String message) {
         SwingUtilities.invokeLater(() -> {
-            chatArea.append(message);
+            if (message.startsWith("AI Financial Advisor:")) {
+                // 添加AI回复的顶部边框
+                chatArea.append("┏━━━━━━━━━━━━━━━━━━ AI Response ━━━━━━━━━━━━━━━━━━┓\n");
+                chatArea.append("┃                                            ┃\n");
+                // 不显示前缀"AI Financial Advisor:"，而是直接在边框内显示内容
+            } else {
+                chatArea.append(message);
+            }
             chatArea.setCaretPosition(chatArea.getDocument().getLength());
         });
     }
     
     private void appendNewline() {
         SwingUtilities.invokeLater(() -> {
-            chatArea.append("\n\n");
+            // 添加AI回复的底部边框
+            chatArea.append("┃                                            ┃\n");
+            chatArea.append("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n\n");
             chatArea.setCaretPosition(chatArea.getDocument().getLength());
         });
     }
@@ -492,7 +541,26 @@ public class AIChatPanel extends JPanel {
             if (message.startsWith("Error:")) {
                 chatArea.append(message + "\n\n");
             } else {
-                chatArea.append(message + "\n\n");
+                // 添加带有美观边框的财务建议
+                if (message.contains("financial advice") || message.contains("财务建议")) {
+                    String[] parts = message.split("\n");
+                    StringBuilder formattedMessage = new StringBuilder();
+                    
+                    // 添加顶部边框
+                    formattedMessage.append("┏━━━━━━━━━━━━━━━━━━ Financial Advice ━━━━━━━━━━━━━━━━━━┓\n");
+                    
+                    // 添加内容，每行前后加上边框
+                    for (String line : parts) {
+                        formattedMessage.append("┃  ").append(line).append("  ┃\n");
+                    }
+                    
+                    // 添加底部边框
+                    formattedMessage.append("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n\n");
+                    
+                    chatArea.append(formattedMessage.toString());
+                } else {
+                    chatArea.append(message + "\n\n");
+                }
             }
             chatArea.setCaretPosition(chatArea.getDocument().getLength());
         });
@@ -500,9 +568,279 @@ public class AIChatPanel extends JPanel {
     
     private void appendStreamContent(String content) {
         SwingUtilities.invokeLater(() -> {
-            chatArea.append(content);
+            // 如果内容中包含财务建议关键词，做特殊处理
+            if (content.contains("financial advice") || content.contains("财务建议")) {
+                // 检查当前累积的响应是否已经包含完整的财务建议
+                if (isCompleteAdviceBlock(currentResponse.toString() + content)) {
+                    // 完整的建议块，应用美化格式
+                    formatAndDisplayFinancialAdvice(currentResponse.toString() + content);
+                } else {
+                    // 仍在累积中，正常追加
+                    appendFormattedContent(content);
+                }
+            } else {
+                // 普通内容，正常追加但添加边框格式
+                appendFormattedContent(content);
+            }
             chatArea.setCaretPosition(chatArea.getDocument().getLength());
         });
+    }
+    
+    /**
+     * 判断是否是完整的财务建议块
+     */
+    private boolean isCompleteAdviceBlock(String text) {
+        // 简单判断：如果包含建议序号（如"1."，"2."等）并且最后一个建议后面有完整的句子，则认为是完整的建议块
+        return (text.contains("1.") && text.contains("2.") && 
+                (text.endsWith(".") || text.endsWith("!") || text.endsWith("?")));
+    }
+    
+    /**
+     * 格式化并显示财务建议
+     */
+    private void formatAndDisplayFinancialAdvice(String advice) {
+        // 清除当前已显示的内容
+        int lastAdviceStart = chatArea.getText().lastIndexOf("┏━━━━━━━━━━━━━━━━━━ AI回复 ━━━━━━━━━━━━━━━━━━━┓");
+        if (lastAdviceStart < 0) {
+            lastAdviceStart = chatArea.getText().lastIndexOf("┏━━━━━━━━━━━━━━━━━━ AI Response ━━━━━━━━━━━━━━━━━━┓");
+        }
+        if (lastAdviceStart >= 0) {
+            try {
+                chatArea.getDocument().remove(lastAdviceStart, chatArea.getDocument().getLength() - lastAdviceStart);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        
+        // 重新添加AI回复边框顶部
+        chatArea.append("┏━━━━━━━━━━━━━━━━━━ AI Response ━━━━━━━━━━━━━━━━━━┓\n");
+        chatArea.append("┃                                            ┃\n");
+        
+        // 提取建议部分
+        String[] paragraphs = advice.split("\n\n");
+        StringBuilder formattedAdvice = new StringBuilder();
+        
+        // 添加常规回复内容（除了财务建议部分）
+        boolean foundAdvice = false;
+        for (String paragraph : paragraphs) {
+            if (paragraph.contains("financial advice") || paragraph.contains("财务建议") ||
+                (paragraph.contains("1.") && paragraph.contains("2."))) {
+                foundAdvice = true;
+                break;
+            }
+            
+            // 为常规内容添加边框格式
+            String[] lines = paragraph.split("\n");
+            for (String line : lines) {
+                // 确保行不超过边框宽度，如果超过则换行
+                if (line.length() > 40) {
+                    // 简单的文本换行处理
+                    int i = 0;
+                    while (i < line.length()) {
+                        int end = Math.min(i + 40, line.length());
+                        if (end < line.length() && Character.isLetterOrDigit(line.charAt(end))) {
+                            // 查找上一个空格
+                            int lastSpace = line.lastIndexOf(' ', end);
+                            if (lastSpace > i) {
+                                end = lastSpace;
+                            }
+                        }
+                        formattedAdvice.append("┃  ").append(line.substring(i, end)).append(new String(new char[40 - (end - i)]).replace('\0', ' ')).append("  ┃\n");
+                        i = end;
+                        if (i < line.length() && line.charAt(i) == ' ') {
+                            i++; // 跳过空格
+                        }
+                    }
+                } else {
+                    // 短行，直接添加并填充空格
+                    formattedAdvice.append("┃  ").append(line).append(new String(new char[40 - line.length()]).replace('\0', ' ')).append("  ┃\n");
+                }
+            }
+            // 段落之间添加空行
+            formattedAdvice.append("┃                                            ┃\n");
+        }
+        
+        // 显示常规回复内容
+        chatArea.append(formattedAdvice.toString());
+        
+        // 添加美化的财务建议框
+        chatArea.append("┃                                            ┃\n");
+        chatArea.append("┃  ┏━━━━━━━━━━━━ Financial Advice ━━━━━━━━━━━━┓      ┃\n");
+        
+        // 查找并格式化财务建议部分
+        boolean hasAdvice = false;
+        StringBuilder adviceContent = new StringBuilder();
+        
+        for (String paragraph : paragraphs) {
+            if (paragraph.contains("financial advice") || paragraph.contains("财务建议") ||
+                (paragraph.contains("1.") && paragraph.contains("2."))) {
+                hasAdvice = true;
+                
+                // 处理建议内容
+                String[] lines = paragraph.split("\n");
+                for (String line : lines) {
+                    // 跳过标题行
+                    if (line.contains("financial advice") || line.contains("财务建议")) {
+                        continue;
+                    }
+                    
+                    // 确保行不超过建议框宽度，如果超过则换行
+                    if (line.length() > 32) { // 缩小宽度以适应嵌套边框
+                        // 简单的文本换行处理
+                        int i = 0;
+                        while (i < line.length()) {
+                            int end = Math.min(i + 32, line.length());
+                            if (end < line.length() && Character.isLetterOrDigit(line.charAt(end))) {
+                                // 查找上一个空格
+                                int lastSpace = line.lastIndexOf(' ', end);
+                                if (lastSpace > i) {
+                                    end = lastSpace;
+                                }
+                            }
+                            adviceContent.append("┃  ┃  ").append(line.substring(i, end))
+                                   .append(new String(new char[32 - (end - i)]).replace('\0', ' '))
+                                   .append("  ┃  ┃\n");
+                            i = end;
+                            if (i < line.length() && line.charAt(i) == ' ') {
+                                i++; // 跳过空格
+                            }
+                        }
+                    } else {
+                        // 短行，直接添加并填充空格
+                        adviceContent.append("┃  ┃  ").append(line)
+                               .append(new String(new char[32 - line.length()]).replace('\0', ' '))
+                               .append("  ┃  ┃\n");
+                    }
+                }
+                
+                // 建议部分之间添加空行
+                adviceContent.append("┃  ┃                                ┃  ┃\n");
+            }
+        }
+        
+        // 如果没有找到具体建议，添加默认建议
+        if (!hasAdvice) {
+            adviceContent.append("┃  ┃  No specific financial advice found    ┃  ┃\n");
+        } else {
+            // 移除最后一个建议部分的空行
+            int lastEmptyLine = adviceContent.lastIndexOf("┃  ┃                                ┃  ┃\n");
+            if (lastEmptyLine > 0) {
+                adviceContent.delete(lastEmptyLine, lastEmptyLine + 45);
+            }
+        }
+        
+        // 添加建议内容
+        chatArea.append(adviceContent.toString());
+        
+        // 添加建议框底部
+        chatArea.append("┃  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛      ┃\n");
+        
+        // 可能的结束内容
+        boolean hasEndingContent = false;
+        StringBuilder endingContent = new StringBuilder();
+        
+        for (int i = paragraphs.length - 1; i >= 0; i--) {
+            String paragraph = paragraphs[i];
+            if (paragraph.contains("financial advice") || paragraph.contains("财务建议") ||
+                (paragraph.contains("1.") && paragraph.contains("2."))) {
+                break;
+            }
+            
+            if (i == paragraphs.length - 1) {
+                hasEndingContent = true;
+                
+                // 添加结束内容
+                endingContent.append("┃                                            ┃\n");
+                
+                // 为结束内容添加边框格式
+                String[] lines = paragraph.split("\n");
+                for (String line : lines) {
+                    // 确保行不超过边框宽度，如果超过则换行
+                    if (line.length() > 40) {
+                        // 简单的文本换行处理
+                        int j = 0;
+                        while (j < line.length()) {
+                            int end = Math.min(j + 40, line.length());
+                            if (end < line.length() && Character.isLetterOrDigit(line.charAt(end))) {
+                                // 查找上一个空格
+                                int lastSpace = line.lastIndexOf(' ', end);
+                                if (lastSpace > j) {
+                                    end = lastSpace;
+                                }
+                            }
+                            endingContent.append("┃  ").append(line.substring(j, end))
+                                   .append(new String(new char[40 - (end - j)]).replace('\0', ' '))
+                                   .append("  ┃\n");
+                            j = end;
+                            if (j < line.length() && line.charAt(j) == ' ') {
+                                j++; // 跳过空格
+                            }
+                        }
+                    } else {
+                        // 短行，直接添加并填充空格
+                        endingContent.append("┃  ").append(line)
+                               .append(new String(new char[40 - line.length()]).replace('\0', ' '))
+                               .append("  ┃\n");
+                    }
+                }
+            }
+        }
+        
+        // 添加结束内容
+        if (hasEndingContent) {
+            chatArea.append(endingContent.toString());
+        } else {
+            // 如果没有结束内容，添加一个空行
+            chatArea.append("┃                                            ┃\n");
+        }
+        
+        // 添加AI回复底部边框
+        chatArea.append("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n\n");
+    }
+
+    /**
+     * 格式化追加内容，适应AI回复边框
+     */
+    private void appendFormattedContent(String content) {
+        // 分行处理
+        String[] lines = content.split("\n");
+        StringBuilder formatted = new StringBuilder();
+        
+        for (String line : lines) {
+            // 处理空行
+            if (line.trim().isEmpty()) {
+                formatted.append("┃                                            ┃\n");
+                continue;
+            }
+            
+            // 处理长行，进行换行
+            if (line.length() > 40) {
+                int i = 0;
+                while (i < line.length()) {
+                    int end = Math.min(i + 40, line.length());
+                    if (end < line.length() && Character.isLetterOrDigit(line.charAt(end))) {
+                        int lastSpace = line.lastIndexOf(' ', end);
+                        if (lastSpace > i) {
+                            end = lastSpace;
+                        }
+                    }
+                    formatted.append("┃  ").append(line.substring(i, end))
+                             .append(new String(new char[40 - (end - i)]).replace('\0', ' '))
+                             .append("  ┃\n");
+                    i = end;
+                    if (i < line.length() && line.charAt(i) == ' ') {
+                        i++; // 跳过空格
+                    }
+                }
+            } else {
+                // 短行直接添加
+                formatted.append("┃  ").append(line)
+                         .append(new String(new char[40 - line.length()]).replace('\0', ' '))
+                         .append("  ┃\n");
+            }
+        }
+        
+        chatArea.append(formatted.toString());
     }
 
     private void getAIResponseStreaming(String message) throws Exception {
@@ -572,7 +910,7 @@ public class AIChatPanel extends JPanel {
                         }
                     } catch (Exception e) {
                         // 如果解析特定行失败，继续处理下一行
-                        System.err.println("无法解析流数据行: " + data);
+                        System.err.println("Cannot parse the stream data line: " + data);
                     }
                 }
             }
