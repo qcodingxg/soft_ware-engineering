@@ -22,7 +22,8 @@ import org.json.JSONObject;
 import org.json.JSONArray;
 
 public class AIChatPanel extends JPanel {
-    private JTextArea chatArea;
+    private JPanel chatMessagesPanel; // 替换JTextArea的消息面板
+    private JScrollPane scrollPane;   // 滚动面板
     private JTextField inputField;
     private JButton sendButton;
     private static final String API_KEY = "sk-92f9dba0310242988bafce610d4664be"; // 请替换为您的API密钥
@@ -70,10 +71,17 @@ public class AIChatPanel extends JPanel {
     private JPanel progressPanel;
     private JLabel progressLabel;
 
+    // 当前AI回复的消息面板
+    private JTextArea currentAIMessageArea;
+    // 存储所有消息面板的列表
+    private List<Component> messageComponents = new ArrayList<>();
+
     public AIChatPanel() {
         setLayout(new BorderLayout(0, 10));
         setBackground(BACKGROUND_COLOR);
         setBorder(new EmptyBorder(15, 15, 15, 15));
+        // 设置首选大小，使聊天面板更宽
+        setPreferredSize(new Dimension(800, 600));
 
         // 创建标题面板
         JPanel titlePanel = createTitlePanel();
@@ -83,16 +91,16 @@ public class AIChatPanel extends JPanel {
         JPanel chatPanel = new JPanel(new BorderLayout());
         chatPanel.setBackground(BACKGROUND_COLOR);
         
-        chatArea = new JTextArea();
-        chatArea.setEditable(false);
-        chatArea.setLineWrap(true);
-        chatArea.setWrapStyleWord(true);
-        chatArea.setBackground(Color.WHITE);
-        chatArea.setForeground(TEXT_COLOR);
-        chatArea.setFont(new Font("Microsoft YaHei", Font.PLAIN, 14));
-        chatArea.setBorder(new EmptyBorder(10, 10, 10, 10));
+        // 创建垂直消息面板
+        chatMessagesPanel = new JPanel();
+        chatMessagesPanel.setLayout(new BoxLayout(chatMessagesPanel, BoxLayout.Y_AXIS));
+        chatMessagesPanel.setBackground(Color.WHITE);
         
-        JScrollPane scrollPane = new JScrollPane(chatArea);
+        // 添加一些顶部间距
+        chatMessagesPanel.add(Box.createVerticalStrut(10));
+        
+        // 创建滚动面板
+        scrollPane = new JScrollPane(chatMessagesPanel);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         
@@ -102,20 +110,41 @@ public class AIChatPanel extends JPanel {
         // 创建输入区域
         JPanel inputPanel = new JPanel(new BorderLayout(10, 0));
         inputPanel.setBackground(BACKGROUND_COLOR);
-        inputPanel.setBorder(new EmptyBorder(10, 0, 0, 0));
+        inputPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        
+        // 创建包含输入框和发送按钮的面板
+        JPanel inputFieldPanel = new JPanel(new BorderLayout(5, 0));
+        inputFieldPanel.setBackground(Color.WHITE);
+        inputFieldPanel.setBorder(new CompoundBorder(
+                new RoundedBorder(20, SECONDARY_COLOR),  // 使用更大的圆角值
+                BorderFactory.createEmptyBorder(0, 0, 0, 0)));
         
         inputField = new JTextField();
-        inputField.setFont(new Font("Microsoft YaHei", Font.PLAIN, 14));
+        inputField.setFont(new Font("Microsoft YaHei", Font.PLAIN, 15)); // 更大的字体
         inputField.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(SECONDARY_COLOR, 1, true),
-                BorderFactory.createEmptyBorder(8, 10, 8, 10)));
+                BorderFactory.createEmptyBorder(0, 0, 0, 0),
+                BorderFactory.createEmptyBorder(10, 15, 10, 5))); // 更多的内边距
         inputField.setBackground(Color.WHITE);
         inputField.setForeground(TEXT_COLOR);
         
-        sendButton = createStyledButton("Send");
+        // 创建圆形发送按钮
+        sendButton = new JButton("Send");
+        sendButton.setFont(new Font("Microsoft YaHei", Font.BOLD, 14));
+        sendButton.setBackground(PRIMARY_COLOR);
+        sendButton.setForeground(Color.WHITE);
+        sendButton.setFocusPainted(false);
+        sendButton.setBorderPainted(false);
+        sendButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        sendButton.setPreferredSize(new Dimension(80, 36));
+        sendButton.setBorder(new RoundedBorder(20, PRIMARY_COLOR));
         
-        inputPanel.add(inputField, BorderLayout.CENTER);
-        inputPanel.add(sendButton, BorderLayout.EAST);
+        // 将输入框和按钮添加到面板
+        inputFieldPanel.add(inputField, BorderLayout.CENTER);
+        inputFieldPanel.add(sendButton, BorderLayout.EAST);
+        
+        // 添加到主输入面板
+        inputPanel.add(inputFieldPanel, BorderLayout.CENTER);
+        
         add(inputPanel, BorderLayout.SOUTH);
         
         // 创建进度条面板(开始时不可见)
@@ -149,7 +178,7 @@ public class AIChatPanel extends JPanel {
         loadTransactionsData();
         
         // 添加初始化消息
-        chatArea.append("AI Financial Advisor: Hello! I'm your personal financial advisor. Whether it's budget planning, savings goals, investment advice, or debt management, I can provide professional guidance. What financial questions can I help you with?\n\n");
+        addAIMessage("Hello! I'm your personal financial advisor. Whether it's budget planning, savings goals, investment advice, or debt management, I can provide professional guidance. What financial questions can I help you with?");
         
         // 发送初始交易数据到AI
         if (transactionsData != null && !transactionsData.isEmpty()) {
@@ -251,9 +280,26 @@ public class AIChatPanel extends JPanel {
                 // 重新添加输入面板
                 JPanel inputPanel = new JPanel(new BorderLayout(10, 0));
                 inputPanel.setBackground(BACKGROUND_COLOR);
-                inputPanel.setBorder(new EmptyBorder(10, 0, 0, 0));
-                inputPanel.add(inputField, BorderLayout.CENTER);
-                inputPanel.add(sendButton, BorderLayout.EAST);
+                inputPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+                
+                // 创建包含输入框和发送按钮的面板
+                JPanel inputFieldPanel = new JPanel(new BorderLayout(5, 0));
+                inputFieldPanel.setBackground(Color.WHITE);
+                inputFieldPanel.setBorder(new CompoundBorder(
+                        new RoundedBorder(20, SECONDARY_COLOR),
+                        BorderFactory.createEmptyBorder(0, 0, 0, 0)));
+                
+                inputField.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createEmptyBorder(0, 0, 0, 0),
+                        BorderFactory.createEmptyBorder(10, 15, 10, 5)));
+                
+                // 将输入框和按钮添加到面板
+                inputFieldPanel.add(inputField, BorderLayout.CENTER);
+                inputFieldPanel.add(sendButton, BorderLayout.EAST);
+                
+                // 添加到主输入面板
+                inputPanel.add(inputFieldPanel, BorderLayout.CENTER);
+                
                 add(inputPanel, BorderLayout.SOUTH);
                 
                 revalidate();
@@ -291,25 +337,6 @@ public class AIChatPanel extends JPanel {
         ));
         
         return panel;
-    }
-    
-    /**
-     * 创建样式化按钮
-     */
-    private JButton createStyledButton(String text) {
-        JButton button = new JButton(text);
-        button.setFont(new Font("Microsoft YaHei", Font.BOLD, 14));
-        button.setBackground(PRIMARY_COLOR);
-        button.setForeground(Color.WHITE);
-        button.setFocusPainted(false);
-        button.setBorderPainted(false);
-        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        button.setPreferredSize(new Dimension(80, 36));
-        
-        // 设置圆角
-        button.setBorder(new RoundedBorder(5, PRIMARY_COLOR));
-        
-        return button;
     }
     
     /**
@@ -404,10 +431,8 @@ public class AIChatPanel extends JPanel {
                     stopProgressBar();
                     
                     // 显示分析结果和财务建议
-                    chatArea.append("AI Financial Advisor: Based on your transaction data, I have prepared the following financial analysis and advice:\n\n");
-                    chatArea.append(response);
-                    chatArea.append("\n\nWhat specific financial questions do you need help with?\n\n");
-                    chatArea.setCaretPosition(chatArea.getDocument().getLength());
+                    addAIMessage("Based on your transaction data, I have prepared the following financial analysis and advice:\n\n" + 
+                                response + "\n\nWhat specific financial questions do you need help with?");
                 });
                 
                 // 启用输入框
@@ -421,7 +446,7 @@ public class AIChatPanel extends JPanel {
                 SwingUtilities.invokeLater(() -> {
                     stopProgressBar();
                     setInputEnabled(true);
-                    chatArea.append("AI Financial Advisor: Sorry, there was an issue analyzing your transaction data. Please try again later.\n\n");
+                    addAIMessage("Sorry, there was an issue analyzing your transaction data. Please try again later.");
                 });
             }
         }).start();
@@ -431,14 +456,14 @@ public class AIChatPanel extends JPanel {
         String message = inputField.getText().trim();
         if (!message.isEmpty()) {
             // 显示用户消息
-            appendMessage("User: " + message);
+            addUserMessage(message);
             inputField.setText("");
             
             // 禁用输入框和发送按钮，直到回复完成
             setInputEnabled(false);
             
-            // 添加AI助手标签但不换行，以便后续流式显示内容
-            appendMessageWithoutNewline("AI Financial Advisor: ");
+            // 创建新的AI消息气泡(流式输出)
+            currentAIMessageArea = createStreamingAIMessageBubble();
             
             // 重置当前回复
             currentResponse = new StringBuilder();
@@ -447,10 +472,8 @@ public class AIChatPanel extends JPanel {
             new Thread(() -> {
                 try {
                     getAIResponseStreaming(message);
-                    // 回复完成后添加额外的换行
-                    appendNewline();
                 } catch (Exception e) {
-                    appendMessageFromThread("Error: " + e.getMessage());
+                    appendStreamContent("Error: " + e.getMessage());
                     e.printStackTrace();
                 } finally {
                     // 无论是否发生错误，都重新启用输入
@@ -465,48 +488,79 @@ public class AIChatPanel extends JPanel {
         sendButton.setEnabled(enabled);
     }
 
-    private void appendMessage(String message) {
-        SwingUtilities.invokeLater(() -> {
-            if (message.startsWith("User:")) {
-                // 为用户消息应用不同样式
-                chatArea.append(message + "\n\n");
-            } else {
-                chatArea.append(message + "\n\n");
-            }
-            chatArea.setCaretPosition(chatArea.getDocument().getLength());
-        });
+    /**
+     * 计算文本在给定宽度下需要的行数
+     * @param text 文本内容
+     * @param textArea 文本区域
+     * @param width 可用宽度
+     * @return 估计的行数
+     */
+    private int estimateLineCount(String text, JTextArea textArea, int width) {
+        // 创建一个临时的字体度量对象用于计算
+        FontMetrics fm = textArea.getFontMetrics(textArea.getFont());
+        
+        // 考虑到单词换行，这里做一个粗略估计
+        int charWidth = fm.charWidth('a'); // 使用字母'a'的宽度作为平均字符宽度
+        int charsPerLine = Math.max(1, width / charWidth);
+        
+        // 计算文本的行数（考虑已有的换行符）
+        String[] lines = text.split("\n");
+        int totalLines = 0;
+        
+        for (String line : lines) {
+            // 每行文本可能需要自动换行，所以计算它需要的额外行数
+            int lineLength = line.length();
+            int linesNeeded = (int) Math.ceil((double) lineLength / charsPerLine);
+            totalLines += Math.max(1, linesNeeded);
+        }
+        
+        return totalLines;
     }
-    
-    private void appendMessageWithoutNewline(String message) {
-        SwingUtilities.invokeLater(() -> {
-            chatArea.append(message);
-            chatArea.setCaretPosition(chatArea.getDocument().getLength());
-        });
-    }
-    
-    private void appendNewline() {
-        SwingUtilities.invokeLater(() -> {
-            chatArea.append("\n\n");
-            chatArea.setCaretPosition(chatArea.getDocument().getLength());
-        });
-    }
-    
-    private void appendMessageFromThread(String message) {
-        SwingUtilities.invokeLater(() -> {
-            // 为错误消息应用不同样式
-            if (message.startsWith("Error:")) {
-                chatArea.append(message + "\n\n");
-            } else {
-                chatArea.append(message + "\n\n");
-            }
-            chatArea.setCaretPosition(chatArea.getDocument().getLength());
-        });
-    }
-    
+
     private void appendStreamContent(String content) {
         SwingUtilities.invokeLater(() -> {
-            chatArea.append(content);
-            chatArea.setCaretPosition(chatArea.getDocument().getLength());
+            // 添加内容到文本区域
+            currentAIMessageArea.append(content);
+            
+            // 获取当前内容的总长度
+            String fullText = currentAIMessageArea.getText();
+            int totalLength = fullText.length();
+            
+            // 根据内容长度动态调整气泡宽度
+            int newWidth;
+            if (totalLength < 100) {
+                // 短消息
+                newWidth = Math.min(350, 15 * totalLength);
+                newWidth = Math.max(newWidth, 200); // 最小宽度
+            } else if (totalLength < 500) {
+                // 中等长度消息
+                newWidth = 420;
+            } else {
+                // 长消息
+                newWidth = 450;
+            }
+            
+            // 估计需要的行数
+            int textPadding = 30; // 文本区域内边距(左右两侧各15)
+            int estimatedLines = estimateLineCount(fullText, currentAIMessageArea, newWidth - textPadding);
+            int lineHeight = currentAIMessageArea.getFontMetrics(currentAIMessageArea.getFont()).getHeight();
+            int estimatedHeight = estimatedLines * lineHeight + 10; // 额外增加一点高度作为缓冲
+            
+            // 设置新的首选大小
+            currentAIMessageArea.setPreferredSize(new Dimension(newWidth, estimatedHeight));
+            
+            // 强制重新布局并验证大小
+            Container parent = currentAIMessageArea.getParent();
+            while (parent != null) {
+                parent.invalidate();
+                parent = parent.getParent();
+            }
+            chatMessagesPanel.revalidate();
+            chatMessagesPanel.repaint();
+            
+            // 滚动到底部
+            JScrollBar vertical = scrollPane.getVerticalScrollBar();
+            vertical.setValue(vertical.getMaximum());
         });
     }
 
@@ -649,5 +703,260 @@ public class AIChatPanel extends JPanel {
         } catch (Exception e) {
             return "Sorry, I cannot understand the AI service response. Error information: " + e.getMessage();
         }
+    }
+
+    /**
+     * 创建用户消息气泡（右侧对齐）
+     */
+    private JPanel createUserMessageBubble(String message) {
+        // 外部面板，用于布局
+        JPanel outerPanel = new JPanel(new BorderLayout());
+        outerPanel.setBackground(Color.WHITE);
+        outerPanel.setBorder(new EmptyBorder(5, 80, 5, 10)); // 增加左侧留白，使消息更靠右
+
+        // 消息面板
+        JPanel messagePanel = new JPanel(new BorderLayout());
+        messagePanel.setBackground(USER_BUBBLE_COLOR);
+        messagePanel.setBorder(new CompoundBorder(
+            new RoundedBorder(10, USER_BUBBLE_COLOR),
+            new EmptyBorder(10, 15, 10, 15)
+        ));
+
+        // 消息文本
+        JTextArea textArea = new JTextArea(message);
+        textArea.setFont(new Font("Microsoft YaHei", Font.PLAIN, 15)); // 增大字体
+        textArea.setForeground(new Color(30, 30, 30)); // 更深的文本颜色，增加对比度
+        textArea.setBackground(USER_BUBBLE_COLOR);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        textArea.setEditable(false);
+        textArea.setBorder(null);
+        
+        // 根据消息字数动态调整文本区域大小
+        int messageLength = message.length();
+        int preferredWidth;
+        
+        // 根据字数设置不同的宽度
+        if (messageLength < 50) {
+            // 短消息
+            preferredWidth = Math.min(300, 15 * messageLength);
+            preferredWidth = Math.max(preferredWidth, 150); // 最小宽度
+        } else if (messageLength < 200) {
+            // 中等长度消息
+            preferredWidth = 350;
+        } else {
+            // 长消息
+            preferredWidth = 400;
+        }
+        
+        // 估计需要的行数和高度
+        int textPadding = 30; // 文本区域内边距(左右两侧各15)
+        int estimatedLines = estimateLineCount(message, textArea, preferredWidth - textPadding);
+        int lineHeight = textArea.getFontMetrics(textArea.getFont()).getHeight();
+        int estimatedHeight = estimatedLines * lineHeight + 10; // 额外增加一点高度作为缓冲
+        
+        // 设置首选尺寸，使文本区域宽度和消息长度匹配
+        textArea.setPreferredSize(new Dimension(preferredWidth, estimatedHeight));
+
+        messagePanel.add(textArea, BorderLayout.CENTER);
+        outerPanel.add(messagePanel, BorderLayout.EAST); // 靠右对齐
+
+        // 添加"You"标签
+        JLabel userLabel = new JLabel("You");
+        userLabel.setFont(new Font("Microsoft YaHei", Font.BOLD, 13));
+        userLabel.setForeground(new Color(80, 80, 80));
+        JPanel labelPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        labelPanel.setBackground(Color.WHITE);
+        labelPanel.add(userLabel);
+        
+        // 垂直布局面板
+        JPanel verticalPanel = new JPanel();
+        verticalPanel.setLayout(new BoxLayout(verticalPanel, BoxLayout.Y_AXIS));
+        verticalPanel.setBackground(Color.WHITE);
+        verticalPanel.add(labelPanel);
+        verticalPanel.add(outerPanel);
+        
+        return verticalPanel;
+    }
+
+    /**
+     * 创建AI消息气泡（左侧对齐）
+     */
+    private JPanel createAIMessageBubble(String message) {
+        // 外部面板，用于布局
+        JPanel outerPanel = new JPanel(new BorderLayout());
+        outerPanel.setBackground(Color.WHITE);
+        outerPanel.setBorder(new EmptyBorder(5, 10, 5, 80)); // 增加右侧留白，使消息更靠左
+
+        // 消息面板
+        JPanel messagePanel = new JPanel(new BorderLayout());
+        messagePanel.setBackground(BOT_BUBBLE_COLOR);
+        messagePanel.setBorder(new CompoundBorder(
+            new RoundedBorder(10, BOT_BUBBLE_COLOR),
+            new EmptyBorder(10, 15, 10, 15)
+        ));
+
+        // 消息文本
+        JTextArea textArea = new JTextArea(message);
+        textArea.setFont(new Font("Microsoft YaHei", Font.PLAIN, 15)); // 增大字体
+        textArea.setForeground(new Color(30, 30, 30)); // 更深的文本颜色，增加对比度
+        textArea.setBackground(BOT_BUBBLE_COLOR);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        textArea.setEditable(false);
+        textArea.setBorder(null);
+        
+        // 根据消息字数动态调整文本区域大小
+        int messageLength = message.length();
+        int preferredWidth;
+        
+        // AI回复通常更长，所以给予更大的尺寸
+        if (messageLength < 100) {
+            // 短消息
+            preferredWidth = Math.min(350, 15 * messageLength);
+            preferredWidth = Math.max(preferredWidth, 200); // 最小宽度
+        } else if (messageLength < 500) {
+            // 中等长度消息
+            preferredWidth = 420;
+        } else {
+            // 长消息
+            preferredWidth = 450;
+        }
+        
+        // 估计需要的行数和高度
+        int textPadding = 30; // 文本区域内边距(左右两侧各15)
+        int estimatedLines = estimateLineCount(message, textArea, preferredWidth - textPadding);
+        int lineHeight = textArea.getFontMetrics(textArea.getFont()).getHeight();
+        int estimatedHeight = estimatedLines * lineHeight + 10; // 额外增加一点高度作为缓冲
+        
+        // 设置首选尺寸，使文本区域宽度和消息长度匹配
+        textArea.setPreferredSize(new Dimension(preferredWidth, estimatedHeight));
+
+        messagePanel.add(textArea, BorderLayout.CENTER);
+        outerPanel.add(messagePanel, BorderLayout.WEST); // 靠左对齐
+        
+        // 添加"AI Financial Advisor"标签
+        JLabel aiLabel = new JLabel("AI Financial Advisor");
+        aiLabel.setFont(new Font("Microsoft YaHei", Font.BOLD, 13));
+        aiLabel.setForeground(new Color(80, 80, 80));
+        JPanel labelPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        labelPanel.setBackground(Color.WHITE);
+        labelPanel.add(aiLabel);
+        
+        // 垂直布局面板
+        JPanel verticalPanel = new JPanel();
+        verticalPanel.setLayout(new BoxLayout(verticalPanel, BoxLayout.Y_AXIS));
+        verticalPanel.setBackground(Color.WHITE);
+        verticalPanel.add(labelPanel);
+        verticalPanel.add(outerPanel);
+        
+        return verticalPanel;
+    }
+
+    /**
+     * 创建流式AI消息气泡（返回文本区域以便后续更新）
+     */
+    private JTextArea createStreamingAIMessageBubble() {
+        // 外部面板，用于布局
+        JPanel outerPanel = new JPanel(new BorderLayout());
+        outerPanel.setBackground(Color.WHITE);
+        outerPanel.setBorder(new EmptyBorder(5, 10, 5, 80)); // 增加右侧留白，使消息更靠左
+
+        // 消息面板
+        JPanel messagePanel = new JPanel(new BorderLayout());
+        messagePanel.setBackground(BOT_BUBBLE_COLOR);
+        messagePanel.setBorder(new CompoundBorder(
+            new RoundedBorder(10, BOT_BUBBLE_COLOR),
+            new EmptyBorder(10, 15, 10, 15)
+        ));
+
+        // 消息文本
+        JTextArea textArea = new JTextArea();
+        textArea.setFont(new Font("Microsoft YaHei", Font.PLAIN, 15)); // 增大字体
+        textArea.setForeground(new Color(30, 30, 30)); // 更深的文本颜色，增加对比度
+        textArea.setBackground(BOT_BUBBLE_COLOR);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        textArea.setEditable(false);
+        textArea.setBorder(null);
+        
+        // 初始设置为较宽，因为AI回复通常较长
+        // 后续会随着内容增加而自动调整大小
+        textArea.setPreferredSize(new Dimension(450, 20));
+
+        messagePanel.add(textArea, BorderLayout.CENTER);
+        outerPanel.add(messagePanel, BorderLayout.WEST); // 靠左对齐
+        
+        // 添加"AI Financial Advisor"标签
+        JLabel aiLabel = new JLabel("AI Financial Advisor");
+        aiLabel.setFont(new Font("Microsoft YaHei", Font.BOLD, 13));
+        aiLabel.setForeground(new Color(80, 80, 80));
+        JPanel labelPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        labelPanel.setBackground(Color.WHITE);
+        labelPanel.add(aiLabel);
+        
+        // 垂直布局面板
+        JPanel verticalPanel = new JPanel();
+        verticalPanel.setLayout(new BoxLayout(verticalPanel, BoxLayout.Y_AXIS));
+        verticalPanel.setBackground(Color.WHITE);
+        verticalPanel.add(labelPanel);
+        verticalPanel.add(outerPanel);
+        
+        // 添加到消息面板
+        chatMessagesPanel.add(verticalPanel);
+        messageComponents.add(verticalPanel);
+        chatMessagesPanel.add(Box.createVerticalStrut(15)); // 添加一些底部间距
+        
+        // 更新UI
+        chatMessagesPanel.revalidate();
+        chatMessagesPanel.repaint();
+        
+        // 滚动到底部
+        SwingUtilities.invokeLater(() -> {
+            JScrollBar vertical = scrollPane.getVerticalScrollBar();
+            vertical.setValue(vertical.getMaximum());
+        });
+        
+        return textArea;
+    }
+    
+    /**
+     * 添加用户消息到聊天区域
+     */
+    private void addUserMessage(String message) {
+        JPanel messageBubble = createUserMessageBubble(message);
+        chatMessagesPanel.add(messageBubble);
+        messageComponents.add(messageBubble);
+        chatMessagesPanel.add(Box.createVerticalStrut(15)); // 添加一些底部间距
+        
+        // 更新UI
+        chatMessagesPanel.revalidate();
+        chatMessagesPanel.repaint();
+        
+        // 滚动到底部
+        SwingUtilities.invokeLater(() -> {
+            JScrollBar vertical = scrollPane.getVerticalScrollBar();
+            vertical.setValue(vertical.getMaximum());
+        });
+    }
+    
+    /**
+     * 添加AI消息到聊天区域
+     */
+    private void addAIMessage(String message) {
+        JPanel messageBubble = createAIMessageBubble(message);
+        chatMessagesPanel.add(messageBubble);
+        messageComponents.add(messageBubble);
+        chatMessagesPanel.add(Box.createVerticalStrut(15)); // 添加一些底部间距
+        
+        // 更新UI
+        chatMessagesPanel.revalidate();
+        chatMessagesPanel.repaint();
+        
+        // 滚动到底部
+        SwingUtilities.invokeLater(() -> {
+            JScrollBar vertical = scrollPane.getVerticalScrollBar();
+            vertical.setValue(vertical.getMaximum());
+        });
     }
 } 
