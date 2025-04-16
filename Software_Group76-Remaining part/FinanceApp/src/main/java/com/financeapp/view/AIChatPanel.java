@@ -42,7 +42,7 @@ public class AIChatPanel extends JPanel {
             "- 尊重用户的财务状况，不做过度假设\n" +
             "- 鼓励健康的财务习惯和长期规划\n" +
             "- 提醒用户重要的财务决策应咨询专业人士\n" +
-            "- 所有回答均使用中文\n\n" +
+            "- 所有回答均使用英文\n\n" +
             "当用户提出非财务相关问题时，礼貌地将话题引导回财务领域。";
     
     // 用于存储当前的回复内容
@@ -112,7 +112,7 @@ public class AIChatPanel extends JPanel {
         inputField.setBackground(Color.WHITE);
         inputField.setForeground(TEXT_COLOR);
         
-        sendButton = createStyledButton("发送");
+        sendButton = createStyledButton("Send");
         
         inputPanel.add(inputField, BorderLayout.CENTER);
         inputPanel.add(sendButton, BorderLayout.EAST);
@@ -140,7 +140,7 @@ public class AIChatPanel extends JPanel {
         });
         
         // 为输入框添加提示文本
-        inputField.putClientProperty("JTextField.placeholderText", "请输入您的财务问题...");
+        inputField.putClientProperty("JTextField.placeholderText", "Please enter your financial questions...");
         
         // 初始化当前回复
         currentResponse = new StringBuilder();
@@ -149,7 +149,7 @@ public class AIChatPanel extends JPanel {
         loadTransactionsData();
         
         // 添加初始化消息
-        chatArea.append("财智助手: 您好！我是您的个人财务顾问。无论是预算规划、储蓄目标、投资建议还是债务管理，我都能为您提供专业指导。有什么财务问题我可以帮您解答吗？\n\n");
+        chatArea.append("AI Financial Advisor: Hello! I'm your personal financial advisor. Whether it's budget planning, savings goals, investment advice, or debt management, I can provide professional guidance. What financial questions can I help you with?\n\n");
         
         // 发送初始交易数据到AI
         if (transactionsData != null && !transactionsData.isEmpty()) {
@@ -268,13 +268,13 @@ public class AIChatPanel extends JPanel {
         panel.setBorder(new EmptyBorder(10, 15, 10, 15));
         
         // 创建标题标签
-        JLabel titleLabel = new JLabel("AI财务顾问");
+        JLabel titleLabel = new JLabel("AI Financial Advisor");
         titleLabel.setFont(new Font("Microsoft YaHei", Font.BOLD, 18));
         titleLabel.setForeground(Color.WHITE);
         panel.add(titleLabel, BorderLayout.WEST);
         
         // 创建状态标签
-        JLabel statusLabel = new JLabel("在线");
+        JLabel statusLabel = new JLabel("Online");
         statusLabel.setFont(new Font("Microsoft YaHei", Font.PLAIN, 12));
         statusLabel.setForeground(Color.WHITE);
         panel.add(statusLabel, BorderLayout.EAST);
@@ -378,8 +378,8 @@ public class AIChatPanel extends JPanel {
         new Thread(() -> {
             try {
                 // 创建提示词，要求AI基于交易数据生成财务建议
-                String message = "请基于以下交易数据分析用户的财务状况，并提供3-5条具体的财务建议。这些数据是用户的最新交易记录。请确保你的回答包含以下部分：1. 简短的财务状况总结；2. 3-5条具体的、针对性的财务建议。格式应简洁清晰。\n\n" + 
-                                "交易数据 (CSV格式):\n" + transactionsData;
+                String message = "Please analyze the user's financial situation based on the following transaction data and provide 3-5 specific financial advice. These data are the user's latest transaction records. Please ensure your response includes the following parts: 1. A brief summary of the user's financial situation; 2. 3-5 specific and targeted financial advice. The format should be concise and clear.\n\n" + 
+                                "Transaction data (CSV format):\n" + transactionsData;
                 
                 // 禁用输入框直到初始分析完成
                 setInputEnabled(false);
@@ -391,7 +391,7 @@ public class AIChatPanel extends JPanel {
                 String response = getAIResponse(message);
                 
                 // 将分析结果存储到系统内，并显示给用户
-                System.out.println("AI已分析交易数据，准备好针对用户情况的建议");
+                System.out.println("AI has analyzed the transaction data and prepared advice for the user's situation");
                 
                 // 停止进度条并显示结果
                 SwingUtilities.invokeLater(() -> {
@@ -399,9 +399,9 @@ public class AIChatPanel extends JPanel {
                     stopProgressBar();
                     
                     // 显示分析结果和财务建议
-                    chatArea.append("财智助手: 基于您的交易数据，我为您准备了以下财务分析和建议：\n\n");
+                    chatArea.append("AI Financial Advisor: Based on your transaction data, I have prepared the following financial analysis and advice:\n\n");
                     chatArea.append(response);
-                    chatArea.append("\n\n您有什么具体的财务问题需要咨询吗？\n\n");
+                    chatArea.append("\n\nWhat specific financial questions do you need help with?\n\n");
                     chatArea.setCaretPosition(chatArea.getDocument().getLength());
                 });
                 
@@ -416,7 +416,7 @@ public class AIChatPanel extends JPanel {
                 SwingUtilities.invokeLater(() -> {
                     stopProgressBar();
                     setInputEnabled(true);
-                    chatArea.append("财智助手: 抱歉，分析您的交易数据时遇到了问题。请稍后再试。\n\n");
+                    chatArea.append("AI Financial Advisor: Sorry, there was an issue analyzing your transaction data. Please try again later.\n\n");
                 });
             }
         }).start();
@@ -426,14 +426,14 @@ public class AIChatPanel extends JPanel {
         String message = inputField.getText().trim();
         if (!message.isEmpty()) {
             // 显示用户消息
-            appendMessage("用户: " + message);
+            appendMessage("User: " + message);
             inputField.setText("");
             
             // 禁用输入框和发送按钮，直到回复完成
             setInputEnabled(false);
             
             // 添加AI助手标签但不换行，以便后续流式显示内容
-            appendMessageWithoutNewline("财智助手: ");
+            appendMessageWithoutNewline("AI Financial Advisor: ");
             
             // 重置当前回复
             currentResponse = new StringBuilder();
@@ -445,7 +445,7 @@ public class AIChatPanel extends JPanel {
                     // 回复完成后添加额外的换行
                     appendNewline();
                 } catch (Exception e) {
-                    appendMessageFromThread("错误: " + e.getMessage());
+                    appendMessageFromThread("Error: " + e.getMessage());
                     e.printStackTrace();
                 } finally {
                     // 无论是否发生错误，都重新启用输入
@@ -462,7 +462,7 @@ public class AIChatPanel extends JPanel {
 
     private void appendMessage(String message) {
         SwingUtilities.invokeLater(() -> {
-            if (message.startsWith("用户:")) {
+            if (message.startsWith("User:")) {
                 // 为用户消息应用不同样式
                 chatArea.append(message + "\n\n");
             } else {
@@ -489,7 +489,7 @@ public class AIChatPanel extends JPanel {
     private void appendMessageFromThread(String message) {
         SwingUtilities.invokeLater(() -> {
             // 为错误消息应用不同样式
-            if (message.startsWith("错误:")) {
+            if (message.startsWith("Error:")) {
                 chatArea.append(message + "\n\n");
             } else {
                 chatArea.append(message + "\n\n");
@@ -524,7 +524,7 @@ public class AIChatPanel extends JPanel {
         JSONObject systemMessage = new JSONObject();
         systemMessage.put("role", "system");
         systemMessage.put("content", SYSTEM_PROMPT + (transactionsData != null && !transactionsData.isEmpty() ? 
-                "\n\n我已经分析了用户的交易数据，了解了用户的财务状况。请基于这些信息提供更有针对性的建议。" : ""));
+                "\n\nI have analyzed the user's transaction data, and I understand their financial situation. Please provide more targeted advice based on this information." : ""));
         messagesArray.put(systemMessage);
         
         // 添加用户消息
@@ -578,7 +578,7 @@ public class AIChatPanel extends JPanel {
             }
         } catch (Exception e) {
             // 如果API调用失败，显示错误信息
-            appendStreamContent("\n抱歉，我现在无法连接到AI服务。请稍后再试。错误信息: " + e.getMessage());
+            appendStreamContent("\nSorry, I cannot connect to the AI service right now. Please try again later. Error information: " + e.getMessage());
             throw e;
         }
     }
@@ -631,7 +631,7 @@ public class AIChatPanel extends JPanel {
             }
         } catch (Exception e) {
             // 如果API调用失败，返回一个友好的响应
-            return "抱歉，我现在无法连接到AI服务。请稍后再试。错误信息: " + e.getMessage();
+            return "Sorry, I cannot connect to the AI service right now. Please try again later. Error information: " + e.getMessage();
         }
 
         try {
@@ -642,7 +642,7 @@ public class AIChatPanel extends JPanel {
                     .getJSONObject("message")
                     .getString("content");
         } catch (Exception e) {
-            return "抱歉，我无法理解AI服务的响应。错误信息: " + e.getMessage();
+            return "Sorry, I cannot understand the AI service response. Error information: " + e.getMessage();
         }
     }
 } 
