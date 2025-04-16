@@ -92,7 +92,11 @@ public class MainFrame extends JFrame implements LoginPanel.LoginCallback, Regis
         statisticsPanel = new StatisticsPanel(transactionController);
         expenseAlertPanel = new ExpenseAlertPanel(transactionController);
         localConsumptionPanel = new LocalConsumptionPanel(transactionController);
+        
+        // 创建AI聊天面板并添加到JPanel中，避免直接将其添加到tabbedPane
         aiChatPanel = new AIChatPanel();
+        JPanel aiChatContainer = new JPanel(new BorderLayout());
+        aiChatContainer.add(aiChatPanel, BorderLayout.CENTER);
         
         // Add to tabs
         addStyledTab(tabbedPane, "Dashboard", dashboardPanel, "Welcome to your financial dashboard");
@@ -101,7 +105,7 @@ public class MainFrame extends JFrame implements LoginPanel.LoginCallback, Regis
         addStyledTab(tabbedPane, "Statistics View", statisticsPanel, "View spending statistics and budget suggestions");
         addStyledTab(tabbedPane, "Expense Alerts", expenseAlertPanel, "Monitor and get alerted when expenses exceed thresholds");
         addStyledTab(tabbedPane, "Local Consumption", localConsumptionPanel, "Analyze local consumption patterns");
-        addStyledTab(tabbedPane, "AI Chat", aiChatPanel, "Chat with AI assistant for financial advice");
+        addStyledTab(tabbedPane, "AI Chat", aiChatContainer, "Chat with AI assistant for financial advice");
         
         // Add to main panel
         mainPanel.add(tabbedPane, BorderLayout.CENTER);
@@ -149,6 +153,22 @@ public class MainFrame extends JFrame implements LoginPanel.LoginCallback, Regis
      * Add styled tab to tabbed pane
      */
     private void addStyledTab(JTabbedPane pane, String title, Component component, String tooltip) {
+        // 特殊处理AI聊天面板
+        if (title.equals("AI Chat")) {
+            try {
+                // 为AIChatPanel创建一个普通的面板作为容器
+                JPanel containerPanel = new JPanel(new BorderLayout());
+                containerPanel.add(component, BorderLayout.CENTER);
+                pane.addTab(title, containerPanel);
+                int index = pane.indexOfTab(title);
+                pane.setToolTipTextAt(index, tooltip);
+                return;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        
+        // 正常处理其他面板
         pane.addTab(title, component);
         int index = pane.indexOfTab(title);
         pane.setToolTipTextAt(index, tooltip);
