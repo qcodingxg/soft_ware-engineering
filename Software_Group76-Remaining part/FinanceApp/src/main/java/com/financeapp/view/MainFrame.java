@@ -94,7 +94,7 @@ public class MainFrame extends JFrame implements LoginPanel.LoginCallback, Regis
         localConsumptionPanel = new LocalConsumptionPanel(transactionController);
         
         // 创建AI聊天面板并添加到JPanel中，避免直接将其添加到tabbedPane
-        aiChatPanel = new AIChatPanel(transactionController);
+        aiChatPanel = new AIChatPanel();
         JPanel aiChatContainer = new JPanel(new BorderLayout());
         aiChatContainer.add(aiChatPanel, BorderLayout.CENTER);
         
