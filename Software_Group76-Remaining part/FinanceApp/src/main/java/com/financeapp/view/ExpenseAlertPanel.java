@@ -314,7 +314,7 @@ public class ExpenseAlertPanel extends JPanel {
         
         // Enable notifications
         enableNotificationsCheckbox = new JCheckBox("Enable Alert Notifications", true);
-        enableNotificationsCheckbox.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        enableNotificationsCheckbox.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         enableNotificationsCheckbox.setOpaque(false);
         enableNotificationsCheckbox.setAlignmentX(Component.LEFT_ALIGNMENT);
         settingsPanel.add(enableNotificationsCheckbox);
@@ -375,7 +375,7 @@ public class ExpenseAlertPanel extends JPanel {
         buttonPanel.setOpaque(false);
         
         JButton saveButton = new JButton("Save Notification Settings");
-        saveButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        saveButton.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         saveButton.setBackground(Color.WHITE);
         saveButton.setForeground(Color.BLACK);
         saveButton.setFocusPainted(false);
@@ -435,7 +435,7 @@ public class ExpenseAlertPanel extends JPanel {
         buttonPanel.setOpaque(false);
         
         saveSettingsButton = new JButton("Save Settings");
-        saveSettingsButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        saveSettingsButton.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         saveSettingsButton.setBackground(Color.WHITE);
         saveSettingsButton.setForeground(Color.BLACK);
         saveSettingsButton.setFocusPainted(false);
