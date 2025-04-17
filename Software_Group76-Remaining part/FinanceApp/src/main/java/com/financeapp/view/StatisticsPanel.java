@@ -24,9 +24,8 @@ public class StatisticsPanel extends JPanel {
     private JPanel chartPanel;
     private JTextArea suggestionsArea;
     private JComboBox<Integer> yearComboBox;
+    //将monthComboBox改为JList,实现多选
     private JList<String> monthList;
-
-
     // Colors (matching login panel)
     private static final Color PRIMARY_COLOR = new Color(41, 128, 185);
     private static final Color SECONDARY_COLOR = new Color(52, 152, 219);
@@ -124,7 +123,7 @@ public class StatisticsPanel extends JPanel {
         monthLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         monthLabel.setForeground(TEXT_COLOR);
         panel.add(monthLabel);
-
+        //将原有的月份单选框修改为复选框，实现多月对比
         DefaultListModel<String> monthListModel = new DefaultListModel<>();
         String[] englishMonths = {
                 "January", "February", "March", "April", "May", "June",
@@ -133,6 +132,7 @@ public class StatisticsPanel extends JPanel {
         for (String month : englishMonths) {
             monthListModel.addElement(month);
         }
+        // Create JList for month selection
         monthList = new JList<>(monthListModel);
         monthList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         monthList.setVisibleRowCount(4);
@@ -220,6 +220,7 @@ public class StatisticsPanel extends JPanel {
      */
     public void updateStatistics() {
         int selectedYear = (Integer) yearComboBox.getSelectedItem();
+        //修改为List
         List<String> selectedMonths = monthList.getSelectedValuesList();
 
         chartPanel.removeAll();
@@ -265,7 +266,7 @@ public class StatisticsPanel extends JPanel {
         JPanel chart = new GroupedBarChartComponent(data);
         chartPanel.add(chart, BorderLayout.CENTER);
     }
-    private class GroupedBarChartComponent extends JPanel {
+    private static class GroupedBarChartComponent extends JPanel {
         private final Map<String, Map<String, Double>> multiMonthData; // month -> category -> value
 
         public GroupedBarChartComponent(Map<String, Map<String, Double>> data) {
@@ -370,162 +371,4 @@ public class StatisticsPanel extends JPanel {
             }
         }
     }
-
-
-
-    /**
-     * Draw bar chart
-     */
-    private void drawBarChart(Map<String, Double> expenses) {
-        // Create chart component
-        BarChartComponent chart = new BarChartComponent(expenses);
-        chartPanel.add(chart, BorderLayout.CENTER);
-
-        // Create legend
-        JPanel legendPanel = new JPanel(new GridLayout(0, 2, 5, 2));
-        legendPanel.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(SECONDARY_COLOR, 1),
-                "Legend",
-                TitledBorder.LEFT,
-                TitledBorder.TOP,
-                new Font("Segoe UI", Font.BOLD, 12),
-                PRIMARY_COLOR));
-        legendPanel.setBackground(BACKGROUND_COLOR);
-
-        // Add total to legend
-        double total = expenses.values().stream().mapToDouble(Double::doubleValue).sum();
-        JLabel totalLabel = new JLabel("Total:");
-        totalLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        totalLabel.setForeground(TEXT_COLOR);
-        legendPanel.add(totalLabel);
-
-        JLabel totalValueLabel = new JLabel(String.format("%.2f", total));
-        totalValueLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        totalValueLabel.setForeground(TEXT_COLOR);
-        legendPanel.add(totalValueLabel);
-
-        // Add categories to legend
-        int index = 0;
-        for (Map.Entry<String, Double> entry : expenses.entrySet()) {
-            Color color = CHART_COLORS[index % CHART_COLORS.length];
-
-            // Create colored square icon
-            JLabel categoryLabel = new JLabel(entry.getKey() + ":");
-            categoryLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-            categoryLabel.setForeground(TEXT_COLOR);
-            categoryLabel.setIcon(createColorIcon(color, 12, 12));
-            legendPanel.add(categoryLabel);
-
-            // Create value label
-            JLabel valueLabel = new JLabel(String.format("%.2f (%.1f%%)",
-                    entry.getValue(), entry.getValue() / total * 100));
-            valueLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-            valueLabel.setForeground(TEXT_COLOR);
-            legendPanel.add(valueLabel);
-
-            index++;
-        }
-
-        chartPanel.add(legendPanel, BorderLayout.SOUTH);
-    }
-
-    /**
-     * Create color icon for legend
-     */
-    private Icon createColorIcon(Color color, int width, int height) {
-        return new Icon() {
-            @Override
-            public void paintIcon(Component c, Graphics g, int x, int y) {
-                g.setColor(color);
-                g.fillRect(x, y, width, height);
-                g.setColor(Color.DARK_GRAY);
-                g.drawRect(x, y, width, height);
-            }
-
-            @Override
-            public int getIconWidth() {
-                return width;
-            }
-
-            @Override
-            public int getIconHeight() {
-                return height;
-            }
-        };
-    }
-
-    /**
-     * Bar chart component for drawing expense data
-     */
-    private class BarChartComponent extends JPanel {
-        private final Map<String, Double> data;
-
-        /**
-         * Constructor
-         */
-        public BarChartComponent(Map<String, Double> data) {
-            this.data = new HashMap<>(data);
-            setPreferredSize(new Dimension(400, 300));
-            setBackground(Color.WHITE);
-            setBorder(BorderFactory.createLineBorder(SECONDARY_COLOR, 1));
-
-        }
-
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-
-            if (data.isEmpty()) {
-                return;
-            }
-
-            Graphics2D g2d = (Graphics2D) g;
-            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-            int width = getWidth();
-            int height = getHeight();
-            int barWidth = width / (data.size() * 2);
-
-            // Find maximum value
-            double maxValue = data.values().stream().mapToDouble(Double::doubleValue).max().orElse(1.0);
-
-            // Draw bars
-            int index = 0;
-            for (Map.Entry<String, Double> entry : data.entrySet()) {
-                int x = index * barWidth * 2 + barWidth / 2;
-                int barHeight = (int) (entry.getValue() / maxValue * (height - 50));
-                int y = height - barHeight - 30;
-
-                // Draw bar
-                g2d.setColor(CHART_COLORS[index % CHART_COLORS.length]);
-                g2d.fillRect(x, y, barWidth, barHeight);
-                g2d.setColor(Color.DARK_GRAY);
-                g2d.drawRect(x, y, barWidth, barHeight);
-
-                // Draw category name
-                g2d.setColor(TEXT_COLOR);
-                g2d.setFont(new Font("Segoe UI", Font.PLAIN, 10));
-                FontMetrics fm = g2d.getFontMetrics();
-                String category = entry.getKey();
-                if (category.length() > 10) {
-                    category = category.substring(0, 7) + "...";
-                }
-                int textWidth = fm.stringWidth(category);
-                g2d.drawString(category, x + (barWidth - textWidth) / 2, height - 10);
-
-                // Draw value
-                g2d.setColor(TEXT_COLOR);
-                g2d.setFont(new Font("Segoe UI", Font.BOLD, 11));
-                String value = String.format("%.0f", entry.getValue());
-                textWidth = g2d.getFontMetrics().stringWidth(value);
-                g2d.drawString(value, x + (barWidth - textWidth) / 2, y - 5);
-
-                index++;
-            }
-
-            // Draw axes
-            g2d.setColor(Color.DARK_GRAY);
-            g2d.drawLine(barWidth / 2 - 10, height - 30, width - barWidth / 2, height - 30); // X-axis
-        }
-    }
-} 
+}
