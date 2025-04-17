@@ -8,9 +8,15 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.BasicTabbedPaneUI;
 import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.event.MouseAdapter;
 
 /**
  * Main Window Frame
@@ -300,25 +306,21 @@ public class MainFrame extends JFrame implements LoginPanel.LoginCallback, Regis
         // File menu
         JMenu fileMenu = createStyledMenu("File");
         
-        JMenuItem refreshItem = createStyledMenuItem("Refresh Data");
-        refreshItem.addActionListener(e -> loadData());
+        JMenuItem refreshItem = createStyledMenuItem("Refresh Data", e -> loadData());
         fileMenu.add(refreshItem);
         
         fileMenu.addSeparator();
         
-        JMenuItem logoutItem = createStyledMenuItem("Logout");
-        logoutItem.addActionListener(e -> logout());
+        JMenuItem logoutItem = createStyledMenuItem("Logout", e -> logout());
         fileMenu.add(logoutItem);
         
-        JMenuItem exitItem = createStyledMenuItem("Exit");
-        exitItem.addActionListener(e -> System.exit(0));
+        JMenuItem exitItem = createStyledMenuItem("Exit", e -> System.exit(0));
         fileMenu.add(exitItem);
         
         // Help menu
         JMenu helpMenu = createStyledMenu("Help");
         
-        JMenuItem aboutItem = createStyledMenuItem("About");
-        aboutItem.addActionListener(e -> showAboutDialog());
+        JMenuItem aboutItem = createStyledMenuItem("About", e -> showAboutDialog());
         helpMenu.add(aboutItem);
         
         // Add menus to menu bar
@@ -334,7 +336,7 @@ public class MainFrame extends JFrame implements LoginPanel.LoginCallback, Regis
     private JMenu createStyledMenu(String text) {
         JMenu menu = new JMenu(text);
         menu.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        menu.setForeground(Color.WHITE);
+        menu.setForeground(Color.BLACK);
         menu.setBackground(PRIMARY_COLOR);
         menu.setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
         
@@ -354,25 +356,28 @@ public class MainFrame extends JFrame implements LoginPanel.LoginCallback, Regis
     /**
      * Create styled menu item
      */
-    private JMenuItem createStyledMenuItem(String text) {
-        JMenuItem item = new JMenuItem(text);
-        item.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        item.setForeground(TEXT_COLOR);
-        item.setBackground(Color.WHITE);
+    private JMenuItem createStyledMenuItem(String text, ActionListener listener) {
+        JMenuItem menuItem = new JMenuItem(text);
+        menuItem.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        menuItem.setForeground(Color.BLACK);
+        menuItem.setBackground(PRIMARY_COLOR);
+        menuItem.setBorder(BorderFactory.createEmptyBorder(6, 15, 6, 15));
+        menuItem.addActionListener(listener);
         
         // Add hover effect
-        item.addChangeListener(e -> {
-            JMenuItem source = (JMenuItem) e.getSource();
-            if (source.isArmed()) {
-                source.setBackground(SECONDARY_COLOR.brighter());
-                source.setForeground(Color.WHITE);
-            } else {
-                source.setBackground(Color.WHITE);
-                source.setForeground(TEXT_COLOR);
+        menuItem.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                menuItem.setBackground(PRIMARY_COLOR.darker());
+            }
+            
+            @Override
+            public void mouseExited(MouseEvent e) {
+                menuItem.setBackground(PRIMARY_COLOR);
             }
         });
         
-        return item;
+        return menuItem;
     }
     
     /**

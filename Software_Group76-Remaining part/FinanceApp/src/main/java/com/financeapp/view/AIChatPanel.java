@@ -525,17 +525,17 @@ public class AIChatPanel extends JPanel {
             // 获取当前内容的总文本
             String fullText = currentAIMessageArea.getText();
             
-            // 使用固定的气泡宽度（屏幕宽度的3/4）
-            int bubbleWidth = getBubbleWidth();
+            // 根据内容动态计算适合的宽度
+            int preferredWidth = calculateBubbleWidth(fullText, currentAIMessageArea, false);
             
             // 估计需要的行数
             int textPadding = 30; // 文本区域内边距(左右两侧各15)
-            int estimatedLines = estimateLineCount(fullText, currentAIMessageArea, bubbleWidth - textPadding);
+            int estimatedLines = estimateLineCount(fullText, currentAIMessageArea, preferredWidth - textPadding);
             int lineHeight = currentAIMessageArea.getFontMetrics(currentAIMessageArea.getFont()).getHeight();
             int estimatedHeight = estimatedLines * lineHeight + 10; // 额外增加一点高度作为缓冲
             
-            // 设置新的首选大小（宽度固定为屏幕宽度的3/4）
-            currentAIMessageArea.setPreferredSize(new Dimension(bubbleWidth, estimatedHeight));
+            // 设置新的首选大小
+            currentAIMessageArea.setPreferredSize(new Dimension(preferredWidth, estimatedHeight));
             
             // 强制重新布局并验证大小
             Container parent = currentAIMessageArea.getParent();
@@ -694,6 +694,52 @@ public class AIChatPanel extends JPanel {
     }
 
     /**
+     * 获取屏幕宽度的3/4作为消息气泡的最大宽度
+     * @return 气泡最大宽度（屏幕宽度的3/4）
+     */
+    private int getMaxBubbleWidth() {
+        // 获取屏幕尺寸
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        // 返回屏幕宽度的3/4
+        return (int)(screenSize.getWidth() * 0.75);
+    }
+    
+    /**
+     * 根据文本内容计算适合的气泡宽度，最大不超过屏幕宽度的3/4
+     * @param message 消息内容
+     * @param textArea 文本区域
+     * @param isUserMessage 是否为用户消息
+     * @return 适合的气泡宽度
+     */
+    private int calculateBubbleWidth(String message, JTextArea textArea, boolean isUserMessage) {
+        // 获取最大宽度
+        int maxWidth = getMaxBubbleWidth();
+        
+        // 计算每个字符的平均宽度
+        FontMetrics fm = textArea.getFontMetrics(textArea.getFont());
+        int avgCharWidth = fm.charWidth('a');
+        
+        // 查找消息中最长的一行
+        String[] lines = message.split("\n");
+        int maxLineLength = 0;
+        for (String line : lines) {
+            maxLineLength = Math.max(maxLineLength, line.length());
+        }
+        
+        // 计算基于最长行的预估宽度
+        int estimatedWidth = maxLineLength * avgCharWidth;
+        
+        // 根据消息长度设置最小宽度
+        int minWidth = isUserMessage ? 200 : 250; // 用户消息和AI消息的最小宽度不同
+        
+        // 添加一些内边距
+        estimatedWidth += 50;
+        
+        // 返回适合的宽度，不小于最小宽度，不大于最大宽度
+        return Math.max(minWidth, Math.min(estimatedWidth, maxWidth));
+    }
+
+    /**
      * 获取屏幕宽度的3/4作为消息气泡的固定宽度
      * @return 气泡宽度（屏幕宽度的3/4）
      */
@@ -708,9 +754,6 @@ public class AIChatPanel extends JPanel {
      * 创建用户消息气泡（右侧对齐）
      */
     private JPanel createUserMessageBubble(String message) {
-        // 获取固定的气泡宽度（屏幕宽度的3/4）
-        int bubbleWidth = getBubbleWidth();
-        
         // 外部面板，用于布局
         JPanel outerPanel = new JPanel(new BorderLayout());
         outerPanel.setBackground(Color.WHITE);
@@ -734,8 +777,8 @@ public class AIChatPanel extends JPanel {
         textArea.setEditable(false);
         textArea.setBorder(null);
         
-        // 使用固定的宽度，而不是根据文本长度动态调整
-        int preferredWidth = bubbleWidth;
+        // 根据内容计算适合的宽度，最大不超过屏幕宽度的3/4
+        int preferredWidth = calculateBubbleWidth(message, textArea, true);
         
         // 估计需要的行数和高度
         int textPadding = 30; // 文本区域内边距(左右两侧各15)
@@ -743,7 +786,7 @@ public class AIChatPanel extends JPanel {
         int lineHeight = textArea.getFontMetrics(textArea.getFont()).getHeight();
         int estimatedHeight = estimatedLines * lineHeight + 10; // 额外增加一点高度作为缓冲
         
-        // 设置首选尺寸，使文本区域宽度固定为屏幕宽度的3/4
+        // 设置首选尺寸
         textArea.setPreferredSize(new Dimension(preferredWidth, estimatedHeight));
 
         messagePanel.add(textArea, BorderLayout.CENTER);
@@ -771,9 +814,6 @@ public class AIChatPanel extends JPanel {
      * 创建AI消息气泡（左侧对齐）
      */
     private JPanel createAIMessageBubble(String message) {
-        // 获取固定的气泡宽度（屏幕宽度的3/4）
-        int bubbleWidth = getBubbleWidth();
-        
         // 外部面板，用于布局
         JPanel outerPanel = new JPanel(new BorderLayout());
         outerPanel.setBackground(Color.WHITE);
@@ -797,8 +837,8 @@ public class AIChatPanel extends JPanel {
         textArea.setEditable(false);
         textArea.setBorder(null);
         
-        // 使用固定的宽度，而不是根据文本长度动态调整
-        int preferredWidth = bubbleWidth;
+        // 根据内容计算适合的宽度，最大不超过屏幕宽度的3/4
+        int preferredWidth = calculateBubbleWidth(message, textArea, false);
         
         // 估计需要的行数和高度
         int textPadding = 30; // 文本区域内边距(左右两侧各15)
@@ -806,7 +846,7 @@ public class AIChatPanel extends JPanel {
         int lineHeight = textArea.getFontMetrics(textArea.getFont()).getHeight();
         int estimatedHeight = estimatedLines * lineHeight + 10; // 额外增加一点高度作为缓冲
         
-        // 设置首选尺寸，使文本区域宽度固定为屏幕宽度的3/4
+        // 设置首选尺寸
         textArea.setPreferredSize(new Dimension(preferredWidth, estimatedHeight));
 
         messagePanel.add(textArea, BorderLayout.CENTER);
@@ -834,8 +874,8 @@ public class AIChatPanel extends JPanel {
      * 创建流式AI消息气泡（返回文本区域以便后续更新）
      */
     private JTextArea createStreamingAIMessageBubble() {
-        // 获取固定的气泡宽度（屏幕宽度的3/4）
-        int bubbleWidth = getBubbleWidth();
+        // 初始使用较小的宽度，后续会动态调整
+        int initialWidth = 250;
         
         // 外部面板，用于布局
         JPanel outerPanel = new JPanel(new BorderLayout());
@@ -860,8 +900,8 @@ public class AIChatPanel extends JPanel {
         textArea.setEditable(false);
         textArea.setBorder(null);
         
-        // 初始设置固定宽度，高度较小
-        textArea.setPreferredSize(new Dimension(bubbleWidth, 20));
+        // 初始设置较小宽度，后续会根据内容动态调整
+        textArea.setPreferredSize(new Dimension(initialWidth, 20));
 
         messagePanel.add(textArea, BorderLayout.CENTER);
         outerPanel.add(messagePanel, BorderLayout.WEST); // 靠左对齐
