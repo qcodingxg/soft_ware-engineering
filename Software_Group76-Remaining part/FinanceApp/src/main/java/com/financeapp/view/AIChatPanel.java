@@ -28,6 +28,8 @@ public class AIChatPanel extends JPanel {
     private static final Color SECONDARY_COLOR = new Color(52, 152, 219); // 蓝色
     private static final Color BACKGROUND_COLOR = new Color(236, 240, 241); // 浅灰色
     private static final Color TEXT_COLOR = new Color(44, 62, 80); // 深灰色
+    private static final Color SUGGESTION_COLOR = new Color(245, 247, 249); // 建议按钮背景色
+    private static final Color SUGGESTION_HOVER_COLOR = new Color(225, 235, 245); // 建议按钮悬停背景色
     
     // 进度条组件
     private JProgressBar progressBar;
@@ -45,6 +47,15 @@ public class AIChatPanel extends JPanel {
     
     // AI聊天服务
     private AIChatService chatService;
+    
+    // 推荐问题列表
+    private static final String[] SUGGESTED_QUESTIONS = {
+        "How do I create a monthly budget?",
+        "What's the best way to save for retirement?",
+        "How can I pay off my debt faster?",
+        "Should I invest in stocks or mutual funds?",
+        "How much emergency fund should I have?"
+    };
 
     /**
      * 创建AI聊天面板
@@ -84,10 +95,19 @@ public class AIChatPanel extends JPanel {
         chatPanel.add(scrollPane, BorderLayout.CENTER);
         add(chatPanel, BorderLayout.CENTER);
 
+        // 创建底部面板，包括推荐问题和输入区
+        JPanel bottomPanel = new JPanel(new BorderLayout(0, 10));
+        bottomPanel.setBackground(BACKGROUND_COLOR);
+        bottomPanel.setBorder(new EmptyBorder(5, 0, 0, 0));
+        
+        // 创建推荐问题面板
+        JPanel suggestionsPanel = createSuggestionsPanel();
+        bottomPanel.add(suggestionsPanel, BorderLayout.NORTH);
+        
         // 创建输入区域
         JPanel inputPanel = new JPanel(new BorderLayout(10, 0));
         inputPanel.setBackground(BACKGROUND_COLOR);
-        inputPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        inputPanel.setBorder(new EmptyBorder(5, 10, 10, 10));
         
         // 创建包含输入框和发送按钮的面板
         JPanel inputFieldPanel = new JPanel(new BorderLayout(5, 0));
@@ -122,7 +142,11 @@ public class AIChatPanel extends JPanel {
         // 添加到主输入面板
         inputPanel.add(inputFieldPanel, BorderLayout.CENTER);
         
-        add(inputPanel, BorderLayout.SOUTH);
+        // 将输入面板添加到底部面板
+        bottomPanel.add(inputPanel, BorderLayout.CENTER);
+        
+        // 将底部面板添加到主面板
+        add(bottomPanel, BorderLayout.SOUTH);
         
         // 创建进度条面板(开始时不可见)
         progressPanel = ChatBubbleFactory.createProgressPanel();
@@ -131,7 +155,6 @@ public class AIChatPanel extends JPanel {
         progressBar = (JProgressBar) progressContentPanel.getComponent(1);
         progressLabel = (JLabel) progressContentPanel.getComponent(0);
         progressPanel.setVisible(false);
-        add(progressPanel, BorderLayout.SOUTH);
 
         // 添加发送按钮事件监听
         sendButton.addActionListener(new ActionListener() {
@@ -165,6 +188,69 @@ public class AIChatPanel extends JPanel {
     }
     
     /**
+     * 创建推荐问题面板
+     */
+    private JPanel createSuggestionsPanel() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        panel.setBackground(BACKGROUND_COLOR);
+        
+        JLabel suggestLabel = new JLabel("Try asking: ");
+        suggestLabel.setFont(new Font("Microsoft YaHei", Font.BOLD, 13));
+        suggestLabel.setForeground(TEXT_COLOR);
+        panel.add(suggestLabel);
+        
+        for (String question : SUGGESTED_QUESTIONS) {
+            JButton suggestionButton = createSuggestionButton(question);
+            panel.add(suggestionButton);
+        }
+        
+        return panel;
+    }
+    
+    /**
+     * 创建单个推荐问题按钮
+     */
+    private JButton createSuggestionButton(String question) {
+        JButton button = new JButton(question);
+        button.setFont(new Font("Microsoft YaHei", Font.PLAIN, 12));
+        button.setBackground(SUGGESTION_COLOR);
+        button.setForeground(TEXT_COLOR);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        button.setMargin(new Insets(5, 10, 5, 10));
+        
+        // 使用圆角边框
+        button.setBorder(new CompoundBorder(
+            new RoundedBorder(15, SECONDARY_COLOR),
+            BorderFactory.createEmptyBorder(5, 10, 5, 10)
+        ));
+        
+        // 添加鼠标悬停效果
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(SUGGESTION_HOVER_COLOR);
+            }
+            
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(SUGGESTION_COLOR);
+            }
+        });
+        
+        // 添加点击事件
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // 将问题填充到输入框并发送
+                inputField.setText(question);
+                sendMessage();
+            }
+        });
+        
+        return button;
+    }
+    
+    /**
      * 发送分析交易数据请求，显示进度条并等待结果
      */
     private void analyzeTransactionData() {
@@ -173,8 +259,15 @@ public class AIChatPanel extends JPanel {
                 // 禁用输入框直到初始分析完成
                 setInputEnabled(false);
                 
+                // 替换底部面板为进度条面板
+                remove(getComponent(2)); // 移除底部面板
+                add(progressPanel, BorderLayout.SOUTH);
+                progressPanel.setVisible(true);
+                revalidate();
+                repaint();
+                
                 // 启动进度条动画
-                SwingUtilities.invokeLater(() -> startProgressBar());
+                startProgressBar();
                 
                 // 获取AI响应
                 String response = chatService.analyzeTransactionData();
@@ -268,13 +361,6 @@ public class AIChatPanel extends JPanel {
     private void startProgressBar() {
         progressBar.setValue(0);
         
-        // 切换可见性：隐藏输入面板，显示进度条面板
-        remove(getComponent(2)); // 移除输入面板
-        add(progressPanel, BorderLayout.SOUTH);
-        progressPanel.setVisible(true);
-        revalidate();
-        repaint();
-        
         // 创建定时器，更新进度条
         progressTimer = new Timer(100, new ActionListener() {
             private double progressValue = 0; // 使用double类型存储实际进度值
@@ -311,15 +397,24 @@ public class AIChatPanel extends JPanel {
             progressTimer.stop();
             progressBar.setValue(100); // 设置为100%表示完成
             
-            // 短暂延迟后切换回输入面板
+            // 短暂延迟后切换回底部面板
             Timer completionTimer = new Timer(500, e -> {
                 progressPanel.setVisible(false);
                 remove(progressPanel);
                 
-                // 重新添加输入面板
+                // 重新创建并添加底部面板
+                JPanel bottomPanel = new JPanel(new BorderLayout(0, 10));
+                bottomPanel.setBackground(BACKGROUND_COLOR);
+                bottomPanel.setBorder(new EmptyBorder(5, 0, 0, 0));
+                
+                // 创建推荐问题面板
+                JPanel suggestionsPanel = createSuggestionsPanel();
+                bottomPanel.add(suggestionsPanel, BorderLayout.NORTH);
+                
+                // 创建输入区域
                 JPanel inputPanel = new JPanel(new BorderLayout(10, 0));
                 inputPanel.setBackground(BACKGROUND_COLOR);
-                inputPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+                inputPanel.setBorder(new EmptyBorder(5, 10, 10, 10));
                 
                 // 创建包含输入框和发送按钮的面板
                 JPanel inputFieldPanel = new JPanel(new BorderLayout(5, 0));
@@ -339,7 +434,11 @@ public class AIChatPanel extends JPanel {
                 // 添加到主输入面板
                 inputPanel.add(inputFieldPanel, BorderLayout.CENTER);
                 
-                add(inputPanel, BorderLayout.SOUTH);
+                // 将输入面板添加到底部面板
+                bottomPanel.add(inputPanel, BorderLayout.CENTER);
+                
+                // 将底部面板添加到主面板
+                add(bottomPanel, BorderLayout.SOUTH);
                 
                 revalidate();
                 repaint();
