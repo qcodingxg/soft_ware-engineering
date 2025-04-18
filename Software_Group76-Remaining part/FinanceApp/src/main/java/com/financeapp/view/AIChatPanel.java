@@ -385,7 +385,7 @@ public class AIChatPanel extends JPanel {
                 file = new File(absolutePath + File.separator + TRANSACTIONS_CSV_PATH);
                 
                 if (!file.exists()) {
-                    System.err.println("交易数据文件未找到: " + TRANSACTIONS_CSV_PATH);
+                    System.err.println("Transaction data file not found: " + TRANSACTIONS_CSV_PATH);
                     return;
                 }
             }
@@ -395,10 +395,10 @@ public class AIChatPanel extends JPanel {
                 .stream()
                 .collect(Collectors.joining("\n"));
                 
-            System.out.println("成功加载交易数据");
+            System.out.println("Successfully loaded transaction data");
             
         } catch (Exception e) {
-            System.err.println("加载交易数据失败: " + e.getMessage());
+            System.err.println("Failed to load transaction data: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -439,7 +439,7 @@ public class AIChatPanel extends JPanel {
                 setInputEnabled(true);
                 
             } catch (Exception e) {
-                System.err.println("发送交易数据失败: " + e.getMessage());
+                System.err.println("Failed to send transaction data: " + e.getMessage());
                 e.printStackTrace();
                 
                 // 停止进度条并恢复输入
