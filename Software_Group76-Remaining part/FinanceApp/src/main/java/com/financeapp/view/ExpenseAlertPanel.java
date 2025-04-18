@@ -68,11 +68,6 @@ public class ExpenseAlertPanel extends JPanel {
         this.alertService.registerNotificationHandler(
                 new AlertService.GuiNotificationHandler(this::updateExpenseAlerts)
         );
-
-        // 添加默认的阈值数据
-        categoryThresholds.put("Food", 1000.0);
-        categoryThresholds.put("Transportation", 500.0);
-
         initUI();
         loadSettings();
     }
