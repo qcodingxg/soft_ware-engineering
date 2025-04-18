@@ -17,6 +17,7 @@ com\financeapp\view\CategoryManagementPanel$4.class
 com\financeapp\view\LocalizedFinancePanel.class
 com\financeapp\view\StatisticsPanel$2.class
 com\financeapp\view\TransactionPanel$5.class
+com\financeapp\view\AIChatPanel$6.class
 com\financeapp\service\TransactionService.class
 com\financeapp\util\PasswordUtils.class
 com\financeapp\view\DashboardPanel$4.class
@@ -43,6 +44,7 @@ com\financeapp\view\TransactionPanel$3.class
 com\financeapp\model\BudgetCalculator.class
 com\financeapp\view\ExpenseAlertPanel$ShadowBorder.class
 com\financeapp\view\StatisticsPanel$3.class
+com\financeapp\view\AIChatPanel$5.class
 com\financeapp\view\DashboardPanel$6.class
 com\financeapp\view\TransactionPanel$6.class
 com\financeapp\view\StatisticsPanel$BarChartComponent.class
