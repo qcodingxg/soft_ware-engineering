@@ -12,10 +12,9 @@ import java.awt.event.ActionListener;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.text.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 
 /**
  * AI聊天面板，支持与AI财务顾问进行对话
@@ -44,7 +43,7 @@ public class AIChatPanel extends JPanel {
     private JTextArea currentAIMessageArea;
     // 存储所有消息面板的列表
     private List<Component> messageComponents = new ArrayList<>();
-    
+
     // 用于存储当前的回复内容
     private StringBuilder currentResponse;
     
@@ -106,7 +105,7 @@ public class AIChatPanel extends JPanel {
         // 创建推荐问题面板
         JPanel suggestionsPanel = createSuggestionsPanel();
         bottomPanel.add(suggestionsPanel, BorderLayout.NORTH);
-        
+
         // 创建输入区域
         JPanel inputPanel = new JPanel(new BorderLayout(10, 0));
         inputPanel.setBackground(BACKGROUND_COLOR);
@@ -182,14 +181,7 @@ public class AIChatPanel extends JPanel {
         currentResponse = new StringBuilder();
         
         // 添加初始化消息
-        addAIMessage("# Welcome to AI Financial Advisor!\n\n" +
-                     "I'm your personal financial advisor. I can help you with:\n\n" +
-                     "- **Budget planning** and expense tracking\n" +
-                     "- **Debt management** and repayment strategies\n" +
-                     "- **Savings goals** setting and methods\n" +
-                     "- Basic **investment advice** (stocks, funds, etc.)\n" +
-                     "- **Tax planning** and optimization\n\n" +
-                     "What financial questions can I help you with today?");
+        addAIMessage("Hello! I'm your personal financial advisor. Whether it's budget planning, savings goals, investment advice, or debt management, I can provide professional guidance. What financial questions can I help you with?");
         
         // 发送初始交易数据到AI
         if (chatService.getTransactionsData() != null && !chatService.getTransactionsData().isEmpty()) {
@@ -290,13 +282,12 @@ public class AIChatPanel extends JPanel {
                     // 停止进度条动画
                     stopProgressBar();
                     
+                    // 转换Markdown为普通文本
+                    String plainTextResponse = convertMarkdownToPlainText(response);
+                    
                     // 显示分析结果和财务建议
                     addAIMessage("Based on your transaction data, I have prepared the following financial analysis and advice:\n\n" + 
-                                response + "\n\n" +
-                                "Let me know if you need more specific financial advice. You can ask a question like: \n" + 
-                                "- How to *save money* each month?\n" + 
-                                "- What's the best strategy for **debt reduction**?\n" +
-                                "- How to `invest` wisely for the future?");
+                                plainTextResponse + "\n\nWhat specific financial questions do you need help with?");
                 });
                 
                 // 启用输入框
@@ -341,9 +332,13 @@ public class AIChatPanel extends JPanel {
                 public void onResponseChunk(String content) {
                     // 累积响应
                     currentResponse.append(content);
+                    
+                    // 转换Markdown为普通文本
+                    String plainTextContent = convertMarkdownToPlainText(content);
+                    
                     // 实时显示增量内容
                     SwingUtilities.invokeLater(() -> {
-                        ChatBubbleFactory.updateStreamingMessageBubble(currentAIMessageArea, content, chatMessagesPanel);
+                        ChatBubbleFactory.updateStreamingMessageBubble(currentAIMessageArea, plainTextContent, chatMessagesPanel);
                         // 滚动到底部
                         JScrollBar vertical = scrollPane.getVerticalScrollBar();
                         vertical.setValue(vertical.getMaximum());
@@ -363,13 +358,7 @@ public class AIChatPanel extends JPanel {
                 
                 @Override
                 public void onComplete() {
-                    SwingUtilities.invokeLater(() -> {
-                        // 启用输入控件
-                        setInputEnabled(true);
-                        
-                        // 将流式文本转换为带Markdown格式的文本
-                        ChatBubbleFactory.finalizeStreamingMessage(currentAIMessageArea, chatMessagesPanel, messageComponents);
-                    });
+                    SwingUtilities.invokeLater(() -> setInputEnabled(true));
                 }
             });
         }
@@ -385,7 +374,7 @@ public class AIChatPanel extends JPanel {
         progressTimer = new Timer(100, new ActionListener() {
             private double progressValue = 0; // 使用double类型存储实际进度值
             private boolean forward = true;
-
+            
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (forward) {
@@ -475,7 +464,7 @@ public class AIChatPanel extends JPanel {
         inputField.setEnabled(enabled);
         sendButton.setEnabled(enabled);
     }
-
+    
     /**
      * 添加用户消息到聊天区域
      */
@@ -514,5 +503,71 @@ public class AIChatPanel extends JPanel {
             JScrollBar vertical = scrollPane.getVerticalScrollBar();
             vertical.setValue(vertical.getMaximum());
         });
+    }
+
+    /**
+     * 将Markdown格式转换为普通文本
+     * 
+     * @param markdown Markdown格式文本
+     * @return 转换后的普通文本
+     */
+    private String convertMarkdownToPlainText(String markdown) {
+        if (markdown == null || markdown.isEmpty()) {
+            return "";
+        }
+        
+        String result = markdown;
+        
+        // 处理标题 (# Header)
+        result = result.replaceAll("(?m)^#\\s+(.*?)$", "$1:");
+        result = result.replaceAll("(?m)^##\\s+(.*?)$", "$1:");
+        result = result.replaceAll("(?m)^###\\s+(.*?)$", "$1:");
+        result = result.replaceAll("(?m)^####\\s+(.*?)$", "$1:");
+        
+        // 处理粗体 (**text** 或 __text__)
+        result = result.replaceAll("\\*\\*(.*?)\\*\\*", "$1");
+        result = result.replaceAll("__(.*?)__", "$1");
+        
+        // 处理斜体 (*text* 或 _text_)
+        result = result.replaceAll("\\*(.*?)\\*", "$1");
+        result = result.replaceAll("_(.*?)_", "$1");
+        
+        // 处理列表项，保留列表符号但格式化空间
+        result = result.replaceAll("(?m)^\\s*-\\s+", "• ");
+        result = result.replaceAll("(?m)^\\s*\\*\\s+", "• ");
+        result = result.replaceAll("(?m)^\\s*\\d+\\.\\s+", "• ");
+        
+        // 处理代码块 ```code```
+        Pattern codeBlockPattern = Pattern.compile("```[\\s\\S]*?```");
+        Matcher codeBlockMatcher = codeBlockPattern.matcher(result);
+        StringBuffer sb = new StringBuffer();
+        while (codeBlockMatcher.find()) {
+            String codeBlock = codeBlockMatcher.group();
+            String cleanCode = codeBlock.substring(3, codeBlock.length() - 3).trim();
+            codeBlockMatcher.appendReplacement(sb, Matcher.quoteReplacement(cleanCode));
+        }
+        codeBlockMatcher.appendTail(sb);
+        result = sb.toString();
+        
+        // 处理行内代码 `code`
+        result = result.replaceAll("`([^`]*?)`", "$1");
+        
+        // 处理链接 [text](url)
+        result = result.replaceAll("\\[(.*?)\\]\\((.*?)\\)", "$1");
+        
+        // 处理图片 ![alt text](url)
+        result = result.replaceAll("!\\[(.*?)\\]\\((.*?)\\)", "[Image: $1]");
+        
+        // 处理水平分隔线
+        result = result.replaceAll("(?m)^\\s*[-*_]{3,}\\s*$", "\n---\n");
+        
+        // 处理引用
+        result = result.replaceAll("(?m)^>\\s+(.*?)$", "\"$1\"");
+        
+        // 处理表格(简化处理，仅移除表格标记)
+        result = result.replaceAll("\\|\\s*:?-+:?\\s*\\|", "");
+        result = result.replaceAll("\\|", " | ");
+        
+        return result;
     }
 } 
