@@ -34,6 +34,18 @@
             <artifactId>json</artifactId>
             <version>20231013</version>
         </dependency>
+        <!-- FlatLaf - Modern Look and Feel -->
+        <dependency>
+            <groupId>com.formdev</groupId>
+            <artifactId>flatlaf</artifactId>
+            <version>3.2.1</version>
+        </dependency>
+        <!-- FlatLaf Extras - Additional components and utilities -->
+        <dependency>
+            <groupId>com.formdev</groupId>
+            <artifactId>flatlaf-extras</artifactId>
+            <version>3.2.1</version>
+        </dependency>
     </dependencies>
 
     <build>

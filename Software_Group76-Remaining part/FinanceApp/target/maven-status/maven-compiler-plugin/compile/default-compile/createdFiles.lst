@@ -71,10 +71,12 @@ com\financeapp\model\AlertService$ConsoleNotificationHandler.class
 com\financeapp\view\ExpenseAlertPanel$3.class
 com\financeapp\view\AIChatPanel$RoundedBorder.class
 com\financeapp\view\LocalConsumptionPanel$3.class
+com\financeapp\util\UIConstants$1.class
 com\financeapp\view\CategoryManagementPanel$3.class
 com\financeapp\view\CategoryManagementPanel$9.class
 com\financeapp\controller\TransactionController.class
 com\financeapp\view\StatisticsPanel.class
 com\financeapp\view\TransactionPanel$3.class
 com\financeapp\model\BudgetCalculator.class
+com\financeapp\util\UIConstants.class
 com\financeapp\view\CategoryManagementPanel$6.class

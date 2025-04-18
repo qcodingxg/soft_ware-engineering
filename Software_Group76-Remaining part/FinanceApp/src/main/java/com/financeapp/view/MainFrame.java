@@ -3,6 +3,7 @@ package com.financeapp.view;
 import com.financeapp.controller.AuthController;
 import com.financeapp.controller.TransactionController;
 import com.financeapp.model.Transaction;
+import com.financeapp.util.UIConstants;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -17,6 +18,8 @@ import java.time.format.DateTimeFormatter;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.event.MouseAdapter;
+import com.formdev.flatlaf.extras.FlatSVGIcon;
+import com.formdev.flatlaf.ui.FlatUIUtils;
 
 /**
  * Main Window Frame
@@ -47,13 +50,13 @@ public class MainFrame extends JFrame implements LoginPanel.LoginCallback, Regis
     private static final String REGISTER_CARD = "REGISTER";
     private static final String MAIN_CARD = "MAIN";
     
-    // Colors (matching login panel)
-    private static final Color PRIMARY_COLOR = new Color(41, 128, 185);
-    private static final Color SECONDARY_COLOR = new Color(52, 152, 219);
-    private static final Color BACKGROUND_COLOR = new Color(236, 240, 241);
-    private static final Color TEXT_COLOR = new Color(44, 62, 80);
-    private static final Color ERROR_COLOR = new Color(231, 76, 60);
-    private static final Color SUCCESS_COLOR = new Color(46, 204, 113);
+    // 颜色 (与FlatLaf主题兼容)
+    private static final Color PRIMARY_COLOR = new Color(24, 115, 204);
+    private static final Color SECONDARY_COLOR = new Color(75, 148, 220);
+    private static final Color BACKGROUND_COLOR = new Color(245, 245, 245);
+    private static final Color TEXT_COLOR = new Color(33, 33, 33);
+    private static final Color ERROR_COLOR = new Color(211, 47, 47);
+    private static final Color SUCCESS_COLOR = new Color(46, 174, 96);
     
     /**
      * Constructor
@@ -71,7 +74,7 @@ public class MainFrame extends JFrame implements LoginPanel.LoginCallback, Regis
     private void initUI() {
         // Setup window
         setTitle("Personal Finance Management System");
-        setSize(900, 700);
+        setSize(1000, 750);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
@@ -86,9 +89,9 @@ public class MainFrame extends JFrame implements LoginPanel.LoginCallback, Regis
         
         // Create main application panel
         JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(BACKGROUND_COLOR);
+        mainPanel.setBackground(UIConstants.BACKGROUND_COLOR);
         
-        // Create tabbed panel with custom UI
+        // Create custom tabbed pane
         tabbedPane = createStyledTabbedPane();
         
         // Create function panels
@@ -99,31 +102,31 @@ public class MainFrame extends JFrame implements LoginPanel.LoginCallback, Regis
         expenseAlertPanel = new ExpenseAlertPanel(transactionController);
         localConsumptionPanel = new LocalConsumptionPanel(transactionController);
         
-        // 创建AI聊天面板并添加到JPanel中，避免直接将其添加到tabbedPane
+        // Create AI chat panel and add to container
         aiChatPanel = new AIChatPanel();
         JPanel aiChatContainer = new JPanel(new BorderLayout());
         aiChatContainer.add(aiChatPanel, BorderLayout.CENTER);
         
-        // Add to tabs
-        addStyledTab(tabbedPane, "Dashboard", dashboardPanel, "Welcome to your financial dashboard");
-        addStyledTab(tabbedPane, "Transaction Entry", transactionPanel, "Add and import transaction records");
-        addStyledTab(tabbedPane, "Category Management", categoryManagementPanel, "View and manage transaction categories");
-        addStyledTab(tabbedPane, "Statistics View", statisticsPanel, "View spending statistics and budget suggestions");
-        addStyledTab(tabbedPane, "Expense Alerts", expenseAlertPanel, "Monitor and get alerted when expenses exceed thresholds");
-        addStyledTab(tabbedPane, "Local Consumption", localConsumptionPanel, "Analyze local consumption patterns");
-        addStyledTab(tabbedPane, "AI Chat", aiChatContainer, "Chat with AI assistant for financial advice");
+        // Add tabs
+        addStyledTab(tabbedPane, "Dashboard", dashboardPanel, "Welcome to your financial dashboard", "dashboard");
+        addStyledTab(tabbedPane, "Transactions", transactionPanel, "Add and import transaction records", "transaction"); 
+        addStyledTab(tabbedPane, "Categories", categoryManagementPanel, "View and manage transaction categories", "category");
+        addStyledTab(tabbedPane, "Statistics", statisticsPanel, "View spending statistics and budget suggestions", "statistics");
+        addStyledTab(tabbedPane, "Alerts", expenseAlertPanel, "Monitor and get alerted when expenses exceed thresholds", "alert");
+        addStyledTab(tabbedPane, "Local Spending", localConsumptionPanel, "Analyze local consumption patterns", "local");
+        addStyledTab(tabbedPane, "AI Assistant", aiChatContainer, "Chat with AI assistant for financial advice", "chat");
         
         // Add to main panel
         mainPanel.add(tabbedPane, BorderLayout.CENTER);
         
         // Create status bar
         statusLabel = new JLabel("Ready");
-        statusLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        statusLabel.setForeground(TEXT_COLOR);
+        statusLabel.setFont(UIConstants.SMALL_FONT);
+        statusLabel.setForeground(UIConstants.TEXT_COLOR);
         statusLabel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(1, 0, 0, 0, SECONDARY_COLOR.darker()),
-                new EmptyBorder(5, 10, 5, 10)));
-        statusLabel.setBackground(BACKGROUND_COLOR.brighter());
+                BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(218, 220, 224)),
+                new EmptyBorder(UIConstants.PADDING_SMALL, UIConstants.PADDING, UIConstants.PADDING_SMALL, UIConstants.PADDING)));
+        statusLabel.setBackground(UIConstants.CARD_BACKGROUND_COLOR);
         statusLabel.setOpaque(true);
         mainPanel.add(statusLabel, BorderLayout.SOUTH);
         
@@ -144,13 +147,21 @@ public class MainFrame extends JFrame implements LoginPanel.LoginCallback, Regis
      */
     private JTabbedPane createStyledTabbedPane() {
         JTabbedPane pane = new JTabbedPane();
-        pane.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        pane.setBackground(BACKGROUND_COLOR);
-        pane.setForeground(TEXT_COLOR);
+        pane.setFont(UIConstants.BODY_FONT);
+        pane.setBackground(UIConstants.BACKGROUND_COLOR);
+        pane.setForeground(UIConstants.TEXT_COLOR);
         pane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         
-        // Apply custom UI
-        pane.setUI(new StyledTabbedPaneUI());
+        // Use FlatLaf flat UI
+        pane.putClientProperty("JTabbedPane.tabHeight", 36);
+        pane.putClientProperty("JTabbedPane.tabInsets", new Insets(8, 12, 8, 12));
+        pane.putClientProperty("JTabbedPane.selectedBackground", UIConstants.CARD_BACKGROUND_COLOR);
+        pane.putClientProperty("JTabbedPane.selectedForeground", UIConstants.PRIMARY_COLOR);
+        pane.putClientProperty("JTabbedPane.tabSeparatorsFullHeight", true);
+        pane.putClientProperty("JTabbedPane.showTabSeparators", true);
+        pane.putClientProperty("JTabbedPane.tabAreaAlignment", "fill");
+        pane.putClientProperty("JTabbedPane.minimumTabWidth", 80);
+        pane.putClientProperty("JTabbedPane.tabSelectionHeight", 3);
         
         return pane;
     }
@@ -158,11 +169,11 @@ public class MainFrame extends JFrame implements LoginPanel.LoginCallback, Regis
     /**
      * Add styled tab to tabbed pane
      */
-    private void addStyledTab(JTabbedPane pane, String title, Component component, String tooltip) {
-        // 特殊处理AI聊天面板
-        if (title.equals("AI Chat")) {
+    private void addStyledTab(JTabbedPane pane, String title, Component component, String tooltip, String iconName) {
+        // Special handling for AI Assistant panel
+        if (title.equals("AI Assistant")) {
             try {
-                // 为AIChatPanel创建一个普通的面板作为容器
+                // Create a regular panel as container for AIChatPanel
                 JPanel containerPanel = new JPanel(new BorderLayout());
                 containerPanel.add(component, BorderLayout.CENTER);
                 pane.addTab(title, containerPanel);
@@ -174,7 +185,7 @@ public class MainFrame extends JFrame implements LoginPanel.LoginCallback, Regis
             }
         }
         
-        // 正常处理其他面板
+        // Normal handling for other panels
         pane.addTab(title, component);
         int index = pane.indexOfTab(title);
         pane.setToolTipTextAt(index, tooltip);
@@ -183,9 +194,23 @@ public class MainFrame extends JFrame implements LoginPanel.LoginCallback, Regis
         JPanel tabComponent = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 2));
         tabComponent.setOpaque(false);
         
+        // Add icon (if available)
+        try {
+            // Try to use FlatLaf's SVG icons (in resources directory)
+            // Assumes icon files are stored in resources/icons/
+            Icon icon = new FlatSVGIcon("icons/" + iconName + ".svg", 16, 16);
+            JLabel iconLabel = new JLabel(icon);
+            iconLabel.setBorder(new EmptyBorder(0, 0, 0, 5));
+            tabComponent.add(iconLabel);
+        } catch (Exception e) {
+            // If icon loading fails, use text only
+            System.out.println("Icon loading failed: " + iconName);
+        }
+        
+        // Add title text
         JLabel titleLabel = new JLabel(title);
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        titleLabel.setForeground(TEXT_COLOR);
+        titleLabel.setFont(UIConstants.BODY_FONT);
+        titleLabel.setForeground(UIConstants.TEXT_COLOR);
         tabComponent.add(titleLabel);
         
         pane.setTabComponentAt(index, tabComponent);
@@ -562,14 +587,30 @@ public class MainFrame extends JFrame implements LoginPanel.LoginCallback, Regis
      */
     public static void main(String[] args) {
         try {
-            // Set system look and feel
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            // Use FlatLaf modern theme
+            com.formdev.flatlaf.FlatLightLaf.setup();
             
-            // Set anti-aliasing for text
+            // Apply global UI settings
+            UIManager.put("Button.arc", 8); // Button corner radius
+            UIManager.put("Component.arc", 8); // Component corner radius
+            UIManager.put("ProgressBar.arc", 8); // Progress bar corner radius
+            UIManager.put("TextComponent.arc", 8); // Text component corner radius
+            
+            // Set default font
+            Font defaultFont = new Font("Segoe UI", Font.PLAIN, 13);
+            UIManager.put("defaultFont", defaultFont);
+            
+            // Set anti-aliasing for better text rendering
             System.setProperty("awt.useSystemAAFontSettings", "on");
             System.setProperty("swing.aatext", "true");
         } catch (Exception e) {
             e.printStackTrace();
+            // Fallback to system look and feel
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
         
         // Launch application
