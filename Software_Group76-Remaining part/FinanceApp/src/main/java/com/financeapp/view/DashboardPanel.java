@@ -47,6 +47,18 @@ public class DashboardPanel extends JPanel {
     private static final Color WARNING_COLOR = new Color(243, 156, 18);
     private static final Color CARD_BG_COLOR = new Color(255, 255, 255);
     
+    // Add to class variables
+    private JPanel chartPanel;
+    private Map<String, Double> categoryExpenses = new HashMap<>();
+    private Color[] categoryColors = {
+        PRIMARY_COLOR,
+        SECONDARY_COLOR,
+        new Color(46, 204, 113),
+        new Color(241, 196, 15),
+        new Color(231, 76, 60),
+        new Color(155, 89, 182)
+    };
+    
     /**
      * Constructor
      * @param transactionController Transaction controller
@@ -70,27 +82,62 @@ public class DashboardPanel extends JPanel {
         JPanel headerPanel = createHeaderPanel();
         add(headerPanel, BorderLayout.NORTH);
         
-        // Create main content panel with grid layout
-        JPanel contentPanel = new JPanel(new GridLayout(3, 2, 15, 15));
-        contentPanel.setOpaque(false);
-        add(contentPanel, BorderLayout.CENTER);
+        // Create main content panel
+        JPanel mainPanel = new JPanel(new BorderLayout(15, 15));
+        mainPanel.setOpaque(false);
+        
+        // Create left column (2/3 width)
+        JPanel leftPanel = new JPanel(new GridLayout(3, 1, 15, 15));
+        leftPanel.setOpaque(false);
+        
+        // Create overview and quick actions in a panel
+        JPanel topLeftPanel = new JPanel(new GridLayout(1, 2, 15, 0));
+        topLeftPanel.setOpaque(false);
         
         // Create individual panels
         overviewPanel = createOverviewPanel();
-        recentTransactionsPanel = createRecentTransactionsPanel();
         quickActionsPanel = createQuickActionsPanel();
+        recentTransactionsPanel = createRecentTransactionsPanel();
+        
+        // Add to top left panel
+        topLeftPanel.add(overviewPanel);
+        topLeftPanel.add(quickActionsPanel);
+        
+        // Add to left panel
+        leftPanel.add(topLeftPanel);
+        leftPanel.add(recentTransactionsPanel);
+        
+        // Create summary panel
+        JPanel summaryPanel = createSummaryPanel();
+        leftPanel.add(summaryPanel);
+        
+        // Create right column (1/3 width)
+        JPanel rightPanel = new JPanel(new GridLayout(2, 1, 0, 15));
+        rightPanel.setOpaque(false);
+        
+        // Create individual right panels
         tipsPanel = createTipsPanel();
         alertsPanel = createAlertsPanel();
         
-        // Add panels to content panel
-        contentPanel.add(overviewPanel);
-        contentPanel.add(recentTransactionsPanel);
-        contentPanel.add(quickActionsPanel);
-        contentPanel.add(tipsPanel);
-        contentPanel.add(alertsPanel);
+        // Add to right panel
+        rightPanel.add(tipsPanel);
+        rightPanel.add(alertsPanel);
+        
+        // Add columns to main panel
+        mainPanel.add(leftPanel, BorderLayout.CENTER);
+        mainPanel.add(rightPanel, BorderLayout.EAST);
+        
+        // Set preferred size for right panel (1/3 of width)
+        rightPanel.setPreferredSize(new Dimension(300, 0));
+        
+        // Add main panel to dashboard
+        add(mainPanel, BorderLayout.CENTER);
         
         // Initial data update
         updateDashboard();
+        
+        // Verify tab availability
+        verifyTabAvailability();
     }
     
     /**
@@ -110,12 +157,48 @@ public class DashboardPanel extends JPanel {
         welcomeLabel.setForeground(PRIMARY_COLOR);
         panel.add(welcomeLabel, BorderLayout.WEST);
         
+        // Create date and stats panel
+        JPanel rightPanel = new JPanel(new BorderLayout(0, 5));
+        rightPanel.setOpaque(false);
+        
         // Create date display
         LocalDate today = LocalDate.now();
         JLabel dateLabel = new JLabel(today.format(DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy")));
         dateLabel.setFont(new Font("Segoe UI", Font.PLAIN, 16));
         dateLabel.setForeground(TEXT_COLOR);
-        panel.add(dateLabel, BorderLayout.EAST);
+        rightPanel.add(dateLabel, BorderLayout.NORTH);
+        
+        // Add stats summary
+        JPanel statsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
+        statsPanel.setOpaque(false);
+        
+        try {
+            List<Transaction> transactions = transactionController.getTransactions();
+            int transactionCount = transactions.size();
+            
+            // Extract unique categories from transactions
+            Set<String> uniqueCategories = new HashSet<>();
+            for (Transaction t : transactions) {
+                uniqueCategories.add(t.getCategory());
+            }
+            int categoryCount = uniqueCategories.size();
+            
+            JLabel transactionLabel = new JLabel("Transactions: " + transactionCount);
+            transactionLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+            transactionLabel.setForeground(SECONDARY_COLOR);
+            
+            JLabel categoryLabel = new JLabel("Categories: " + categoryCount);
+            categoryLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+            categoryLabel.setForeground(SECONDARY_COLOR);
+            
+            statsPanel.add(transactionLabel);
+            statsPanel.add(categoryLabel);
+        } catch (Exception e) {
+            // Ignore if data isn't available yet
+        }
+        
+        rightPanel.add(statsPanel, BorderLayout.SOUTH);
+        panel.add(rightPanel, BorderLayout.EAST);
         
         // Add separator and motivation message
         JPanel subHeaderPanel = new JPanel(new BorderLayout());
@@ -136,7 +219,7 @@ public class DashboardPanel extends JPanel {
      */
     private JPanel createOverviewPanel() {
         JPanel panel = createCardPanel("Financial Overview");
-        panel.setLayout(new GridLayout(4, 1, 5, 10));
+        panel.setLayout(new GridLayout(5, 1, 5, 10));
         
         // Total expenses
         JPanel expensesPanel = new JPanel(new BorderLayout(5, 0));
@@ -190,11 +273,42 @@ public class DashboardPanel extends JPanel {
         monthlyBudgetLabel.setForeground(SUCCESS_COLOR);
         budgetPanel.add(monthlyBudgetLabel, BorderLayout.EAST);
         
+        // Local spending indicator
+        JPanel localSpendingPanel = new JPanel(new BorderLayout(5, 0));
+        localSpendingPanel.setOpaque(false);
+        JLabel localSpendingTitle = new JLabel("Local Spending:");
+        localSpendingTitle.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        localSpendingTitle.setForeground(TEXT_COLOR);
+        localSpendingPanel.add(localSpendingTitle, BorderLayout.WEST);
+        
+        JLabel localSpendingValue = new JLabel("View Analysis");
+        localSpendingValue.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        localSpendingValue.setForeground(SECONDARY_COLOR);
+        localSpendingValue.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        localSpendingValue.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                showLocalConsumptionTab();
+            }
+            
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                localSpendingValue.setText("<html><u>View Analysis</u></html>");
+            }
+            
+            @Override
+            public void mouseExited(MouseEvent e) {
+                localSpendingValue.setText("View Analysis");
+            }
+        });
+        localSpendingPanel.add(localSpendingValue, BorderLayout.EAST);
+        
         // Add all components to panel
         panel.add(balancePanel);
         panel.add(incomePanel);
         panel.add(expensesPanel);
         panel.add(budgetPanel);
+        panel.add(localSpendingPanel);
         
         return panel;
     }
@@ -244,7 +358,7 @@ public class DashboardPanel extends JPanel {
      */
     private JPanel createQuickActionsPanel() {
         JPanel panel = createCardPanel("Quick Actions");
-        panel.setLayout(new GridLayout(2, 2, 10, 10));
+        panel.setLayout(new GridLayout(2, 3, 10, 10));
         
         // Create action buttons
         JButton addTransactionButton = createActionButton("Add Transaction", "Add a new transaction record");
@@ -256,14 +370,22 @@ public class DashboardPanel extends JPanel {
         JButton viewStatsButton = createActionButton("View Statistics", "Check your spending patterns");
         viewStatsButton.addActionListener(e -> showStatisticsTab());
         
-        JButton aiAnalysisButton = createActionButton("AI Analysis", "Get AI-powered financial advice");
+        JButton aiAnalysisButton = createActionButton("AI Assistant", "Get AI-powered financial advice");
         aiAnalysisButton.addActionListener(e -> showAIAdvisorTab());
+        
+        JButton categoryButton = createActionButton("Categories", "Manage your transaction categories");
+        categoryButton.addActionListener(e -> showCategoriesTab());
+        
+        JButton localSpendingButton = createActionButton("Local Spending", "Analyze local consumption patterns");
+        localSpendingButton.addActionListener(e -> showLocalConsumptionTab());
         
         // Add buttons to panel
         panel.add(addTransactionButton);
         panel.add(importButton);
         panel.add(viewStatsButton);
         panel.add(aiAnalysisButton);
+        panel.add(categoryButton);
+        panel.add(localSpendingButton);
         
         return panel;
     }
@@ -272,13 +394,23 @@ public class DashboardPanel extends JPanel {
      * Create tips panel with AI-generated financial tips
      */
     private JPanel createTipsPanel() {
-        JPanel panel = createCardPanel("Financial Tips");
+        JPanel panel = createCardPanel("AI Financial Tips");
         panel.setLayout(new BorderLayout(0, 10));
         
         // Create tips content
         JPanel tipsContentPanel = new JPanel();
         tipsContentPanel.setLayout(new BoxLayout(tipsContentPanel, BoxLayout.Y_AXIS));
         tipsContentPanel.setOpaque(false);
+        
+        // Add a small AI icon
+        JPanel iconPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        iconPanel.setOpaque(false);
+        JLabel aiIconLabel = new JLabel(createRobotIcon());
+        JLabel aiLabel = new JLabel("AI Financial Advisor");
+        aiLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        aiLabel.setForeground(PRIMARY_COLOR);
+        iconPanel.add(aiIconLabel);
+        iconPanel.add(aiLabel);
         
         // Add some sample tips (in real app these would come from AI)
         String[] tips = {
@@ -298,6 +430,9 @@ public class DashboardPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(tipsContentPanel);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        
+        // Add components
+        panel.add(iconPanel, BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
         
         // Get more tips button
@@ -310,8 +445,18 @@ public class DashboardPanel extends JPanel {
         refreshTipsButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         refreshTipsButton.addActionListener(e -> refreshTips());
         
+        JButton chatButton = new JButton("Chat with AI Assistant");
+        chatButton.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        chatButton.setBackground(PRIMARY_COLOR);
+        chatButton.setForeground(Color.WHITE);
+        chatButton.setFocusPainted(false);
+        chatButton.setBorderPainted(false);
+        chatButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        chatButton.addActionListener(e -> showAIAdvisorTab());
+        
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.setOpaque(false);
+        buttonPanel.add(chatButton);
         buttonPanel.add(refreshTipsButton);
         panel.add(buttonPanel, BorderLayout.SOUTH);
         
@@ -481,6 +626,9 @@ public class DashboardPanel extends JPanel {
             // Update recent transactions
             updateRecentTransactions(transactions);
             
+            // Update category expenses for pie chart
+            updateCategoryExpenses(transactions);
+            
             // Refresh tips
             refreshTips();
             
@@ -593,7 +741,7 @@ public class DashboardPanel extends JPanel {
      * Get time-based greeting message
      */
     private String getTimeBasedGreeting() {
-        int hour = LocalDate.now().atStartOfDay().getHour();
+        int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
         
         if (hour >= 5 && hour < 12) {
             return "Good morning";
@@ -605,43 +753,63 @@ public class DashboardPanel extends JPanel {
     }
     
     /**
-     * Show transactions tab
+     * Generic method to navigate to a specific tab by index
+     * @param tabIndex the index of the tab to navigate to
+     */
+    private void navigateToTab(int tabIndex) {
+        JTabbedPane tabbedPane = (JTabbedPane) SwingUtilities.getAncestorOfClass(JTabbedPane.class, this);
+        if (tabbedPane != null && tabIndex >= 0 && tabIndex < tabbedPane.getTabCount()) {
+            tabbedPane.setSelectedIndex(tabIndex);
+        }
+    }
+
+    /**
+     * Show transactions tab (index 1)
      */
     private void showTransactionTab() {
-        JTabbedPane tabbedPane = (JTabbedPane) SwingUtilities.getAncestorOfClass(JTabbedPane.class, this);
-        if (tabbedPane != null) {
-            tabbedPane.setSelectedIndex(1); // Transaction Entry tab
-        }
+        navigateToTab(1);
     }
-    
+
     /**
-     * Show categories tab
+     * Show categories tab (index 2)
      */
     private void showCategoriesTab() {
-        JTabbedPane tabbedPane = (JTabbedPane) SwingUtilities.getAncestorOfClass(JTabbedPane.class, this);
-        if (tabbedPane != null) {
-            tabbedPane.setSelectedIndex(2); // Category Management tab
-        }
+        navigateToTab(2);
     }
-    
+
     /**
-     * Show statistics tab
+     * Show statistics tab (index 3)
      */
     private void showStatisticsTab() {
-        JTabbedPane tabbedPane = (JTabbedPane) SwingUtilities.getAncestorOfClass(JTabbedPane.class, this);
-        if (tabbedPane != null) {
-            tabbedPane.setSelectedIndex(3); // Statistics View tab
-        }
+        navigateToTab(3);
     }
-    
+
     /**
-     * Show AI Advisor tab
+     * Show expense alerts tab (index 4)
+     */
+    private void showExpenseAlertsTab() {
+        navigateToTab(4);
+    }
+
+    /**
+     * Show local consumption tab (index 5)
+     */
+    private void showLocalConsumptionTab() {
+        navigateToTab(5);
+    }
+
+    /**
+     * Show AI Advisor tab (index 6)
      */
     private void showAIAdvisorTab() {
-        JTabbedPane tabbedPane = (JTabbedPane) SwingUtilities.getAncestorOfClass(JTabbedPane.class, this);
-        if (tabbedPane != null) {
-            tabbedPane.setSelectedIndex(4); // AI Advisor tab
-        }
+        navigateToTab(6);
+    }
+
+    /**
+     * Navigate to transactions tab and show all transactions
+     */
+    private void showTransactionsTab() {
+        showTransactionTab();
     }
     
     /**
@@ -668,7 +836,8 @@ public class DashboardPanel extends JPanel {
     private void updateTipsContent() {
         try {
             // Clear existing content in tips panel
-            JPanel tipsContent = (JPanel) ((JScrollPane) tipsPanel.getComponent(0)).getViewport().getView();
+            // 由于我们添加了一个iconPanel，滚动面板现在是第二个组件(index 1)
+            JPanel tipsContent = (JPanel) ((JScrollPane) tipsPanel.getComponent(1)).getViewport().getView();
             tipsContent.removeAll();
             
             // Add new financial tips
@@ -705,13 +874,6 @@ public class DashboardPanel extends JPanel {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-    
-    /**
-     * Navigate to transactions tab and show all transactions
-     */
-    private void showTransactionsTab() {
-        showTransactionTab();
     }
     
     /**
@@ -754,7 +916,29 @@ public class DashboardPanel extends JPanel {
         alertsContent.setLayout(new BoxLayout(alertsContent, BoxLayout.Y_AXIS));
         alertsContent.setOpaque(false);
         
-        // Add "View All" button
+        // Add title with icon
+        JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        titlePanel.setOpaque(false);
+        JLabel alertIconLabel = new JLabel("⚠");
+        alertIconLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        alertIconLabel.setForeground(ERROR_COLOR);
+        JLabel alertStatusLabel = new JLabel("Active alerts will appear here");
+        alertStatusLabel.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+        alertStatusLabel.setForeground(TEXT_COLOR);
+        titlePanel.add(alertIconLabel);
+        titlePanel.add(alertStatusLabel);
+        
+        // Add to alerts panel
+        alertsContent.add(titlePanel);
+        alertsContent.add(Box.createVerticalStrut(10));
+        
+        // Add initial empty state message
+        JLabel initialLabel = new JLabel("Loading alerts...", JLabel.CENTER);
+        initialLabel.setFont(new Font("Segoe UI", Font.ITALIC, 14));
+        initialLabel.setForeground(SECONDARY_COLOR);
+        alertsContent.add(initialLabel);
+        
+        // Add "View All" button and AI analysis button
         JButton viewAllButton = new JButton("View All Alerts");
         viewAllButton.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         viewAllButton.setBackground(ERROR_COLOR);
@@ -764,8 +948,18 @@ public class DashboardPanel extends JPanel {
         viewAllButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         viewAllButton.addActionListener(e -> showExpenseAlertsTab());
         
+        JButton aiAnalysisButton = new JButton("AI Spending Analysis");
+        aiAnalysisButton.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        aiAnalysisButton.setBackground(PRIMARY_COLOR);
+        aiAnalysisButton.setForeground(Color.WHITE);
+        aiAnalysisButton.setFocusPainted(false);
+        aiAnalysisButton.setBorderPainted(false);
+        aiAnalysisButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        aiAnalysisButton.addActionListener(e -> showAIAdvisorTab());
+        
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.setOpaque(false);
+        buttonPanel.add(aiAnalysisButton);
         buttonPanel.add(viewAllButton);
         
         // Add content and button to panel
@@ -874,22 +1068,253 @@ public class DashboardPanel extends JPanel {
     }
     
     /**
-     * Show expense alerts tab
+     * Create summary panel showing categorical breakdown
      */
-    private void showExpenseAlertsTab() {
-        Container parent = getParent();
-        while (parent != null && !(parent instanceof JTabbedPane)) {
-            parent = parent.getParent();
+    private JPanel createSummaryPanel() {
+        JPanel panel = createCardPanel("Expense Categories");
+        panel.setLayout(new BorderLayout(10, 10));
+        
+        // Create pie chart placeholder
+        chartPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                int width = getWidth();
+                int height = getHeight();
+                int size = Math.min(width, height) - 40;
+                int x = (width - size) / 2;
+                int y = (height - size) / 2;
+                
+                // If no data, show empty chart
+                if (categoryExpenses.isEmpty()) {
+                    g2d.setColor(Color.LIGHT_GRAY);
+                    g2d.fillOval(x, y, size, size);
+                    
+                    // Draw center circle for donut chart
+                    int innerSize = size / 2;
+                    g2d.setColor(CARD_BG_COLOR);
+                    g2d.fillOval(x + size/4, y + size/4, innerSize, innerSize);
+                    
+                    // Draw "No Data" text
+                    g2d.setColor(TEXT_COLOR);
+                    g2d.setFont(new Font("Segoe UI", Font.BOLD, 14));
+                    FontMetrics fm = g2d.getFontMetrics();
+                    String noDataText = "No Data";
+                    int textWidth = fm.stringWidth(noDataText);
+                    g2d.drawString(noDataText, x + (size - textWidth) / 2, y + size / 2 + fm.getAscent() / 2);
+                    
+                    return;
+                }
+                
+                // Calculate total
+                double total = categoryExpenses.values().stream().mapToDouble(Double::doubleValue).sum();
+                if (total <= 0) {
+                    g2d.setColor(Color.LIGHT_GRAY);
+                    g2d.fillOval(x, y, size, size);
+                    return;
+                }
+                
+                // Draw pie chart
+                int startAngle = 0;
+                int colorIndex = 0;
+                for (Map.Entry<String, Double> entry : categoryExpenses.entrySet()) {
+                    int arcAngle = (int) (360.0 * entry.getValue() / total);
+                    if (arcAngle > 0) {
+                        g2d.setColor(categoryColors[colorIndex % categoryColors.length]);
+                        g2d.fillArc(x, y, size, size, startAngle, arcAngle);
+                        startAngle += arcAngle;
+                    }
+                    colorIndex++;
+                }
+                
+                // Draw center circle (for donut chart effect)
+                int innerSize = size / 2;
+                g2d.setColor(CARD_BG_COLOR);
+                g2d.fillOval(x + size/4, y + size/4, innerSize, innerSize);
+            }
+        };
+        chartPanel.setPreferredSize(new Dimension(0, 150));
+        chartPanel.setBackground(CARD_BG_COLOR);
+        
+        // Make chart clickable to navigate to categories
+        chartPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        chartPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                showCategoriesTab();
+            }
+        });
+        
+        // Add legend
+        JPanel legendPanel = new JPanel(new GridLayout(1, 5, 5, 0));
+        legendPanel.setOpaque(false);
+        
+        String[] categories = {"Food", "Transport", "Shopping", "Bills", "Other"};
+        
+        for (int i = 0; i < categories.length; i++) {
+            JPanel item = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+            item.setOpaque(false);
+            
+            JPanel colorBox = new JPanel();
+            colorBox.setPreferredSize(new Dimension(12, 12));
+            colorBox.setBackground(categoryColors[i % categoryColors.length]);
+            
+            JLabel label = new JLabel(categories[i]);
+            label.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+            
+            // Make each legend item clickable
+            final int categoryIndex = i;
+            item.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            item.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    showCategoriesTab();
+                }
+                
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    label.setForeground(PRIMARY_COLOR);
+                    label.setText("<html><u>" + categories[categoryIndex] + "</u></html>");
+                }
+                
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    label.setForeground(TEXT_COLOR);
+                    label.setText(categories[categoryIndex]);
+                }
+            });
+            
+            item.add(colorBox);
+            item.add(label);
+            legendPanel.add(item);
         }
         
-        if (parent instanceof JTabbedPane) {
-            JTabbedPane tabbedPane = (JTabbedPane) parent;
-            for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-                if (tabbedPane.getComponentAt(i) instanceof ExpenseAlertPanel) {
-                    tabbedPane.setSelectedIndex(i);
-                    break;
-                }
+        // Add view statistics and manage categories buttons
+        JButton viewStatsButton = new JButton("Detailed Statistics");
+        viewStatsButton.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        viewStatsButton.setBackground(SECONDARY_COLOR);
+        viewStatsButton.setForeground(Color.WHITE);
+        viewStatsButton.setFocusPainted(false);
+        viewStatsButton.setBorderPainted(false);
+        viewStatsButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        viewStatsButton.addActionListener(e -> showStatisticsTab());
+        
+        JButton manageCategoriesButton = new JButton("Manage Categories");
+        manageCategoriesButton.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        manageCategoriesButton.setBackground(PRIMARY_COLOR);
+        manageCategoriesButton.setForeground(Color.WHITE);
+        manageCategoriesButton.setFocusPainted(false);
+        manageCategoriesButton.setBorderPainted(false);
+        manageCategoriesButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        manageCategoriesButton.addActionListener(e -> showCategoriesTab());
+        
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonPanel.setOpaque(false);
+        buttonPanel.add(manageCategoriesButton);
+        buttonPanel.add(viewStatsButton);
+        
+        // Add components to panel
+        panel.add(chartPanel, BorderLayout.CENTER);
+        
+        JPanel southPanel = new JPanel(new BorderLayout());
+        southPanel.setOpaque(false);
+        southPanel.add(legendPanel, BorderLayout.CENTER);
+        southPanel.add(buttonPanel, BorderLayout.SOUTH);
+        
+        panel.add(southPanel, BorderLayout.SOUTH);
+        
+        return panel;
+    }
+
+    /**
+     * Update category expenses for pie chart
+     */
+    private void updateCategoryExpenses(List<Transaction> transactions) {
+        // Clear previous data
+        categoryExpenses.clear();
+        
+        // Process only expenses (negative amounts)
+        for (Transaction t : transactions) {
+            double amount = t.getAmount();
+            if (amount < 0) { // It's an expense
+                String category = t.getCategory();
+                double absAmount = Math.abs(amount);
+                
+                // Update category total
+                categoryExpenses.put(category, categoryExpenses.getOrDefault(category, 0.0) + absAmount);
             }
+        }
+        
+        // Merge small categories into "Other"
+        double total = categoryExpenses.values().stream().mapToDouble(Double::doubleValue).sum();
+        double threshold = total * 0.05; // Categories less than 5% go to "Other"
+        
+        Map<String, Double> mergedCategories = new HashMap<>();
+        double otherTotal = 0;
+        
+        for (Map.Entry<String, Double> entry : categoryExpenses.entrySet()) {
+            if (entry.getValue() < threshold) {
+                otherTotal += entry.getValue();
+            } else {
+                mergedCategories.put(entry.getKey(), entry.getValue());
+            }
+        }
+        
+        if (otherTotal > 0) {
+            mergedCategories.put("Other", otherTotal);
+        }
+        
+        // Sort by amount (descending)
+        List<Map.Entry<String, Double>> sortedEntries = new ArrayList<>(mergedCategories.entrySet());
+        sortedEntries.sort(Map.Entry.<String, Double>comparingByValue().reversed());
+        
+        // Update categoryExpenses with sorted data
+        categoryExpenses.clear();
+        for (Map.Entry<String, Double> entry : sortedEntries) {
+            categoryExpenses.put(entry.getKey(), entry.getValue());
+        }
+        
+        // Request repaint of chart panel
+        if (chartPanel != null) {
+            chartPanel.repaint();
+        }
+    }
+
+    /**
+     * Check if a tab at the specified index exists in the parent tabbed pane
+     * @param tabIndex the index to check
+     * @return true if the tab exists
+     */
+    private boolean tabExists(int tabIndex) {
+        JTabbedPane tabbedPane = (JTabbedPane) SwingUtilities.getAncestorOfClass(JTabbedPane.class, this);
+        return tabbedPane != null && tabIndex >= 0 && tabIndex < tabbedPane.getTabCount();
+    }
+
+    /**
+     * Verify if all required tabs are present and update UI accordingly
+     * Should be called after the dashboard is fully initialized
+     */
+    private void verifyTabAvailability() {
+        // Check if essential tabs exist
+        boolean transactionsTabExists = tabExists(1);
+        boolean categoriesTabExists = tabExists(2);
+        boolean statisticsTabExists = tabExists(3);
+        boolean alertsTabExists = tabExists(4);
+        boolean localConsumptionTabExists = tabExists(5);
+        boolean aiAssistantTabExists = tabExists(6);
+        
+        // Update UI based on tab availability
+        // You might want to disable buttons or show error messages if tabs are missing
+        
+        // This is just a notification in console for debugging purposes
+        if (!transactionsTabExists || !categoriesTabExists || !statisticsTabExists || 
+                !alertsTabExists || !localConsumptionTabExists || !aiAssistantTabExists) {
+            System.out.println("Warning: Some tabs are missing in the dashboard. Navigation may not work properly.");
+        } else {
+            System.out.println("All dashboard navigation tabs are available.");
         }
     }
 } 
