@@ -11,4 +11,4 @@ if not exist target\finance-app-1.0-SNAPSHOT-jar-with-dependencies.jar (
 )
 echo 正在启动应用程序...
 java -jar target\finance-app-1.0-SNAPSHOT-jar-with-dependencies.jar
-pause 
+pause
