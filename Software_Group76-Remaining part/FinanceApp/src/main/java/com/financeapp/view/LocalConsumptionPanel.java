@@ -1,19 +1,13 @@
 package com.financeapp.view;
 
 import com.financeapp.controller.TransactionController;
-import com.financeapp.model.Transaction;
 import com.financeapp.util.CSVHandler;
 
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.List;
+
 
 public class LocalConsumptionPanel extends JPanel {
     private static final Color PRIMARY_COLOR = new Color(41, 128, 185);
