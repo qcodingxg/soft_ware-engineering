@@ -115,7 +115,7 @@ public class LocalConsumptionPanel extends JPanel {
         panel.setOpaque(false);
         
         JLabel titleLabel = new JLabel("Chinese Consumption Patterns");
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 22));
         titleLabel.setForeground(PRIMARY_COLOR);
         panel.add(titleLabel, BorderLayout.WEST);
         
@@ -487,88 +487,120 @@ public class LocalConsumptionPanel extends JPanel {
         
         return panel;
     }
-    
+
     private JPanel createDigitalServicesPanel() {
         JPanel panel = createCardPanel("Digital Services Adoption");
         panel.setLayout(new BorderLayout(10, 10));
-        
+
         // Create service usage chart
         JPanel chartPanel = new JPanel(new GridLayout(3, 2, 15, 15));
         chartPanel.setOpaque(false);
         chartPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        
-        // Digital services data
+
+        // Digital services data with descriptions
         String[][] servicesData = {
-            {"Mobile Payment", "98%", "Daily"},
-            {"Food Delivery", "75%", "Weekly"},
-            {"Ride Hailing", "65%", "Weekly"},
-            {"Online Education", "45%", "Monthly"},
-            {"Digital Healthcare", "38%", "Monthly"},
-            {"Subscription Services", "25%", "Monthly"}
+                {"Mobile Payment", "98%", "Daily", "Use mobile devices to make payments"},
+                {"Food Delivery", "75%", "Weekly", "Order food from restaurants for delivery"},
+                {"Ride Hailing", "65%", "Weekly", "Use mobile apps to book rides"},
+                {"Online Education", "45%", "Monthly", "Take online courses"},
+                {"Digital Healthcare", "38%", "Monthly", "Access healthcare services online"},
+                {"Subscription Services", "25%", "Monthly", "Subscribe to various online services"}
         };
-        
+
         // Create service tiles
         for (String[] service : servicesData) {
-            JPanel servicePanel = createServiceTile(service[0], service[1], service[2]);
+            JPanel servicePanel = createServiceTile(service[0], service[1], service[2], service[3]);
             chartPanel.add(servicePanel);
         }
-        
+
         JScrollPane scrollPane = new JScrollPane(chartPanel);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.getViewport().setBackground(CARD_BACKGROUND);
-        
+
         // Create summary
         JPanel summaryPanel = new JPanel();
         summaryPanel.setLayout(new BoxLayout(summaryPanel, BoxLayout.Y_AXIS));
         summaryPanel.setOpaque(false);
         summaryPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
-        
+
         JLabel summaryLabel = new JLabel("Digital Service Integration");
         summaryLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
         summaryPanel.add(summaryLabel);
-        
+
         JLabel statsLabel = new JLabel("Average user accesses 4.2 digital services daily");
         statsLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         statsLabel.setForeground(SECONDARY_COLOR);
         summaryPanel.add(statsLabel);
-        
+
         panel.add(scrollPane, BorderLayout.CENTER);
         panel.add(summaryPanel, BorderLayout.SOUTH);
-        
+
         return panel;
     }
-    
-    private JPanel createServiceTile(String serviceName, String penetration, String frequency) {
+
+    private static final Color[] BLUE_SHADES = {
+            new Color(41, 128, 185), // 深蓝
+            new Color(52, 152, 219), // 中蓝
+            new Color(173, 216, 230), // 浅蓝
+            new Color(224, 243, 250), // 非常浅的蓝
+            new Color(236, 240, 241)  // 几乎白色的蓝
+    };
+
+    private Color getServiceColor(String serviceName) {
+        switch (serviceName) {
+            case "Mobile Payment":
+                return BLUE_SHADES[0]; // 深蓝
+            case "Food Delivery":
+                return BLUE_SHADES[1]; // 中蓝
+            case "Ride Hailing":
+                return BLUE_SHADES[2]; // 浅蓝
+            case "Online Education":
+                return BLUE_SHADES[3]; // 非常浅的蓝
+            case "Digital Healthcare":
+                return BLUE_SHADES[4]; // 几乎白色的蓝
+            case "Subscription Services":
+                return BLUE_SHADES[0]; // 深蓝
+            default:
+                return Color.GRAY;
+        }
+    }
+
+    private JPanel createServiceTile(String serviceName, String penetration, String frequency, String description) {
         JPanel panel = new JPanel(new BorderLayout(5, 5));
         panel.setBackground(new Color(245, 245, 245));
         panel.setBorder(BorderFactory.createLineBorder(new Color(220, 220, 220)));
-        
-        // Service icon placeholder
+
+        // Service icon placeholder with color
         JPanel iconPanel = new JPanel();
         iconPanel.setPreferredSize(new Dimension(40, 40));
-        iconPanel.setBackground(PRIMARY_COLOR);
-        
+        iconPanel.setBackground(getServiceColor(serviceName)); // 使用不同的蓝色阴影
+
         // Service info
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
         infoPanel.setOpaque(false);
-        
+
         JLabel nameLabel = new JLabel(serviceName);
         nameLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        
+
         JLabel usageLabel = new JLabel("Usage: " + penetration);
         usageLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        
+
         JLabel frequencyLabel = new JLabel("Freq: " + frequency);
         frequencyLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        
+
+        JLabel descriptionLabel = new JLabel("Description: " + description);
+        descriptionLabel.setFont(new Font("Segoe UI", Font.ITALIC, 11));
+        descriptionLabel.setForeground(Color.GRAY);
+
         infoPanel.add(nameLabel);
         infoPanel.add(usageLabel);
         infoPanel.add(frequencyLabel);
-        
+        infoPanel.add(descriptionLabel);
+
         panel.add(iconPanel, BorderLayout.WEST);
         panel.add(infoPanel, BorderLayout.CENTER);
-        
+
         return panel;
     }
     
