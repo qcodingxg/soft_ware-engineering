@@ -34,6 +34,7 @@ public class ExpenseAlertPanel extends JPanel {
     private JButton viewAllAlertsButton;
     private JButton saveSettingsButton;
     private JButton refreshButton;
+    private JButton historyAlarmsButton; // 新增历史警报按钮
     private JCheckBox enableAlertsCheckbox;
     private JTextField globalThresholdField;
     private JTable categoryThresholdsTable;
@@ -68,6 +69,7 @@ public class ExpenseAlertPanel extends JPanel {
         this.alertService.registerNotificationHandler(
                 new AlertService.GuiNotificationHandler(this::updateExpenseAlerts)
         );
+
         initUI();
         loadSettings();
     }
@@ -99,6 +101,17 @@ public class ExpenseAlertPanel extends JPanel {
         JPanel refreshPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         refreshPanel.setOpaque(false);
         refreshPanel.add(refreshButton);
+
+        // 新增历史警报按钮
+        historyAlarmsButton = new JButton("History Alarms");
+        historyAlarmsButton.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        historyAlarmsButton.setForeground(Color.BLACK);
+        historyAlarmsButton.setBackground(Color.WHITE);
+        historyAlarmsButton.setFocusPainted(false);
+        historyAlarmsButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        historyAlarmsButton.addActionListener(e -> showHistoryAlarms());
+        refreshPanel.add(historyAlarmsButton);
+
         add(refreshPanel, BorderLayout.SOUTH);
 
         // Initial data update
@@ -254,11 +267,6 @@ public class ExpenseAlertPanel extends JPanel {
         buttonPanel.add(removeCategoryButton);
         panel.add(buttonPanel, BorderLayout.SOUTH);
 
-        // 填充表格数据
-        for (Map.Entry<String, Double> entry : categoryThresholds.entrySet()) {
-            categoryThresholdsModel.addRow(new Object[]{entry.getKey(), entry.getValue()});
-        }
-
         return panel;
     }
 
@@ -341,6 +349,19 @@ public class ExpenseAlertPanel extends JPanel {
         }
         JScrollPane scrollPane = new JScrollPane(textArea);
         JOptionPane.showMessageDialog(this, scrollPane, "All Alerts", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    /**
+     * 显示历史警报
+     */
+    private void showHistoryAlarms() {
+        List<Alert> allAlerts = alertService.getAllAlerts();
+        JTextArea textArea = new JTextArea();
+        for (Alert alert : allAlerts) {
+            textArea.append(alert.getTimestamp().toLocalDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + " - " + alert.getMessage() + "\n");
+        }
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        JOptionPane.showMessageDialog(this, scrollPane, "History Alarms", JOptionPane.INFORMATION_MESSAGE);
     }
 
     /**
