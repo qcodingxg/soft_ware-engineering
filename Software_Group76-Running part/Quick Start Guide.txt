@@ -1,0 +1,35 @@
+=====================================================
+       Personal Finance Management System
+               Quick Start Guide
+                    v1.0
+=====================================================
+
+[System Requirements]
+- Windows 10 or higher
+- Java 21 installed
+
+[How to Start]
+1. Double-click the "run_finance_app.bat" file
+2. The system will automatically check for Java and launch the application
+
+[First-time Use]
+Default test account:
+- Username: test
+- Password: 1234
+
+Or click "Register" to create a new account.
+
+[Troubleshooting]
+1. Make sure Java 21 is installed
+   - Open command prompt and type "java -version" to check
+
+2. If you see "Java not found" error:
+   - Visit https://adoptium.net/temurin/releases/?version=21 to download and install Java 21
+
+[Data Files]
+All your data is stored in the app/data directory:
+- transactions.csv: Transaction records
+- users.csv: User account information
+
+Software Engineering Group 76
+===================================================== 
