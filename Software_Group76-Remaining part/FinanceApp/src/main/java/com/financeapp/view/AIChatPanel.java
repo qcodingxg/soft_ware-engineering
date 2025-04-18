@@ -13,6 +13,9 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.text.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * AI聊天面板，支持与AI财务顾问进行对话
@@ -179,7 +182,14 @@ public class AIChatPanel extends JPanel {
         currentResponse = new StringBuilder();
         
         // 添加初始化消息
-        addAIMessage("Hello! I'm your personal financial advisor. Whether it's budget planning, savings goals, investment advice, or debt management, I can provide professional guidance. What financial questions can I help you with?");
+        addAIMessage("# Welcome to AI Financial Advisor!\n\n" +
+                     "I'm your personal financial advisor. I can help you with:\n\n" +
+                     "- **Budget planning** and expense tracking\n" +
+                     "- **Debt management** and repayment strategies\n" +
+                     "- **Savings goals** setting and methods\n" +
+                     "- Basic **investment advice** (stocks, funds, etc.)\n" +
+                     "- **Tax planning** and optimization\n\n" +
+                     "What financial questions can I help you with today?");
         
         // 发送初始交易数据到AI
         if (chatService.getTransactionsData() != null && !chatService.getTransactionsData().isEmpty()) {
@@ -282,7 +292,11 @@ public class AIChatPanel extends JPanel {
                     
                     // 显示分析结果和财务建议
                     addAIMessage("Based on your transaction data, I have prepared the following financial analysis and advice:\n\n" + 
-                                response + "\n\nWhat specific financial questions do you need help with?");
+                                response + "\n\n" +
+                                "Let me know if you need more specific financial advice. You can ask a question like: \n" + 
+                                "- How to *save money* each month?\n" + 
+                                "- What's the best strategy for **debt reduction**?\n" +
+                                "- How to `invest` wisely for the future?");
                 });
                 
                 // 启用输入框
@@ -349,7 +363,13 @@ public class AIChatPanel extends JPanel {
                 
                 @Override
                 public void onComplete() {
-                    SwingUtilities.invokeLater(() -> setInputEnabled(true));
+                    SwingUtilities.invokeLater(() -> {
+                        // 启用输入控件
+                        setInputEnabled(true);
+                        
+                        // 将流式文本转换为带Markdown格式的文本
+                        ChatBubbleFactory.finalizeStreamingMessage(currentAIMessageArea, chatMessagesPanel, messageComponents);
+                    });
                 }
             });
         }
