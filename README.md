@@ -2,7 +2,50 @@
 
 A comprehensive personal finance management system for recording and analyzing personal income and expenses, with integrated intelligent financial advisory services.
 
-## Features
+## Repository Structure
+
+This repository contains two main parts:
+
+1. **Software_Group76-Running part** - Executable version of the application
+2. **Software_Group76-Remaining part** - Source code and development version
+
+## Executable Version (Software_Group76-Running part)
+
+This is the ready-to-run version of the Personal Finance Management System. This version provides a one-click application launch without the need to compile source code.
+
+### System Requirements
+
+- Windows 10 or higher
+- Java 21 (LTS version) installed
+- Screen resolution of at least 1280×720
+
+### How to Run
+
+1. Ensure Java 21 is installed on your system. If not, download and install it from the [Oracle website](https://www.oracle.com/java/technologies/downloads/#java21) or [Adoptium](https://adoptium.net/temurin/releases/?version=21).
+
+2. Double-click the `run_finance_app.bat` file to start the application.
+
+3. If you are a first-time user, use the registration feature to create a new account. You can also use the following test account:
+   - Username: test
+   - Password: 1234
+
+### File Structure
+
+- `app/` - Application folder
+  - `finance-app-1.0-SNAPSHOT-jar-with-dependencies.jar` - Main application file
+  - `data/` - Data folder
+    - `transactions.csv` - Transaction records
+    - `users.csv` - User information
+  - `lib/` - Dependencies
+
+- `run_finance_app.bat` - Windows launch script
+- `Quick Start Guide.txt` - Brief guide for running the application
+
+## Source Code Version (Software_Group76-Remaining part)
+
+This is the development version containing all source code of the Personal Finance Management System.
+
+### Features
 
 - **Transaction Management**: Add, import, edit, and delete transaction records
 - **Statistical Analysis**: View monthly expense statistics and budget recommendations
@@ -14,14 +57,14 @@ A comprehensive personal finance management system for recording and analyzing p
 - **Localized Financial Analysis**: Analyze consumption patterns based on geographic location
 - **Budget Calculator**: Provide intelligent budget suggestions and analysis
 
-## System Requirements
+### System Requirements for Development
 
 - Java 21 (LTS version)
 - Swing GUI library (part of the Java standard library)
 - JUnit 5 (for running tests)
 - External dependencies: org.json (for JSON processing)
 
-## Directory Structure
+### Directory Structure
 
 ```
 FinanceApp/
@@ -79,9 +122,9 @@ FinanceApp/
 └── README.md                     # Project documentation
 ```
 
-## Quick Start
+### Development Quick Start
 
-### Using Batch File (Recommended)
+#### Using Batch File (Recommended)
 
 1. Double-click the `run.bat` file in the project root directory, or execute in command line:
    ```
@@ -89,7 +132,7 @@ FinanceApp/
    ```
    This command will automatically compile all Java source files and start the application.
 
-### Manual Compilation and Execution
+#### Manual Compilation and Execution
 
 1. Create a bin directory in the project root (if it doesn't exist):
    ```
