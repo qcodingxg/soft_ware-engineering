@@ -394,9 +394,56 @@ public class ExpenseAlertPanel extends JPanel {
      * 添加类别
      */
     private void addCategory() {
-        String category = JOptionPane.showInputDialog(this, "Enter category name:");
-        if (category != null &&!category.isEmpty()) {
-            categoryThresholdsModel.addRow(new Object[]{category, 0.0});
+        List<Transaction> transactions = transactionController.getTransactions();
+        Set<String> allCategories = transactions.stream()
+                .map(Transaction::getCategory)
+                .collect(Collectors.toSet());
+
+        // 排除已经添加过的类别
+        allCategories.removeAll(categoryThresholds.keySet());
+
+        if (allCategories.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No new categories available to add.", "Info", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        String[] categoryArray = allCategories.toArray(new String[0]);
+        DefaultTableModel model = new DefaultTableModel(new String[]{"Category", "Set Threshold"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        for (String category : categoryArray) {
+            boolean hasThreshold = categoryThresholds.containsKey(category);
+            String status = hasThreshold ? "yes" : "no";
+            model.addRow(new Object[]{category, status});
+        }
+
+        JTable table = new JTable(model);
+        table.setRowHeight(25);
+        table.getColumnModel().getColumn(0).setPreferredWidth(150);
+        table.getColumnModel().getColumn(1).setPreferredWidth(50);
+
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+        table.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
+
+        JScrollPane scrollPane = new JScrollPane(table);
+
+        int result = JOptionPane.showConfirmDialog(this, scrollPane, "Select Categories to Add", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (result == JOptionPane.OK_OPTION) {
+            List<String> selectedCategories = new ArrayList<>();
+            for (int i = 0; i < table.getSelectedRows().length; i++) {
+                int selectedRow = table.getSelectedRows()[i];
+                String category = (String) model.getValueAt(selectedRow, 0);
+                selectedCategories.add(category);
+            }
+            for (String category : selectedCategories) {
+                categoryThresholdsModel.addRow(new Object[]{category, 0.0});
+            }
             saveCategoryThresholds();
         }
     }
