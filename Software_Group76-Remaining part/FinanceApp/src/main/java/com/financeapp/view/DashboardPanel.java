@@ -762,7 +762,7 @@ public class DashboardPanel extends JPanel {
             tabbedPane.setSelectedIndex(tabIndex);
         }
     }
-
+    
     /**
      * Show transactions tab (index 1)
      */
@@ -776,7 +776,7 @@ public class DashboardPanel extends JPanel {
     private void showCategoriesTab() {
         navigateToTab(2);
     }
-
+    
     /**
      * Show statistics tab (index 3)
      */
