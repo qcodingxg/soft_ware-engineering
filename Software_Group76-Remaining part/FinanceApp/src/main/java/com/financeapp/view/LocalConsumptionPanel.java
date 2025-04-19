@@ -312,7 +312,7 @@ public class LocalConsumptionPanel extends JPanel {
         summaryPanel.setLayout(new BoxLayout(summaryPanel, BoxLayout.Y_AXIS));
         summaryPanel.setOpaque(false);
         
-        JLabel methodLabel = new JLabel("Mobile Payment Dominance");
+        JLabel methodLabel = new JLabel("Mobile Paymnance");
         methodLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
         summaryPanel.add(methodLabel);
         
@@ -396,6 +396,7 @@ public class LocalConsumptionPanel extends JPanel {
                 }
             }
         };
+
         chartPanel.setPreferredSize(new Dimension(300, 200));
         chartPanel.setBackground(CARD_BACKGROUND);
         
@@ -440,7 +441,7 @@ public class LocalConsumptionPanel extends JPanel {
             {"JD.com", "28%", "+12.2%", "Electronics, home appliances"},
             {"Pinduoduo", "15%", "+24.8%", "Value shopping, groceries"},
             {"Douyin", "8%", "+45.2%", "Fashion, cosmetics"},
-            {"Others", "7%", "+5.4%", "Niche markets"}
+            {"Others", "7%", "+%", "Niche markets"}
         };
         
         // Create platform components
@@ -589,7 +590,7 @@ public class LocalConsumptionPanel extends JPanel {
         JLabel frequencyLabel = new JLabel("Freq: " + frequency);
         frequencyLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
 
-        JLabel descriptionLabel = new JLabel("Deription: " + description);
+        JLabel descriptionLabel = new JLabel("Description: " + description);
         descriptionLabel.setFont(new Font("Segoe UI", Font.ITALIC, 11));
         descriptionLabel.setForeground(Color.GRAY);
 
