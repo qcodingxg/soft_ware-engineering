@@ -6,6 +6,10 @@ import com.financeapp.util.CSVHandler;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.geom.AffineTransform;
 import java.util.*;
 
 
@@ -63,18 +67,12 @@ public class LocalConsumptionPanel extends JPanel {
     private static final Map<String, String> SHOPPING_FESTIVALS = new HashMap<>();
     static {
         SHOPPING_FESTIVALS.put("Double 11", "November 11");
-        SHOPPING_FESTIVALS.put("618 Festival", "June 18");
+        SHOPPING_FESTIVALS.put("618", "June 18");
         SHOPPING_FESTIVALS.put("Double 12", "December 12");
         SHOPPING_FESTIVALS.put("Women's Day", "March 8");
-        SHOPPING_FESTIVALS.put("Chinese New Year", "January/February");
-        SHOPPING_FESTIVALS.put("Cyber Monday", "November (Monday after Thanksgiving)");
-        SHOPPING_FESTIVALS.put("Black Friday", "November (Day after Thanksgiving)");
         SHOPPING_FESTIVALS.put("Valentine's Day", "February 14");
-        SHOPPING_FESTIVALS.put("Dragon Boat Festival", "May/June (Lunar Calendar)");
-        SHOPPING_FESTIVALS.put("Mid-Autumn Festival", "September/October (Lunar Calendar)");
-        SHOPPING_FESTIVALS.put("Singles' Day", "November 11");
-        SHOPPING_FESTIVALS.put("Father's Day", "June (Third Sunday)");
-        SHOPPING_FESTIVALS.put("Mother's Day", "May (Second Sunday)");
+        SHOPPING_FESTIVALS.put("Dragon Boat ", "May/June (Lunar Calendar)");
+        SHOPPING_FESTIVALS.put("Mid-Autumn", "September/October (Lunar Calendar)");
     }
     
     private JPanel mainContent;
@@ -355,161 +353,228 @@ public class LocalConsumptionPanel extends JPanel {
 
         return panel;
     }
-    
+
     private JPanel createFestivalSpendingPanel() {
         JPanel panel = createCardPanel("Shopping Festival Analysis");
         panel.setLayout(new BorderLayout(10, 10));
-        
+
         // Create festival chart
         JPanel chartPanel = new JPanel() {
+            private int tooltipX, tooltipY;
+            private String tooltipText;
+
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                
+
                 int width = getWidth();
                 int height = getHeight();
-                
+
                 // Draw chart background
-                g2d.setColor(new Color(240, 240, 240));
+                g2d.setColor(CARD_BACKGROUND);
                 g2d.fillRect(40, 30, width - 80, height - 60);
-                
+
                 // Draw axes
                 g2d.setColor(Color.DARK_GRAY);
                 g2d.drawLine(40, height - 30, width - 40, height - 30); // X-axis
                 g2d.drawLine(40, 30, 40, height - 30); // Y-axis
-                
+
                 // Sample data for festival spending (billions)
-                String[] festivals = {"Double 11", "618", "Double 12", "CNY", "Other"};
-                double[] amounts = {84.5, 58.2, 30.8, 25.5, 45.2};
-                
+                String[] festivals = SHOPPING_FESTIVALS.keySet().toArray(new String[0]);
+                double[] amounts = {84.5, 58.2, 30.8, 25.5, 45.2, 60.0, 70.5, 35.0, 50.0, 40.0, 90.0, 55.0, 65.0};
+
                 // Find max for scaling
-                double maxAmount = Arrays.stream(amounts).max().orElse(100);
-                
+                double maxAmount = 90.0; // Fixed max for better visualization
+
                 // Draw bars
                 int barWidth = (width - 120) / festivals.length;
-                int spacing = 10;
+                int spacing = 5;
                 int barX = 60;
-                
+
                 for (int i = 0; i < festivals.length; i++) {
                     // Bar height relative to max
-                    int barHeight = (int)((amounts[i] / maxAmount) * (height - 80));
-                    
+                    int barHeight = (int) ((amounts[i] / maxAmount) * (height - 80));
+
                     // Festival-specific colors
-                    if (festivals[i].equals("Double 11")) {
+                    if (festivals[i].equals("Double 11") || festivals[i].equals("Singles' Day")) {
                         g2d.setColor(FESTIVAL_RED);
-                    } else if (festivals[i].equals("CNY")) {
+                    } else if (festivals[i].equals("Chinese New Year")) {
                         g2d.setColor(FESTIVAL_GOLD);
                     } else {
                         g2d.setColor(PRIMARY_COLOR);
                     }
-                    
+
                     // Draw bar
                     g2d.fillRect(barX, height - 30 - barHeight, barWidth - spacing, barHeight);
-                    
+
                     // Draw label
                     g2d.setColor(Color.DARK_GRAY);
-                    g2d.drawString(festivals[i], barX, height - 15);
-                    
+                    g2d.drawString(festivals[i], barX + (barWidth - spacing) / 2 - g2d.getFontMetrics().stringWidth(festivals[i]) / 2, height - 15);
+
                     // Draw value
-                    g2d.drawString(String.format("¥%.1fB", amounts[i]), 
-                                  barX, height - 35 - barHeight);
-                    
+                    g2d.drawString(String.format("¥%.1fB", amounts[i]),
+                            barX + (barWidth - spacing) / 2 - g2d.getFontMetrics().stringWidth(String.format("¥%.1fB", amounts[i])) / 2, height - 35 - barHeight);
+
                     barX += barWidth;
                 }
+
+                // Draw tooltip
+                if (tooltipText != null) {
+                    g2d.setColor(new Color(255, 255, 204));
+                    g2d.fillRect(tooltipX, tooltipY, 100, 20);
+                    g2d.setColor(Color.BLACK);
+                    g2d.drawString(tooltipText, tooltipX + 5, tooltipY + 15);
+                }
+            }
+
+            @Override
+            public void addNotify() {
+                super.addNotify();
+
+                // Add mouse motion listener for tooltips
+                addMouseMotionListener(new MouseMotionAdapter() {
+                    @Override
+                    public void mouseMoved(MouseEvent e) {
+                        int x = e.getX();
+                        int y = e.getY();
+
+                        // Check if the mouse is over a bar
+                        int barWidth = (getWidth() - 120) / SHOPPING_FESTIVALS.size();
+                        int spacing = 5;
+                        int barX = 60;
+
+                        for (int i = 0; i < SHOPPING_FESTIVALS.size(); i++) {
+                            if (x >= barX && x <= barX + barWidth - spacing) {
+                                double amount = 84.5; // Sample data for demonstration
+                                tooltipX = x + 10;
+                                tooltipY = y - 10;
+                                tooltipText = String.format("¥%.1fB", amount);
+                                repaint();
+                                return;
+                            }
+                            barX += barWidth;
+                        }
+
+                        // Mouse is not over a bar, clear tooltip
+                        tooltipText = null;
+                        repaint();
+                    }
+                });
             }
         };
-
-        chartPanel.setPreferredSize(new Dimension(300, 200));
+        chartPanel.setPreferredSize(new Dimension(600, 400));
         chartPanel.setBackground(CARD_BACKGROUND);
-        
+
         // Create festival summary
         JPanel summaryPanel = new JPanel();
         summaryPanel.setLayout(new BoxLayout(summaryPanel, BoxLayout.Y_AXIS));
         summaryPanel.setOpaque(false);
-        
-        JLabel festivalLabel = new JLabel("Shopping Festival Spending");
+
+        JLabel festivalLabel = new JLabel("Shopping Festival Analysis");
         festivalLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
         summaryPanel.add(festivalLabel);
-        
-        JLabel peakLabel = new JLabel("Double 11 (Singles' Day): ¥84.5B total sales");
-        peakLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        peakLabel.setForeground(FESTIVAL_RED);
-        summaryPanel.add(peakLabel);
-        
-        JLabel growthLabel = new JLabel("YoY Festival Growth: +15.8%");
+
+        JLabel growthLabel = new JLabel("Total Spending: ¥450B annually");
         growthLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         growthLabel.setForeground(SUCCESS_COLOR);
         summaryPanel.add(growthLabel);
-        
+
         panel.add(chartPanel, BorderLayout.CENTER);
         panel.add(summaryPanel, BorderLayout.SOUTH);
-        
+
         return panel;
     }
-    
+
+    private static final Map<String, ImageIcon> PLATFORM_ICONS = new HashMap<>();
+    static {
+        PLATFORM_ICONS.put("Taobao/Tmall", new ImageIcon("src/main/resources/icons/taobao.png")); // 请替换为实际的图标路径
+        PLATFORM_ICONS.put("JD.com", new ImageIcon("src/main/resources/icons/jingdong.png")); // 请替换为实际的图标路径
+        PLATFORM_ICONS.put("Pinduoduo", new ImageIcon("src/main/resources/icons/pinduoduo.png")); // 请替换为实际的图标路径
+        PLATFORM_ICONS.put("Douyin", new ImageIcon("src/main/resources/icons/douyin.png")); // 请替换为实际的图标路径
+        PLATFORM_ICONS.put("Others", new ImageIcon("src/main/resources/icons/other.png")); // 请替换为实际的图标路径
+    }
+
     private JPanel createEcommerceAnalysisPanel() {
         JPanel panel = createCardPanel("E-commerce Platforms");
         panel.setLayout(new BorderLayout(10, 10));
-        
+
         // Create data panel
         JPanel dataPanel = new JPanel();
         dataPanel.setLayout(new BoxLayout(dataPanel, BoxLayout.Y_AXIS));
         dataPanel.setOpaque(false);
         dataPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        
+
         // Platform data
         String[][] platformData = {
-            {"Taobao/Tmall", "42%", "+8.5%", "All categories"},
-            {"JD.com", "28%", "+12.2%", "Electronics, home appliances"},
-            {"Pinduoduo", "15%", "+24.8%", "Value shopping, groceries"},
-            {"Douyin", "8%", "+45.2%", "Fashion, cosmetics"},
-            {"Others", "7%", "+%", "Niche markets"}
+                {"Taobao/Tmall", "42%", "+8.5%", "All categories"},
+                {"JD.com", "28%", "+12.2%", "Electronics, home appliances"},
+                {"Pinduoduo", "15%", "+24.8%", "Value shopping, groceries"},
+                {"Douyin", "8%", "+45.2%", "Fashion, cosmetics"},
+                {"Others", "7%", "+%", "Niche markets"}
         };
-        
+
         // Create platform components
-        for (String[] platform : platformData) {
+        for (int i = 0; i < platformData.length; i++) {
+            String[] platform = platformData[i];
             JPanel platformPanel = new JPanel(new BorderLayout(10, 0));
             platformPanel.setOpaque(false);
             platformPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(230, 230, 230)));
-            
+
             JLabel nameLabel = new JLabel(platform[0]);
             nameLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
-            
+            nameLabel.setForeground(PRIMARY_COLOR);
+            nameLabel.setIcon(PLATFORM_ICONS.get(platform[0])); // 添加图标
+            nameLabel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0)); // 调整图标和文字的间距
+
             JPanel detailsPanel = new JPanel(new GridLayout(2, 2, 10, 2));
             detailsPanel.setOpaque(false);
-            
+            detailsPanel.setBackground(new Color(255, 255, 255, 50)); // 添加背景色
+            detailsPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5)); // 调整内边距
+
             JLabel marketShareLabel = new JLabel("Market Share: " + platform[1]);
             marketShareLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-            
+            marketShareLabel.setForeground(PRIMARY_COLOR);
+            marketShareLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10)); // 调整间距
+
             JLabel growthLabel = new JLabel("Growth: " + platform[2]);
             growthLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
             if (platform[2].startsWith("+")) {
                 growthLabel.setForeground(SUCCESS_COLOR);
+            } else {
+                growthLabel.setForeground(Color.RED); // 如果增长率为负数，则显示为红色
             }
-            
+            growthLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10)); // 调整间距
+
             JLabel categoryLabel = new JLabel("Focus: " + platform[3]);
             categoryLabel.setFont(new Font("Segoe UI", Font.ITALIC, 12));
-            
+            categoryLabel.setForeground(Color.GRAY); // 设置为灰色，以突出显示其他信息
+            categoryLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10)); // 调整间距
+
             detailsPanel.add(marketShareLabel);
             detailsPanel.add(growthLabel);
             detailsPanel.add(categoryLabel);
-            
+
             platformPanel.add(nameLabel, BorderLayout.WEST);
             platformPanel.add(detailsPanel, BorderLayout.CENTER);
-            
+
             // Add some spacing
             dataPanel.add(platformPanel);
-            dataPanel.add(Box.createVerticalStrut(10));
+            dataPanel.add(Box.createVerticalStrut(10)); // 增加垂直间距
         }
-        
+
         JScrollPane scrollPane = new JScrollPane(dataPanel);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.getViewport().setBackground(CARD_BACKGROUND);
-        
+        scrollPane.addMouseListener(new MouseAdapter() { // 添加鼠标监听器，用于处理鼠标点击事件（可选）
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // 处理鼠标点击事件，例如显示详细信息窗口或执行其他操作（可选）
+            }
+        });
+
         panel.add(scrollPane, BorderLayout.CENTER);
-        
         return panel;
     }
 
