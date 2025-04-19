@@ -499,7 +499,7 @@ public class LocalConsumptionPanel extends JPanel {
 
         // Digital services data with descriptions
         String[][] servicesData = {
-                {"Mobile Payment", "98%", "Daily", "Use mobile devices to make payments"},
+                {"Mobile Payment", "90%", "Daily", "Use mobile devices to make payments"},
                 {"Food Delivery", "75%", "Weekly", "Order food from restaurants for delivery"},
                 {"Ride Hailing", "65%", "Weekly", "Use mobile apps to book rides"},
                 {"Online Education", "45%", "Monthly", "Take online courses"},
