@@ -56,7 +56,8 @@ public class AIChatPanel extends JPanel {
         "What's the best way to save for retirement?",
         "How can I pay off my debt faster?",
         "Should I invest in stocks or mutual funds?",
-        "How much emergency fund should I have?"
+        "How much emergency fund should I have?",
+        "What are the benefits of a high-yield savings account?"
     };
 
     /**
