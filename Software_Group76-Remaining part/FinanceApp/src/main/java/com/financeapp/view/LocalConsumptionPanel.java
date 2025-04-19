@@ -589,7 +589,7 @@ public class LocalConsumptionPanel extends JPanel {
         JLabel frequencyLabel = new JLabel("Freq: " + frequency);
         frequencyLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
 
-        JLabel descriptionLabel = new JLabel("Description: " + description);
+        JLabel descriptionLabel = new JLabel("Deription: " + description);
         descriptionLabel.setFont(new Font("Segoe UI", Font.ITALIC, 11));
         descriptionLabel.setForeground(Color.GRAY);
 
