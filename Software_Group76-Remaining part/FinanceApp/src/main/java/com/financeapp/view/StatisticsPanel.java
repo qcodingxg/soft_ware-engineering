@@ -9,10 +9,8 @@ import java.awt.*;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.TextStyle;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 /**
  * Statistics View Panel
@@ -26,8 +24,10 @@ public class StatisticsPanel extends JPanel {
     private JPanel chartPanel;
     private JTextArea suggestionsArea;
     private JComboBox<Integer> yearComboBox;
-    private JComboBox<String> monthComboBox;
-    
+    //private JComboBox<String> monthComboBox;
+    //将monthComboBox改为JList,实现多选
+    private JList<String> monthList;
+
     // Colors (matching login panel)
     private static final Color PRIMARY_COLOR = new Color(41, 128, 185);
     private static final Color SECONDARY_COLOR = new Color(52, 152, 219);
@@ -126,44 +126,58 @@ public class StatisticsPanel extends JPanel {
         monthLabel.setForeground(TEXT_COLOR);
         panel.add(monthLabel);
         
-        monthComboBox = new JComboBox<>();
-        monthComboBox.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        monthComboBox.setBackground(Color.WHITE);
-        monthComboBox.setForeground(TEXT_COLOR);
-        monthComboBox.setPreferredSize(new Dimension(120, 25));
-        
-        // Add custom renderer to fix display issues
-        monthComboBox.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, 
-                    int index, boolean isSelected, boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                setOpaque(true);
-                if (isSelected) {
-                    setBackground(SECONDARY_COLOR);
-                    setForeground(Color.WHITE);
-                } else {
-                    setBackground(Color.WHITE);
-                    setForeground(TEXT_COLOR);
-                }
-                return this;
-            }
-        });
+//        monthComboBox = new JComboBox<>();
+//        monthComboBox.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+//        monthComboBox.setBackground(Color.WHITE);
+//        monthComboBox.setForeground(TEXT_COLOR);
+//        monthComboBox.setPreferredSize(new Dimension(120, 25));
+//
+//        // Add custom renderer to fix display issues
+//        monthComboBox.setRenderer(new DefaultListCellRenderer() {
+//            @Override
+//            public Component getListCellRendererComponent(JList<?> list, Object value,
+//                    int index, boolean isSelected, boolean cellHasFocus) {
+//                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+//                setOpaque(true);
+//                if (isSelected) {
+//                    setBackground(SECONDARY_COLOR);
+//                    setForeground(Color.WHITE);
+//                } else {
+//                    setBackground(Color.WHITE);
+//                    setForeground(TEXT_COLOR);
+//                }
+//                return this;
+//            }
+//        });
         
         // Add all months with English names
         String[] englishMonths = {
             "January", "February", "March", "April", "May", "June", 
             "July", "August", "September", "October", "November", "December"
         };
-        
+        DefaultListModel<String> monthListModel = new DefaultListModel<>();
         for (String month : englishMonths) {
-            monthComboBox.addItem(month);
+            monthListModel.addElement(month);
         }
-        
-        // Set current month as default
-        monthComboBox.setSelectedIndex(LocalDate.now().getMonthValue() - 1);
-        
-        panel.add(monthComboBox);
+        // Create JList for month selection
+        monthList = new JList<>(monthListModel);
+        monthList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        monthList.setVisibleRowCount(4);
+        monthList.setFont(new Font("Segue UI", Font.PLAIN, 12));
+        monthList.setForeground(TEXT_COLOR);
+        monthList.setBackground(Color.WHITE);
+        monthList.setSelectedIndex(LocalDate.now().getMonthValue() - 1);
+        JScrollPane monthScrollPane = new JScrollPane(monthList);
+        monthScrollPane.setPreferredSize(new Dimension(120, 40));
+        panel.add(monthScrollPane);
+//        for (String month : englishMonths) {
+//            monthComboBox.addItem(month);
+//        }
+//
+//        // Set current month as default
+//        monthComboBox.setSelectedIndex(LocalDate.now().getMonthValue() - 1);
+//
+//        panel.add(monthComboBox);
         
         // Query button
         JButton queryButton = createStyledButton("Search", PRIMARY_COLOR);
@@ -242,39 +256,133 @@ public class StatisticsPanel extends JPanel {
     public void updateStatistics() {
         // Get selected year and month
         int selectedYear = (Integer) yearComboBox.getSelectedItem();
-        int selectedMonth = monthComboBox.getSelectedIndex() + 1; // Index starts from 0, month starts from 1
-        
+        //int selectedMonth = monthComboBox.getSelectedIndex() + 1; // Index starts from 0, month starts from 1
+        //修改为List
+        List<String> selectedMonths = monthList.getSelectedValuesList();
+
         // Clear previous data
         chartPanel.removeAll();
         suggestionsArea.setText("");
         
-        // Get expense data for selected month
-        Map<String, Double> expenses = controller.getMonthlyExpenses(selectedYear, selectedMonth);
-        
-        if (expenses.isEmpty()) {
-            // No data for selected month
-            JLabel noDataLabel = new JLabel("No expense data for selected month", SwingConstants.CENTER);
-            noDataLabel.setFont(new Font("Segoe UI", Font.ITALIC, 14));
-            noDataLabel.setForeground(TEXT_COLOR);
-            chartPanel.add(noDataLabel, BorderLayout.CENTER);
-        } else {
-            // Draw bar chart
-            drawBarChart(expenses);
-            
-            // Update suggestions
-            List<String> suggestions = controller.getBudgetSuggestions();
-            StringBuilder sb = new StringBuilder();
-            for (String suggestion : suggestions) {
-                sb.append("• ").append(suggestion).append("\n");
-            }
-            suggestionsArea.setText(sb.toString());
+//        // Get expense data for selected month
+//        Map<String, Double> expenses = controller.getMonthlyExpenses(selectedYear, selectedMonth);
+//
+//        if (expenses.isEmpty()) {
+//            // No data for selected month
+//            JLabel noDataLabel = new JLabel("No expense data for selected month", SwingConstants.CENTER);
+//            noDataLabel.setFont(new Font("Segoe UI", Font.ITALIC, 14));
+//            noDataLabel.setForeground(TEXT_COLOR);
+//            chartPanel.add(noDataLabel, BorderLayout.CENTER);
+//        } else {
+//            // Draw bar chart
+//            drawBarChart(expenses);
+//
+//            // Update suggestions
+//            List<String> suggestions = controller.getBudgetSuggestions();
+//            StringBuilder sb = new StringBuilder();
+//            for (String suggestion : suggestions) {
+//                sb.append("• ").append(suggestion).append("\n");
+//            }
+//            suggestionsArea.setText(sb.toString());
+//        }
+        if (selectedMonths.isEmpty()) {
+            JLabel noSelection = new JLabel("Please select at least one month.", SwingConstants.CENTER);
+            noSelection.setFont(new Font("Segue UI", Font.ITALIC, 14));
+            noSelection.setForeground(ERROR_COLOR);
+            chartPanel.add(noSelection, BorderLayout.CENTER);
         }
-        
+        else {
+            Map<String, Map<String, Double>> multiMonthData = new HashMap<>();
+            for (String monthName : selectedMonths) {
+                int monthIndex = Month.valueOf(monthName.toUpperCase()).getValue();
+                Map<String, Double> monthExpenses = controller.getMonthlyExpenses(selectedYear, monthIndex);
+                if (!monthExpenses.isEmpty()) {
+                    multiMonthData.put(monthName, monthExpenses);
+                }
+            }
+            //若只选择一个月，则直接绘制柱状图
+            if (multiMonthData.size() == 1) {
+                Map.Entry<String, Map<String, Double>> entry = multiMonthData.entrySet().iterator().next();
+                drawBarChart(entry.getValue());
+            }
+            //若选择多个，则绘制分组柱状图
+            else if (multiMonthData.size() > 1) {
+                drawGroupedBarChart(multiMonthData);
+            }
+            else {
+                JLabel noDataLabel = new JLabel("No data for selected months.", SwingConstants.CENTER);
+                noDataLabel.setFont(new Font("Segue UI", Font.ITALIC, 14));
+                noDataLabel.setForeground(TEXT_COLOR);
+                chartPanel.add(noDataLabel, BorderLayout.CENTER);
+            }
+        }
         // Refresh UI
         chartPanel.revalidate();
         chartPanel.repaint();
     }
-    
+    /**
+     * Draw grouped bar chart
+     */
+    private void drawGroupedBarChart(Map<String, Map<String, Double>> expenses) {
+        // Create chart component
+        GroupedBarChartComponent chart = new GroupedBarChartComponent(expenses);
+        chartPanel.add(chart, BorderLayout.CENTER);
+
+        // Create legend
+        JPanel legendPanel = new JPanel(new GridLayout(0, 2, 5, 2));
+        legendPanel.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(SECONDARY_COLOR, 1),
+                "Legend",
+                TitledBorder.LEFT,
+                TitledBorder.TOP,
+                new Font("Segoe UI", Font.BOLD, 12),
+                PRIMARY_COLOR));
+        legendPanel.setBackground(BACKGROUND_COLOR);
+
+        // Add total to legend
+        double total = expenses.values().stream()
+                .flatMap(map -> map.values().stream())
+                .mapToDouble(Double::doubleValue)
+                .sum();
+        JLabel totalLabel = new JLabel("Total:");
+        totalLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        totalLabel.setForeground(TEXT_COLOR);
+        legendPanel.add(totalLabel);
+
+        JLabel totalValueLabel = new JLabel(String.format("%.2f", total));
+        totalValueLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        totalValueLabel.setForeground(TEXT_COLOR);
+        legendPanel.add(totalValueLabel);
+
+        // Add categories to legend
+        int index = 0;
+        for (Map.Entry<String, Map<String, Double>> entry : expenses.entrySet()) {
+            String month = entry.getKey();
+            Map<String, Double> monthData = entry.getValue();
+            for (Map.Entry<String, Double> categoryEntry : monthData.entrySet()) {
+                String category = categoryEntry.getKey();
+                double value = categoryEntry.getValue();
+                Color color = CHART_COLORS[index % CHART_COLORS.length];
+
+                // Create colored square icon
+                JLabel categoryLabel = new JLabel(month + " - " + category + ":");
+                categoryLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+                categoryLabel.setForeground(TEXT_COLOR);
+                categoryLabel.setIcon(createColorIcon(color, 12, 12));
+                legendPanel.add(categoryLabel);
+
+                // Create value label
+                JLabel valueLabel = new JLabel(String.format("%.2f (%.1f%%)",
+                        value, value / total * 100));
+                valueLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+                valueLabel.setForeground(TEXT_COLOR);
+                legendPanel.add(valueLabel);
+
+                index++;
+            }
+        }
+        chartPanel.add(legendPanel, BorderLayout.SOUTH);
+    }
     /**
      * Draw bar chart
      */
@@ -330,7 +438,6 @@ public class StatisticsPanel extends JPanel {
         
         chartPanel.add(legendPanel, BorderLayout.SOUTH);
     }
-    
     /**
      * Create color icon for legend
      */
@@ -355,7 +462,111 @@ public class StatisticsPanel extends JPanel {
             }
         };
     }
-    
+    private static class GroupedBarChartComponent extends JPanel {
+        private final Map<String, Map<String, Double>> multiMonthData; // month -> category -> value
+
+        public GroupedBarChartComponent(Map<String, Map<String, Double>> data) {
+            this.multiMonthData = data;
+            setPreferredSize(new Dimension(600, 350));
+            setBackground(Color.WHITE);
+            setBorder(BorderFactory.createLineBorder(SECONDARY_COLOR, 1));
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+
+            if (multiMonthData.isEmpty()) return;
+
+            Graphics2D g2d = (Graphics2D) g;
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            // Collect all unique categories
+            Set<String> allCategories = new HashSet<>();
+            for (Map<String, Double> monthMap : multiMonthData.values()) {
+                allCategories.addAll(monthMap.keySet());
+            }
+
+            List<String> categories = new ArrayList<>(allCategories);
+            List<String> months = new ArrayList<>(multiMonthData.keySet());
+
+            int width = getWidth();
+            int height = getHeight();
+            int margin = 40;
+            int barSpacing = 5;
+            int groupWidth = 60;
+            int barWidth = (groupWidth - (months.size() - 1) * barSpacing) / months.size();
+
+            // Find max value
+            double maxValue = 1.0;
+            for (Map<String, Double> map : multiMonthData.values()) {
+                for (double val : map.values()) {
+                    if (val > maxValue) maxValue = val;
+                }
+            }
+
+            // Draw bars
+            int startX = margin;
+            int startY = height - margin;
+
+            for (int i = 0; i < categories.size(); i++) {
+                String category = categories.get(i);
+                int groupX = startX + i * (groupWidth + 30);
+
+                for (int j = 0; j < months.size(); j++) {
+                    String month = months.get(j);
+                    Map<String, Double> monthData = multiMonthData.getOrDefault(month, new HashMap<>());
+                    double value = monthData.getOrDefault(category, 0.0);
+                    int barHeight = (int) (value / maxValue * (height - 2 * margin - 20));
+                    int x = groupX + j * (barWidth + barSpacing);
+                    int y = startY - barHeight;
+
+                    // Draw bar
+                    g2d.setColor(CHART_COLORS[j % CHART_COLORS.length]);
+                    g2d.fillRect(x, y, barWidth, barHeight);
+                    g2d.setColor(Color.DARK_GRAY);
+                    g2d.drawRect(x, y, barWidth, barHeight);
+
+                    // Draw value
+                    g2d.setColor(TEXT_COLOR);
+                    g2d.setFont(new Font("Segue UI", Font.PLAIN, 10));
+                    String valStr = String.format("%.0f", value);
+                    int textW = g2d.getFontMetrics().stringWidth(valStr);
+                    g2d.drawString(valStr, x + (barWidth - textW) / 2, y - 3);
+                }
+
+                // Draw category label
+                g2d.setColor(TEXT_COLOR);
+                g2d.setFont(new Font("Segoe UI", Font.BOLD, 11));
+                String label = category.length() > 10 ? category.substring(0, 8) + "…" : category;
+                int labelWidth = g2d.getFontMetrics().stringWidth(label);
+                g2d.drawString(label, groupX + (groupWidth - labelWidth) / 2, startY + 15);
+            }
+
+            // Draw axes
+            g2d.setColor(Color.DARK_GRAY);
+            g2d.drawLine(margin - 10, startY, width - margin / 2, startY); // x-axis
+
+            // Draw legend
+            int legendX = width - 150;
+            int legendY = margin;
+
+            g2d.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+            g2d.setColor(TEXT_COLOR);
+            g2d.drawString("Legend:", legendX, legendY);
+
+            for (int j = 0; j < months.size(); j++) {
+                Color color = CHART_COLORS[j % CHART_COLORS.length];
+                g2d.setColor(color);
+                g2d.fillRect(legendX, legendY + 10 + j * 18, 12, 12);
+                g2d.setColor(Color.DARK_GRAY);
+                g2d.drawRect(legendX, legendY + 10 + j * 18, 12, 12);
+
+                g2d.setColor(TEXT_COLOR);
+                g2d.drawString(months.get(j), legendX + 18, legendY + 20 + j * 18);
+            }
+        }
+    }
     /**
      * Bar chart component for drawing expense data
      */
