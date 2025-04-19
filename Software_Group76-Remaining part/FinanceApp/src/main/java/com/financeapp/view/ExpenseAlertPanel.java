@@ -11,6 +11,13 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -34,7 +41,7 @@ public class ExpenseAlertPanel extends JPanel {
     private JButton viewAllAlertsButton;
     private JButton saveSettingsButton;
     private JButton refreshButton;
-    private JButton historyAlarmsButton; // 新增历史警报按钮
+    private JButton historyAlarmsButton;
     private JCheckBox enableAlertsCheckbox;
     private JTextField globalThresholdField;
     private JTable categoryThresholdsTable;
@@ -56,6 +63,7 @@ public class ExpenseAlertPanel extends JPanel {
     private boolean alertsEnabled = true;
     private double globalThreshold = 5000.0; // Default global threshold
     private Map<String, Double> categoryThresholds = new HashMap<>(); // Thresholds for each category
+    private static final String SETTINGS_FILE = "settings.properties";
 
     /**
      * Constructor
@@ -91,24 +99,14 @@ public class ExpenseAlertPanel extends JPanel {
         add(bottomSettingsPanel, BorderLayout.CENTER);
 
         // 右上角刷新按钮
-        refreshButton = new JButton("Refresh Alerts");
-        refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        refreshButton.setForeground(Color.BLACK);
-        refreshButton.setBackground(Color.WHITE);
-        refreshButton.setFocusPainted(false);
-        refreshButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        refreshButton = createStyledButton("Refresh Alerts");
         refreshButton.addActionListener(e -> updateExpenseAlerts());
         JPanel refreshPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         refreshPanel.setOpaque(false);
         refreshPanel.add(refreshButton);
 
         // 新增历史警报按钮
-        historyAlarmsButton = new JButton("History Alarms");
-        historyAlarmsButton.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        historyAlarmsButton.setForeground(Color.BLACK);
-        historyAlarmsButton.setBackground(Color.WHITE);
-        historyAlarmsButton.setFocusPainted(false);
-        historyAlarmsButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        historyAlarmsButton = createStyledButton("History Alarms");
         historyAlarmsButton.addActionListener(e -> showHistoryAlarms());
         refreshPanel.add(historyAlarmsButton);
 
@@ -136,12 +134,7 @@ public class ExpenseAlertPanel extends JPanel {
         panel.add(alertsScrollPane, BorderLayout.CENTER);
 
         // 右下角查看全部警报按钮
-        viewAllAlertsButton = new JButton("View All Alerts");
-        viewAllAlertsButton.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        viewAllAlertsButton.setBackground(Color.WHITE);
-        viewAllAlertsButton.setForeground(Color.BLACK);
-        viewAllAlertsButton.setFocusPainted(false);
-        viewAllAlertsButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        viewAllAlertsButton = createStyledButton("View All Alerts");
         viewAllAlertsButton.addActionListener(e -> showAllAlerts());
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -169,12 +162,7 @@ public class ExpenseAlertPanel extends JPanel {
         panel.add(categoryThresholdsPanel, BorderLayout.CENTER);
 
         // 右下角保存设置按钮
-        saveSettingsButton = new JButton("Save Settings");
-        saveSettingsButton.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        saveSettingsButton.setBackground(Color.WHITE);
-        saveSettingsButton.setForeground(Color.BLACK);
-        saveSettingsButton.setFocusPainted(false);
-        saveSettingsButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        saveSettingsButton = createStyledButton("Save Settings");
         saveSettingsButton.addActionListener(e -> saveSettings());
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -244,21 +232,21 @@ public class ExpenseAlertPanel extends JPanel {
         categoryThresholdsTable.getColumnModel().getColumn(0).setPreferredWidth(150); // Category
         categoryThresholdsTable.getColumnModel().getColumn(1).setPreferredWidth(100); // Threshold
 
+        // 设置单元格居中显示
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        categoryThresholdsTable.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+        categoryThresholdsTable.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
+
         JScrollPane scrollPane = new JScrollPane(categoryThresholdsTable);
         scrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
         panel.add(scrollPane, BorderLayout.CENTER);
 
         // 添加和删除类别按钮
-        addCategoryButton = new JButton("Add Category");
-        addCategoryButton.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        addCategoryButton.setFocusPainted(false);
-        addCategoryButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        addCategoryButton = createStyledButton("Add Category");
         addCategoryButton.addActionListener(e -> addCategory());
 
-        removeCategoryButton = new JButton("Remove Category");
-        removeCategoryButton.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        removeCategoryButton.setFocusPainted(false);
-        removeCategoryButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        removeCategoryButton = createStyledButton("Remove Category");
         removeCategoryButton.addActionListener(e -> removeCategory());
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -267,6 +255,7 @@ public class ExpenseAlertPanel extends JPanel {
         buttonPanel.add(removeCategoryButton);
         panel.add(buttonPanel, BorderLayout.SOUTH);
 
+        loadCategoryThresholds();
         return panel;
     }
 
@@ -361,7 +350,24 @@ public class ExpenseAlertPanel extends JPanel {
             textArea.append(alert.getTimestamp().toLocalDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + " - " + alert.getMessage() + "\n");
         }
         JScrollPane scrollPane = new JScrollPane(textArea);
-        JOptionPane.showMessageDialog(this, scrollPane, "History Alarms", JOptionPane.INFORMATION_MESSAGE);
+
+        JButton clearHistoryButton = createStyledButton("Clearing History");
+        clearHistoryButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                alertService.clearAllAlerts();
+                textArea.setText("");
+            }
+        });
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(clearHistoryButton);
+
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.add(scrollPane, BorderLayout.CENTER);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        JOptionPane.showMessageDialog(this, mainPanel, "History Alarms", JOptionPane.INFORMATION_MESSAGE);
     }
 
     /**
@@ -378,17 +384,7 @@ public class ExpenseAlertPanel extends JPanel {
         }
 
         // 保存类别阈值设置
-        categoryThresholds.clear();
-        for (int i = 0; i < categoryThresholdsModel.getRowCount(); i++) {
-            String category = (String) categoryThresholdsModel.getValueAt(i, 0);
-            try {
-                double threshold = Double.parseDouble((String) categoryThresholdsModel.getValueAt(i, 1));
-                categoryThresholds.put(category, threshold);
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(this, "Invalid threshold value for " + category, "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-        }
+        saveCategoryThresholds();
 
         // 保存设置后自动更新预警显示
         updateExpenseAlerts();
@@ -399,8 +395,9 @@ public class ExpenseAlertPanel extends JPanel {
      */
     private void addCategory() {
         String category = JOptionPane.showInputDialog(this, "Enter category name:");
-        if (category != null && !category.isEmpty()) {
+        if (category != null &&!category.isEmpty()) {
             categoryThresholdsModel.addRow(new Object[]{category, 0.0});
+            saveCategoryThresholds();
         }
     }
 
@@ -410,7 +407,10 @@ public class ExpenseAlertPanel extends JPanel {
     private void removeCategory() {
         int selectedRow = categoryThresholdsTable.getSelectedRow();
         if (selectedRow != -1) {
+            String category = (String) categoryThresholdsModel.getValueAt(selectedRow, 0);
             categoryThresholdsModel.removeRow(selectedRow);
+            categoryThresholds.remove(category);
+            saveCategoryThresholds();
         }
     }
 
@@ -520,13 +520,11 @@ public class ExpenseAlertPanel extends JPanel {
 
     /**
      * 加载设置
-     * 此方法可用于从配置文件或数据库加载设置，这里简单示例从配置文件加载
      */
     private void loadSettings() {
-        try {
-            // 假设使用 Properties 读取配置文件
-            Properties properties = new Properties();
-            properties.load(getClass().getResourceAsStream("/config.properties"));
+        Properties properties = new Properties();
+        try (InputStream input = new FileInputStream(SETTINGS_FILE)) {
+            properties.load(input);
 
             // 加载全局阈值
             String globalThresholdStr = properties.getProperty("globalThreshold");
@@ -551,8 +549,80 @@ public class ExpenseAlertPanel extends JPanel {
                 categoryThresholdsModel.addRow(new Object[]{entry.getKey(), entry.getValue()});
             }
 
-        } catch (Exception e) {
+        } catch (IOException | NumberFormatException e) {
+            // 如果文件不存在或格式错误，使用默认设置
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 保存类别阈值设置
+     */
+    private void saveCategoryThresholds() {
+        Properties properties = new Properties();
+        properties.setProperty("globalThreshold", String.valueOf(globalThreshold));
+        for (int i = 0; i < categoryThresholdsModel.getRowCount(); i++) {
+            String category = (String) categoryThresholdsModel.getValueAt(i, 0);
+            double threshold = Double.parseDouble((String) categoryThresholdsModel.getValueAt(i, 1));
+            categoryThresholds.put(category, threshold);
+            properties.setProperty("categoryThreshold." + category, String.valueOf(threshold));
+        }
+
+        try (OutputStream output = new FileOutputStream(SETTINGS_FILE)) {
+            properties.store(output, null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 加载类别阈值
+     */
+    private void loadCategoryThresholds() {
+        Properties properties = new Properties();
+        try (InputStream input = new FileInputStream(SETTINGS_FILE)) {
+            properties.load(input);
+
+            categoryThresholds.clear();
+            for (String key : properties.stringPropertyNames()) {
+                if (key.startsWith("categoryThreshold.")) {
+                    String category = key.substring("categoryThreshold.".length());
+                    double threshold = Double.parseDouble(properties.getProperty(key));
+                    categoryThresholds.put(category, threshold);
+                }
+            }
+
+            categoryThresholdsModel.setRowCount(0);
+            for (Map.Entry<String, Double> entry : categoryThresholds.entrySet()) {
+                categoryThresholdsModel.addRow(new Object[]{entry.getKey(), entry.getValue()});
+            }
+        } catch (IOException | NumberFormatException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 创建美化后的按钮
+     * @param text 按钮文本
+     * @return 美化后的按钮
+     */
+    private JButton createStyledButton(String text) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        button.setForeground(Color.WHITE);
+        button.setBackground(PRIMARY_COLOR);
+        button.setFocusPainted(false);
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        button.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(SECONDARY_COLOR);
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(PRIMARY_COLOR);
+            }
+        });
+        return button;
     }
 }
