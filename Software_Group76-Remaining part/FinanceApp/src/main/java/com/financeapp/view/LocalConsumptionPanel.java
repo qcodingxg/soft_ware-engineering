@@ -11,6 +11,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.AffineTransform;
 import java.util.*;
+import java.util.List;
+import java.util.stream.IntStream;
 
 
 public class LocalConsumptionPanel extends JPanel {
@@ -155,8 +157,17 @@ public class LocalConsumptionPanel extends JPanel {
         JPanel panel = createCardPanel("Mobile vs Traditional Shopping");
         panel.setLayout(new BorderLayout(10, 10));
 
-        // Create trend chart panel
+        // 数据准备
+        final int[] years = IntStream.rangeClosed(2015, 2025).toArray();
+        final double[] mobileAmounts = {45, 58, 73, 92, 115, 140, 168, 205, 245, 290, 340}; // 单位：十亿
+        final double[] traditionalAmounts = {85, 82, 78, 72, 65, 58, 52, 47, 42, 38, 35};
+        final Color TRADITIONAL_COLOR = new Color(255, 153, 51);
+
+        // 图表面板
         JPanel chartPanel = new JPanel() {
+            private String tooltipText;
+            private Point tooltipPoint;
+
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -165,34 +176,171 @@ public class LocalConsumptionPanel extends JPanel {
 
                 int width = getWidth();
                 int height = getHeight();
+                int chartX = 60, chartY = 30;
+                int chartWidth = width - 100, chartHeight = height - 80;
 
-                // Draw chart background
-                g2d.setColor(new Color(240, 240, 240));
-                g2d.fillRect(40, 30, width - 80, height - 60);
+                // 新增Y轴刻度绘制
+                drawYAxisLabels(g2d, chartX, chartY, chartHeight, 350); // 最大值为350B
 
-                // Draw axes
+                // 绘制背景
+                g2d.setColor(Color.WHITE);
+                g2d.fillRect(chartX, chartY, chartWidth, chartHeight);
+
+                // 绘制网格线
+                g2d.setColor(new Color(220, 220, 220));
+                for(int i=0; i<=10; i++){ // Y轴网格
+                    int y = chartY + (int)(i * (chartHeight/10.0));
+                    g2d.drawLine(chartX, y, chartX + chartWidth, y);
+                }
+
+                // 绘制坐标轴
                 g2d.setColor(Color.DARK_GRAY);
-                g2d.setStroke(new BasicStroke(2));
-                g2d.drawLine(40, height - 30, width - 40, height - 30); // X-axis
-                g2d.drawLine(40, 30, 40, height - 30); // Y-axis
+                g2d.drawLine(chartX, chartY + chartHeight, chartX + chartWidth, chartY + chartHeight); // X轴
+                g2d.drawLine(chartX, chartY, chartX, chartY + chartHeight); // Y轴
 
-                // Draw mobile shopping trend (increasing)
-                g2d.setColor(PRIMARY_COLOR);
-                g2d.setStroke(new BasicStroke(3));
-                int[] xPoints = {40, 80, 120, 160, 200, 240, 280, 320, 360, 400};
-                int[] yPoints = {height - 100, height - 105, height - 115, height - 130,
-                                 height - 150, height - 175, height - 200, height - 230,
-                                 height - 250, height - 270};
-                g2d.drawPolyline(xPoints, yPoints, xPoints.length);
+                // 绘制X轴标签
+                g2d.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+                for(int i=0; i<years.length; i++){
+                    int x = chartX + (int)(i * (chartWidth/(years.length-1.0)));
+                    String label = String.valueOf(years[i]);
+                    if(years[i] % 5 == 0){ // 每5年显示标签
+                        g2d.drawString(label, x-10, chartY + chartHeight + 15);
+                    }
+                }
 
-                // Draw legend
+                // 绘制折线
+                drawTrendLine(g2d, chartX, chartY, chartWidth, chartHeight,
+                        mobileAmounts, PRIMARY_COLOR, "Mobile Shopping");
+                drawTrendLine(g2d, chartX, chartY, chartWidth, chartHeight,
+                        traditionalAmounts, TRADITIONAL_COLOR, "Traditional Shopping");
+
+                // 绘制图例
+                drawLegend(g2d, width - 150, 40);
+
+                // 绘制工具提示
+                if(tooltipText != null){
+                    g2d.setColor(new Color(255, 255, 204, 220));
+                    g2d.fillRoundRect(tooltipPoint.x, tooltipPoint.y - 25, 120, 20, 5, 5);
+                    g2d.setColor(Color.BLACK);
+                    g2d.drawString(tooltipText, tooltipPoint.x + 5, tooltipPoint.y - 10);
+                }
+            }
+
+            private void drawYAxisLabels(Graphics2D g2d, int chartX, int chartY, int chartHeight, double maxValue) {
+                g2d.setColor(Color.DARK_GRAY);
+                g2d.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+
+                // 计算刻度间隔
+                int majorStep = 50; // 每50B一个主刻度
+                int minorStep = 10; // 每10B一个次刻度
+
+                // 绘制主刻度和标签
+                for (int value = 0; value <= maxValue; value += minorStep) {
+                    int yPos = chartY + chartHeight - (int)((value / maxValue) * chartHeight);
+
+                    // 绘制刻度线
+                    if (value % majorStep == 0) {
+                        // 主刻度线
+                        g2d.setStroke(new BasicStroke(1.5f));
+                        g2d.drawLine(chartX - 5, yPos, chartX, yPos);
+                        // 主刻度标签
+                        String label = value + "B";
+                        int labelWidth = g2d.getFontMetrics().stringWidth(label);
+                        g2d.drawString(label, chartX - labelWidth - 10, yPos + 4);
+                    } else {
+                        // 次刻度线
+                        g2d.setStroke(new BasicStroke(1.0f));
+                        g2d.drawLine(chartX - 3, yPos, chartX, yPos);
+                    }
+                }
+
+                // 添加Y轴标题
+                g2d.rotate(Math.toRadians(-90), chartX - 40, chartY + chartHeight/2);
+                g2d.setFont(new Font("Segoe UI", Font.BOLD, 12));
+                g2d.drawString("Amount (Billion RMB)", chartX - 40, chartY + chartHeight/2);
+                g2d.rotate(Math.toRadians(90), chartX - 40, chartY + chartHeight/2);
+            }
+
+            private void drawTrendLine(Graphics2D g2d, int chartX, int chartY,
+                                       int chartWidth, int chartHeight, double[] data,
+                                       Color color, String label) {
+                // 计算坐标点
+                List<Point> points = new ArrayList<>();
+                double maxValue = 350; // 最大显示值
+
+                for(int i=0; i<data.length; i++){
+                    int x = chartX + (int)(i * (chartWidth/(years.length-1.0)));
+                    int y = chartY + chartHeight - (int)((data[i]/maxValue) * chartHeight);
+                    points.add(new Point(x, y));
+                }
+
+                // 绘制折线
+                g2d.setColor(color);
+                g2d.setStroke(new BasicStroke(2.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                for(int i=0; i<points.size()-1; i++){
+                    Point p1 = points.get(i);
+                    Point p2 = points.get(i+1);
+                    g2d.drawLine(p1.x, p1.y, p2.x, p2.y);
+                }
+
+                // 绘制数据点
+                g2d.setStroke(new BasicStroke(1.5f));
+                for(Point p : points){
+                    g2d.fillOval(p.x-3, p.y-3, 6, 6);
+                    g2d.setColor(new Color(0, 0, 0, 50));
+                    g2d.drawOval(p.x-3, p.y-3, 6, 6);
+                    g2d.setColor(color);
+                }
+            }
+
+            private void drawLegend(Graphics2D g2d, int x, int y) {
                 g2d.setColor(PRIMARY_COLOR);
-                g2d.fillRect(width - 150, 40, 20, 10);
-                g2d.setColor(Color.BLACK);
-                g2d.drawString("Mobile Shopping", width - 120, 50);
+                g2d.fillRect(x, y, 12, 12);
+                g2d.drawString("Mobile Shopping", x + 20, y + 10);
+
+                g2d.setColor(TRADITIONAL_COLOR);
+                g2d.fillRect(x, y + 20, 12, 12);
+                g2d.drawString("Traditional Shopping", x + 20, y + 30);
+            }
+
+            @Override
+            public void addNotify() {
+                super.addNotify();
+                addMouseMotionListener(new MouseMotionAdapter() {
+                    @Override
+                    public void mouseMoved(MouseEvent e) {
+                        int x = e.getX();
+                        int y = e.getY();
+                        tooltipText = null;
+
+                        // 检测移动购物数据点
+                        checkPoints(x, y, mobileAmounts, "Mobile: ¥%.1fB");
+                        // 检测传统购物数据点
+                        checkPoints(x, y, traditionalAmounts, "Traditional: ¥%.1fB");
+
+                        tooltipPoint = new Point(x + 15, y);
+                        repaint();
+                    }
+
+                    private void checkPoints(int mouseX, int mouseY, double[] data, String format) {
+                        int chartX = 60, chartY = 30;
+                        int chartWidth = getWidth() - 100;
+
+                        for(int i=0; i<data.length; i++){
+                            int pointX = chartX + (int)(i * (chartWidth/(years.length-1.0)));
+                            int pointY = chartY + (int)((350 - data[i])/350.0 * (getHeight() - 80));
+
+                            if(Math.abs(mouseX - pointX) < 8 && Math.abs(mouseY - pointY) < 8) {
+                                tooltipText = String.format(format, data[i]);
+                                return;
+                            }
+                        }
+                    }
+                });
             }
         };
-        chartPanel.setPreferredSize(new Dimension(300, 200));
+
+        chartPanel.setPreferredSize(new Dimension(600, 400));
         chartPanel.setBackground(CARD_BACKGROUND);
 
         // Create trend summary

@@ -90,7 +90,6 @@ public class MainFrame extends JFrame implements LoginPanel.LoginCallback, Regis
         // Create main application panel
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(UIConstants.BACKGROUND_COLOR);
-        
         // Create custom tabbed pane
         tabbedPane = createStyledTabbedPane();
         
