@@ -619,4 +619,4 @@ public class MainFrame extends JFrame implements LoginPanel.LoginCallback, Regis
             frame.setVisible(true);
         });
     }
-} 
+}
