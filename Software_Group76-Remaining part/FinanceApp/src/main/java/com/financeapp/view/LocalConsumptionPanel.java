@@ -38,9 +38,15 @@ public class LocalConsumptionPanel extends JPanel {
         LOCAL_CATEGORIES.put("Entertainment", "Entertainment");
         LOCAL_CATEGORIES.put("Real Estate", "Real Estate");
         LOCAL_CATEGORIES.put("Investment", "Investment");
+        LOCAL_CATEGORIES.put("Automotive", "Automotive");
+        LOCAL_CATEGORIES.put("Electronics", "Electronics");
+        LOCAL_CATEGORIES.put("Fashion", "Fashion");
+        LOCAL_CATEGORIES.put("Sports", "Sports");
+        LOCAL_CATEGORIES.put("Utilities", "Utilities");
+        LOCAL_CATEGORIES.put("Personal Finance", "Personal Finance");
     }
     
-    // Chinese payment methods
+
     private static final Map<String, Double> PAYMENT_METHODS = new HashMap<>();
     static {
         PAYMENT_METHODS.put("Alipay", 45.0);
@@ -48,6 +54,9 @@ public class LocalConsumptionPanel extends JPanel {
         PAYMENT_METHODS.put("UnionPay", 10.0);
         PAYMENT_METHODS.put("Credit Card", 3.0);
         PAYMENT_METHODS.put("Cash", 2.0);
+        PAYMENT_METHODS.put("PayPal", 5.0);
+        PAYMENT_METHODS.put("Bitcoin", 2.0);
+        PAYMENT_METHODS.put("Others", 2.0);
     }
     
     // Chinese shopping festivals
@@ -58,6 +67,14 @@ public class LocalConsumptionPanel extends JPanel {
         SHOPPING_FESTIVALS.put("Double 12", "December 12");
         SHOPPING_FESTIVALS.put("Women's Day", "March 8");
         SHOPPING_FESTIVALS.put("Chinese New Year", "January/February");
+        SHOPPING_FESTIVALS.put("Cyber Monday", "November (Monday after Thanksgiving)");
+        SHOPPING_FESTIVALS.put("Black Friday", "November (Day after Thanksgiving)");
+        SHOPPING_FESTIVALS.put("Valentine's Day", "February 14");
+        SHOPPING_FESTIVALS.put("Dragon Boat Festival", "May/June (Lunar Calendar)");
+        SHOPPING_FESTIVALS.put("Mid-Autumn Festival", "September/October (Lunar Calendar)");
+        SHOPPING_FESTIVALS.put("Singles' Day", "November 11");
+        SHOPPING_FESTIVALS.put("Father's Day", "June (Third Sunday)");
+        SHOPPING_FESTIVALS.put("Mother's Day", "May (Second Sunday)");
     }
     
     private JPanel mainContent;
@@ -135,11 +152,11 @@ public class LocalConsumptionPanel extends JPanel {
         
         return panel;
     }
-    
+
     private JPanel createConsumptionTrendPanel() {
         JPanel panel = createCardPanel("Mobile vs Traditional Shopping");
         panel.setLayout(new BorderLayout(10, 10));
-        
+
         // Create trend chart panel
         JPanel chartPanel = new JPanel() {
             @Override
@@ -147,29 +164,29 @@ public class LocalConsumptionPanel extends JPanel {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                
+
                 int width = getWidth();
                 int height = getHeight();
-                
+
                 // Draw chart background
                 g2d.setColor(new Color(240, 240, 240));
                 g2d.fillRect(40, 30, width - 80, height - 60);
-                
+
                 // Draw axes
                 g2d.setColor(Color.DARK_GRAY);
                 g2d.setStroke(new BasicStroke(2));
                 g2d.drawLine(40, height - 30, width - 40, height - 30); // X-axis
                 g2d.drawLine(40, 30, 40, height - 30); // Y-axis
-                
+
                 // Draw mobile shopping trend (increasing)
                 g2d.setColor(PRIMARY_COLOR);
                 g2d.setStroke(new BasicStroke(3));
                 int[] xPoints = {40, 80, 120, 160, 200, 240, 280, 320, 360, 400};
-                int[] yPoints = {height - 100, height - 105, height - 115, height - 130, 
-                                 height - 150, height - 175, height - 200, height - 230, 
+                int[] yPoints = {height - 100, height - 105, height - 115, height - 130,
+                                 height - 150, height - 175, height - 200, height - 230,
                                  height - 250, height - 270};
                 g2d.drawPolyline(xPoints, yPoints, xPoints.length);
-                
+
                 // Draw legend
                 g2d.setColor(PRIMARY_COLOR);
                 g2d.fillRect(width - 150, 40, 20, 10);
@@ -179,32 +196,32 @@ public class LocalConsumptionPanel extends JPanel {
         };
         chartPanel.setPreferredSize(new Dimension(300, 200));
         chartPanel.setBackground(CARD_BACKGROUND);
-        
+
         // Create trend summary
         JPanel summaryPanel = new JPanel();
         summaryPanel.setLayout(new BoxLayout(summaryPanel, BoxLayout.Y_AXIS));
         summaryPanel.setOpaque(false);
-        
+
         JLabel trendLabel = new JLabel("Mobile Shopping Dominance");
         trendLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
         summaryPanel.add(trendLabel);
-        
+
         JLabel growthLabel = new JLabel("Mobile Shopping Growth: +24.8% annually");
         growthLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         growthLabel.setForeground(SUCCESS_COLOR);
         summaryPanel.add(growthLabel);
-        
+
         JLabel statsLabel = new JLabel("Mobile accounts for 85% of all transactions");
         statsLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         statsLabel.setForeground(SECONDARY_COLOR);
         summaryPanel.add(statsLabel);
-        
+
         panel.add(chartPanel, BorderLayout.CENTER);
         panel.add(summaryPanel, BorderLayout.SOUTH);
-        
+
         return panel;
     }
-    
+
     private JPanel createCategoryAnalysisPanel() {
         JPanel panel = createCardPanel("Popular Categories");
         panel.setLayout(new BorderLayout(10, 10));
@@ -243,11 +260,11 @@ public class LocalConsumptionPanel extends JPanel {
         
         return panel;
     }
-    
+
     private JPanel createPaymentMethodPanel() {
         JPanel panel = createCardPanel("Payment Methods");
         panel.setLayout(new BorderLayout(10, 10));
-        
+
         // Create payment method chart
         JPanel chartPanel = new JPanel() {
             @Override
@@ -255,80 +272,87 @@ public class LocalConsumptionPanel extends JPanel {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                
+
                 int width = getWidth();
                 int height = getHeight();
                 int centerX = width / 2;
                 int centerY = height / 2;
                 int radius = Math.min(width, height) / 3;
-                
+
                 // Colors for payment methods
                 Color[] colors = {
-                    new Color(52, 152, 219),   // Alipay: Blue
-                    new Color(46, 204, 113),   // WeChat Pay: Green
-                    new Color(155, 89, 182),   // UnionPay: Purple
-                    new Color(241, 196, 15),   // Credit Card: Yellow
-                    new Color(230, 126, 34)    // Cash: Orange
+                        new Color(52, 152, 219),   // Alipay: Blue
+                        new Color(46, 204, 113),   // WeChat Pay: Green
+                        new Color(155, 89, 182),   // UnionPay: Purple
+                        new Color(241, 196, 15),   // Credit Card: Yellow
+                        new Color(230, 126, 34),   // Cash: Orange
+                        new Color(253, 180, 98),   // PayPal: Peach
+                        new Color(230, 230, 230),  // Bitcoin: Light gray
+                        new Color(192, 57, 43)     // Others: Red
                 };
-                
+
                 // Draw pie chart
                 double total = PAYMENT_METHODS.values().stream().mapToDouble(Double::doubleValue).sum();
                 double startAngle = 0;
-                
+
                 int i = 0;
                 for (Map.Entry<String, Double> entry : PAYMENT_METHODS.entrySet()) {
                     double percentage = entry.getValue();
                     double angle = 360 * (percentage / total);
-                    
+
                     g2d.setColor(colors[i % colors.length]);
-                    g2d.fillArc(centerX - radius, centerY - radius, radius * 2, radius * 2, 
-                                (int)startAngle, (int)angle);
-                    
+                    g2d.fillArc(centerX - radius, centerY - radius, radius * 2, radius * 2,
+                            (int) startAngle, (int) angle);
+
                     startAngle += angle;
                     i++;
                 }
-                
+
+                // Add shadow effect to the pie chart
+                g2d.setColor(new Color(0, 0, 0, 50));
+                g2d.fillArc(centerX - radius - 5, centerY - radius - 5, radius * 2 + 10, radius * 2 + 10, 0, 360);
+
                 // Draw legend
                 int legendX = centerX + radius + 20;
-                int legendY = centerY - radius;
-                
+                int legendY = centerY - radius - 20;
+
                 i = 0;
                 for (Map.Entry<String, Double> entry : PAYMENT_METHODS.entrySet()) {
                     g2d.setColor(colors[i % colors.length]);
-                    g2d.fillRect(legendX, legendY + i * 20, 15, 15);
-                    
+                    g2d.fillRoundRect(legendX, legendY + i * 20, 15, 15, 5, 5);
+
                     g2d.setColor(Color.BLACK);
-                    g2d.drawString(entry.getKey() + " (" + entry.getValue() + "%)", 
-                                   legendX + 20, legendY + i * 20 + 12);
+                    g2d.drawString(entry.getKey() + " (" + entry.getValue() + "%)",
+                            legendX + 20, legendY + i * 20 + 12);
                     i++;
                 }
             }
         };
-        chartPanel.setPreferredSize(new Dimension(300, 200));
+        chartPanel.setPreferredSize(new Dimension(400, 300));
         chartPanel.setBackground(CARD_BACKGROUND);
-        
+
         // Create payment method summary
         JPanel summaryPanel = new JPanel();
         summaryPanel.setLayout(new BoxLayout(summaryPanel, BoxLayout.Y_AXIS));
         summaryPanel.setOpaque(false);
-        
-        JLabel methodLabel = new JLabel("Mobile Paymnance");
+
+        JLabel methodLabel = new JLabel("Mobile Payment");
         methodLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
         summaryPanel.add(methodLabel);
-        
+
         JLabel mobileLabel = new JLabel("Alipay & WeChat Pay: 85% of transactions");
         mobileLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         mobileLabel.setForeground(PRIMARY_COLOR);
         summaryPanel.add(mobileLabel);
-        
+
         JLabel cashLabel = new JLabel("Cash usage declined by 15% this year");
         cashLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         cashLabel.setForeground(SECONDARY_COLOR);
         summaryPanel.add(cashLabel);
-        
+
         panel.add(chartPanel, BorderLayout.CENTER);
         panel.add(summaryPanel, BorderLayout.SOUTH);
-        
+
         return panel;
     }
     
