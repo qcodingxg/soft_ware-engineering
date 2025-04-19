@@ -546,9 +546,9 @@ public class LocalConsumptionPanel extends JPanel {
                     int barHeight = (int) ((amounts[i] / maxAmount) * (height - 80));
 
                     // Festival-specific colors
-                    if (festivals[i].equals("Double 11") || festivals[i].equals("Singles' Day")) {
+                    if (festivals[i].equals("Double 11") || festivals[i].equals("618")) {
                         g2d.setColor(FESTIVAL_RED);
-                    } else if (festivals[i].equals("Chinese New Year")) {
+                    } else if (festivals[i].equals("Women's Day") || festivals[i].equals("Mid-Autumn")) {
                         g2d.setColor(FESTIVAL_GOLD);
                     } else {
                         g2d.setColor(PRIMARY_COLOR);
