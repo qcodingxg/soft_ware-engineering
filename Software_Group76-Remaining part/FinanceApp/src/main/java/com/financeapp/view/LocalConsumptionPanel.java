@@ -411,22 +411,8 @@ public class LocalConsumptionPanel extends JPanel {
         JPanel panel = createCardPanel("Payment Methods");
         panel.setLayout(new BorderLayout(10, 10));
 
-        // 共享颜色数组
-        final Color[] colors = {
-                new Color(52, 152, 219), new Color(46, 204, 113),
-                new Color(155, 89, 182), new Color(241, 196, 15),
-                new Color(230, 126, 34), new Color(253, 180, 98),
-                new Color(230, 230, 230), new Color(192, 57, 43)
-        };
-
-        // 使用数组存储扇形数据：[startAngle, sweepAngle, label, percentage]
-        final List<Object[]> sectors = new ArrayList<>();
-        final double[] total = {0}; // 用于存储总数值
-
+        // Create payment method chart
         JPanel chartPanel = new JPanel() {
-            int hoverIndex = -1;
-            Point hoverPoint = new Point();
-
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -439,119 +425,55 @@ public class LocalConsumptionPanel extends JPanel {
                 int centerY = height / 2;
                 int radius = Math.min(width, height) / 3;
 
-                // 清空扇形数据
-                sectors.clear();
-                total[0] = PAYMENT_METHODS.values().stream().mapToDouble(Double::doubleValue).sum();
+                // Colors for payment methods
+                Color[] colors = {
+                        new Color(52, 152, 219),   // Alipay: Blue
+                        new Color(46, 204, 113),   // WeChat Pay: Green
+                        new Color(155, 89, 182),   // UnionPay: Purple
+                        new Color(241, 196, 15),   // Credit Card: Yellow
+                        new Color(230, 126, 34),   // Cash: Orange
+                        new Color(253, 180, 98),   // PayPal: Peach
+                        new Color(230, 230, 230),  // Bitcoin: Light gray
+                        new Color(192, 57, 43)     // Others: Red
+                };
 
-                // 绘制饼图
+                // Draw pie chart
+                double total = PAYMENT_METHODS.values().stream().mapToDouble(Double::doubleValue).sum();
                 double startAngle = 0;
-                int index = 0;
+
+                int i = 0;
                 for (Map.Entry<String, Double> entry : PAYMENT_METHODS.entrySet()) {
-                    double angle = 360 * (entry.getValue() / total[0]);
-                    boolean isHover = (hoverIndex == index);
+                    double percentage = entry.getValue();
+                    double angle = 360 * (percentage / total);
 
-                    // 存储扇形数据
-                    sectors.add(new Object[]{startAngle, angle, entry.getKey(), entry.getValue()});
-
-                    // 绘制扇形（带高亮效果）
-                    g2d.setColor(isHover ? colors[index].brighter() : colors[index]);
+                    g2d.setColor(colors[i % colors.length]);
                     g2d.fillArc(centerX - radius, centerY - radius, radius * 2, radius * 2,
                             (int) startAngle, (int) angle);
 
                     startAngle += angle;
-                    index++;
+                    i++;
                 }
 
-                // 绘制悬停提示
-                if (hoverIndex != -1 && !sectors.isEmpty()) {
-                    Object[] sector = sectors.get(hoverIndex);
-                    drawHoverTooltip(g2d, (String)sector[2], (Double)sector[3], hoverPoint);
+                // Add shadow effect to the pie chart
+                g2d.setColor(new Color(0, 0, 0, 50));
+                g2d.fillArc(centerX - radius - 5, centerY - radius - 5, radius * 2 + 10, radius * 2 + 10, 0, 360);
+
+                // Draw legend
+                int legendX = centerX + radius + 20;
+                int legendY = centerY - radius - 20;
+
+                i = 0;
+                for (Map.Entry<String, Double> entry : PAYMENT_METHODS.entrySet()) {
+                    g2d.setColor(colors[i % colors.length]);
+                    g2d.fillRoundRect(legendX, legendY + i * 20, 15, 15, 5, 5);
+
+                    g2d.setColor(Color.BLACK);
+                    g2d.drawString(entry.getKey() + " (" + entry.getValue() + "%)",
+                            legendX + 20, legendY + i * 20 + 12);
+                    i++;
                 }
-            }
-
-            // 提示框绘制方法
-            private void drawHoverTooltip(Graphics2D g2d, String label, double percent, Point pos) {
-                String text = String.format("%s: %.1f%%", label, percent);
-
-                // 计算文本尺寸
-                FontMetrics fm = g2d.getFontMetrics();
-                int padding = 8;
-                int textWidth = fm.stringWidth(text) + padding * 2;
-                int textHeight = fm.getHeight() + padding;
-
-                // 位置修正（防止超出面板）
-                pos.x = Math.min(pos.x, getWidth() - textWidth - 5);
-                pos.y = Math.min(pos.y, getHeight() - textHeight - 5);
-
-                // 绘制背景
-                g2d.setColor(new Color(255, 255, 225, 220));
-                g2d.fillRoundRect(pos.x, pos.y, textWidth, textHeight, 5, 5);
-
-                // 绘制边框
-                g2d.setColor(new Color(200, 200, 200, 150));
-                g2d.drawRoundRect(pos.x, pos.y, textWidth, textHeight, 5, 5);
-
-                // 绘制文字
-                g2d.setColor(Color.DARK_GRAY);
-                g2d.drawString(text, pos.x + padding, pos.y + fm.getAscent() + padding/2);
-            }
-
-            @Override
-            public void addNotify() {
-                super.addNotify();
-                addMouseMotionListener(new MouseMotionAdapter() {
-                    @Override
-                    public void mouseMoved(MouseEvent e) {
-                        checkHover(e.getX(), e.getY());
-                    }
-                });
-            }
-
-            // 核心检测算法
-            private void checkHover(int x, int y) {
-                int centerX = getWidth()/2;
-                int centerY = getHeight()/2;
-                int radius = Math.min(getWidth(), getHeight())/3;
-
-                // 转换为相对坐标
-                int dx = x - centerX;
-                int dy = y - centerY;
-                double distance = Math.sqrt(dx*dx + dy*dy);
-
-                // 距离检测
-                if (distance > radius) {
-                    hoverIndex = -1;
-                    repaint();
-                    return;
-                }
-
-                // 计算角度（转换为0-360度）
-                double angle = (Math.toDegrees(Math.atan2(dy, dx)) + 360) % 360;
-
-                // 查找匹配的扇形
-                hoverIndex = -1;
-                for (int i = 0; i < sectors.size(); i++) {
-                    Object[] sector = sectors.get(i);
-                    double start = (Double)sector[0];
-                    double end = start + (Double)sector[1];
-
-                    // 处理角度循环
-                    if (end > 360) {
-                        if (angle >= start || angle <= end % 360) {
-                            hoverIndex = i;
-                            break;
-                        }
-                    } else if (angle >= start && angle <= end) {
-                        hoverIndex = i;
-                        break;
-                    }
-                }
-
-                hoverPoint = new Point(x + 10, y - 10);
-                repaint();
             }
         };
-
         chartPanel.setPreferredSize(new Dimension(400, 300));
         chartPanel.setBackground(CARD_BACKGROUND);
 
