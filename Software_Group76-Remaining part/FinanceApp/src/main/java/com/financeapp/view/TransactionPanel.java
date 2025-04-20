@@ -2,6 +2,7 @@ package com.financeapp.view;
 
 import com.financeapp.controller.TransactionController;
 import com.financeapp.model.Transaction;
+import com.financeapp.model.AIClassifier;
 
 import javax.swing.*;
 import javax.swing.border.*;
@@ -10,7 +11,6 @@ import javax.swing.plaf.basic.BasicButtonUI;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.RoundRectangle2D;
 import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -23,18 +23,13 @@ import java.util.List;
  * Contains transaction form and transaction list
  */
 public class TransactionPanel extends JPanel {
-    
     private final TransactionController controller;
-    
+    private final AIClassifier classifier;
+
     // Form components
-    private JTextField dateField;
-    private JTextField amountField;
-    private JTextField categoryField;
-    private JTextField descriptionField;
-    private JButton addButton;
-    private JButton importButton;
-    private JTextField searchField;
-    
+    private JTextField dateField, amountField, categoryField, descriptionField, searchField;
+    private JButton addButton, importButton,suggestButton,deleteButton;
+
     // Table components
     private JTable transactionTable;
     private DefaultTableModel tableModel;
@@ -58,6 +53,7 @@ public class TransactionPanel extends JPanel {
      */
     public TransactionPanel(TransactionController controller) {
         this.controller = controller;
+        this.classifier = new AIClassifier();
         initUI();
     }
     
@@ -196,7 +192,12 @@ public class TransactionPanel extends JPanel {
         addButton.setIcon(UIManager.getIcon("FileView.fileIcon"));
         addButton.addActionListener(e -> addTransaction());
         buttonPanel.add(addButton);
-        
+
+        suggestButton = createGlassButton("AI Suggest", ACCENT_COLOR);
+        suggestButton.setIcon(UIManager.getIcon("OptionPane.informationIcon"));
+        suggestButton.addActionListener(e -> suggestCategory());
+        buttonPanel.add(suggestButton);
+
         importButton = createGlassButton("Import CSV", SECONDARY_COLOR);
         importButton.setIcon(UIManager.getIcon("FileView.directoryIcon"));
         importButton.addActionListener(e -> importCSV());
@@ -566,67 +567,183 @@ public class TransactionPanel extends JPanel {
             sorter.setRowFilter(RowFilter.regexFilter("(?i)" + searchText));
         }
     }
-    
+
+    private LocalDate validateDate() throws DateTimeParseException, IllegalArgumentException {
+        String dateText = dateField.getText().trim();
+        if (dateText.isEmpty()) {
+            throw new IllegalArgumentException("Please enter a date");
+        }
+        return LocalDate.parse(dateText, DateTimeFormatter.ISO_DATE);
+    }
+
+    private double validateAmount() throws NumberFormatException, IllegalArgumentException {
+        String amountText = amountField.getText().trim();
+        if (amountText.isEmpty()) {
+            throw new IllegalArgumentException("Please enter an amount");
+        }
+        return Double.parseDouble(amountText);
+    }
+
+    private void resetForm() {
+        dateField.setText(LocalDate.now().format(DateTimeFormatter.ISO_DATE));
+        amountField.setText("");
+        descriptionField.setText("");
+        categoryField.setText("");
+        dateField.requestFocus();
+    }
+
+    private void showMessage(String message, String title, int messageType) {
+        JOptionPane.showMessageDialog(this, message, title, messageType);
+    }
+
     /**
      * Add transaction
      */
     private void addTransaction() {
         try {
-            // Validate date
-            String dateText = dateField.getText().trim();
-            if (dateText.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please enter a date", "Error", JOptionPane.ERROR_MESSAGE);
-                dateField.requestFocus();
+            LocalDate date = validateDate();
+            double amount = validateAmount();
+            String description = descriptionField.getText().trim();
+
+            if (description.isEmpty()) {
+                showMessage("Description cannot be empty", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            LocalDate date = LocalDate.parse(dateText, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            
-            // Validate amount
-            String amountText = amountField.getText().trim();
-            if (amountText.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please enter an amount", "Error", JOptionPane.ERROR_MESSAGE);
-                amountField.requestFocus();
-                return;
-            }
-            double amount = Double.parseDouble(amountText);
-            
-            // Get category (default if empty)
+
             String category = categoryField.getText().trim();
             if (category.isEmpty()) {
-                category = "Uncategorized";
+                // 改为模态对话框确保用户必须处理
+                int option = JOptionPane.showConfirmDialog(
+                        this,
+                        "Category is empty. Do you want AI suggestion?",
+                        "Category Required",
+                        JOptionPane.YES_NO_OPTION
+                );
+
+                if (option == JOptionPane.YES_OPTION) {
+                    suggestCategory();
+                }
+                return; // 仍然需要返回，等待用户操作
             }
-            
-            // Get description
-            String description = descriptionField.getText().trim();
-            
-            // Create transaction object
+
+            // 确保所有必要字段已填写
             Transaction transaction = new Transaction(date, category, amount, description);
-            
-            // Add to controller
             controller.addTransaction(transaction);
-            
-            // Clear form
-            dateField.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-            amountField.setText("");
-            categoryField.setText("");
-            descriptionField.setText("");
-            
-            // Update table
+
+            resetForm();
             updateTransactionList();
-            
-            JOptionPane.showMessageDialog(this, "Transaction added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-            
-        } catch (DateTimeParseException e) {
-            JOptionPane.showMessageDialog(this, "Date format error, please use yyyy-MM-dd format", "Error", JOptionPane.ERROR_MESSAGE);
-            dateField.requestFocus();
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Amount format error, please enter valid number", "Error", JOptionPane.ERROR_MESSAGE);
-            amountField.requestFocus();
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Transaction save failed: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            showMessage("Transaction added", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (Exception e) {
+            handleAddError(e);
         }
     }
-    
+
+    private void handleAddError(Exception e) {
+        String message = "";
+        if (e instanceof DateTimeParseException) {
+            message = "Invalid date format (yyyy-MM-dd)";
+            dateField.requestFocus();
+        } else if (e instanceof NumberFormatException) {
+            message = "Invalid amount";
+            amountField.requestFocus();
+        } else {
+            message = "Error: " + e.getMessage();
+        }
+        showMessage(message, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+
+    private void suggestCategory() {
+        String description = descriptionField.getText().trim();
+        if (description.isEmpty()) {
+            showMessage("Please enter description first", "Info", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        setLoadingState(true);
+
+        new SwingWorker<String, Void>() {
+            @Override
+            protected String doInBackground() throws Exception {
+                Transaction tempTrans = new Transaction(
+                        LocalDate.now(),
+                        "Uncategorized",
+                        0.0,
+                        description
+                );
+                return classifier.classify(tempTrans).getCategory();
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    String category = get();
+                    showCategoryConfirmation(category, description);
+                } catch (Exception e) {
+                    handleClassificationError(e);
+                } finally {
+                    setLoadingState(false);
+                }
+            }
+        }.execute();
+    }
+
+    private void setLoadingState(boolean isLoading) {
+        suggestButton.setEnabled(!isLoading);
+        suggestButton.setText(isLoading ? "Analyzing..." : "AI Suggest");
+        categoryField.setForeground(isLoading ? Color.GRAY : TEXT_COLOR);
+        categoryField.setText(isLoading ? "Contacting AI..." : "");
+    }
+
+    private void showCategoryConfirmation(String suggestedCategory, String description) {
+        String[] options = {"Accept and Add", "Modify", "Cancel"};
+        int choice = JOptionPane.showOptionDialog(
+                this,
+                "AI suggests: " + suggestedCategory,
+                "Confirm Category",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[0]
+        );
+
+        if (choice == 0) { // Accept and Add
+            categoryField.setText(suggestedCategory);
+            addTransaction(); // 直接触发添加
+        }
+        else if (choice == 1) { // Modify
+            String userInput = JOptionPane.showInputDialog(
+                    this,
+                    "Edit category:",
+                    suggestedCategory
+            );
+            if (userInput != null && !userInput.trim().isEmpty()) {
+                categoryField.setText(userInput);
+                // 记录用户修正
+                Transaction tempTrans = new Transaction(
+                        LocalDate.now(),
+                        suggestedCategory,
+                        0.0,
+                        description
+                );
+                classifier.recordCorrection(tempTrans, userInput);
+                // 新增：自动触发添加交易
+                addTransaction();
+            }
+        }
+    }
+
+    private void handleClassificationError(Exception e) {
+        String errorMsg = e.getCause() instanceof IOException ?
+                "Network error. Please check your connection." :
+                "Classification failed. Please try manually.";
+
+        showMessage(errorMsg, "Error", JOptionPane.ERROR_MESSAGE);
+        categoryField.setText("");
+    }
+
     /**
      * Import CSV file
      */

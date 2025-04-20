@@ -2,100 +2,143 @@ package com.financeapp.model;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
+import java.io.OutputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
+import org.json.JSONObject;
 
 /**
  * AI Classifier
  * Implements simple classification logic and holiday detection
  */
 public class AIClassifier {
-    private final Map<String, List<Pattern>> categoryPatterns;
     private final Map<String, String> userCorrections;
     private static final String CORRECTIONS_LOG_PATH = "./data/corrections.log";
-    
+    private static final String DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions";
+    private static final String DEEPSEEK_API_KEY = "sk-c352d996488d417aa5643d871887a0ff";
+
     /**
      * Initialize classifier
      */
     public AIClassifier() {
-        categoryPatterns = new HashMap<>();
         userCorrections = new HashMap<>();
-        
-        // Initialize default classification rules
-        initDefaultPatterns();
-        
-        // Load user correction records
         loadCorrections();
     }
-    
+
     /**
-     * Initialize default classification rules
+     * Classify a transaction
+     * @param transaction Transaction to classify
+     * @return Classified transaction
      */
-    private void initDefaultPatterns() {
-        // Food category
-        List<Pattern> foodPatterns = new ArrayList<>();
-        foodPatterns.add(Pattern.compile(".*restaurant.*", Pattern.CASE_INSENSITIVE));
-        foodPatterns.add(Pattern.compile(".*coffee.*", Pattern.CASE_INSENSITIVE));
-        foodPatterns.add(Pattern.compile(".*diner.*", Pattern.CASE_INSENSITIVE));
-        foodPatterns.add(Pattern.compile(".*lunch.*", Pattern.CASE_INSENSITIVE));
-        foodPatterns.add(Pattern.compile(".*dinner.*", Pattern.CASE_INSENSITIVE));
-        foodPatterns.add(Pattern.compile(".*breakfast.*", Pattern.CASE_INSENSITIVE));
-        foodPatterns.add(Pattern.compile(".*takeout.*", Pattern.CASE_INSENSITIVE));
-        foodPatterns.add(Pattern.compile(".*food.*", Pattern.CASE_INSENSITIVE));
-        categoryPatterns.put("Food", foodPatterns);
-        
-        // Transportation category
-        List<Pattern> transportPatterns = new ArrayList<>();
-        transportPatterns.add(Pattern.compile(".*bus.*", Pattern.CASE_INSENSITIVE));
-        transportPatterns.add(Pattern.compile(".*subway.*", Pattern.CASE_INSENSITIVE));
-        transportPatterns.add(Pattern.compile(".*taxi.*", Pattern.CASE_INSENSITIVE));
-        transportPatterns.add(Pattern.compile(".*uber.*", Pattern.CASE_INSENSITIVE));
-        transportPatterns.add(Pattern.compile(".*lyft.*", Pattern.CASE_INSENSITIVE));
-        transportPatterns.add(Pattern.compile(".*gas.*", Pattern.CASE_INSENSITIVE));
-        transportPatterns.add(Pattern.compile(".*transport.*", Pattern.CASE_INSENSITIVE));
-        categoryPatterns.put("Transportation", transportPatterns);
-        
-        // Shopping category
-        List<Pattern> shoppingPatterns = new ArrayList<>();
-        shoppingPatterns.add(Pattern.compile(".*supermarket.*", Pattern.CASE_INSENSITIVE));
-        shoppingPatterns.add(Pattern.compile(".*mall.*", Pattern.CASE_INSENSITIVE));
-        shoppingPatterns.add(Pattern.compile(".*shopping.*", Pattern.CASE_INSENSITIVE));
-        shoppingPatterns.add(Pattern.compile(".*amazon.*", Pattern.CASE_INSENSITIVE));
-        shoppingPatterns.add(Pattern.compile(".*walmart.*", Pattern.CASE_INSENSITIVE));
-        shoppingPatterns.add(Pattern.compile(".*target.*", Pattern.CASE_INSENSITIVE));
-        categoryPatterns.put("Shopping", shoppingPatterns);
-        
-        // Entertainment category
-        List<Pattern> entertainmentPatterns = new ArrayList<>();
-        entertainmentPatterns.add(Pattern.compile(".*movie.*", Pattern.CASE_INSENSITIVE));
-        entertainmentPatterns.add(Pattern.compile(".*game.*", Pattern.CASE_INSENSITIVE));
-        entertainmentPatterns.add(Pattern.compile(".*ktv.*", Pattern.CASE_INSENSITIVE));
-        entertainmentPatterns.add(Pattern.compile(".*show.*", Pattern.CASE_INSENSITIVE));
-        entertainmentPatterns.add(Pattern.compile(".*theater.*", Pattern.CASE_INSENSITIVE));
-        entertainmentPatterns.add(Pattern.compile(".*entertainment.*", Pattern.CASE_INSENSITIVE));
-        categoryPatterns.put("Entertainment", entertainmentPatterns);
-        
-        // Utilities category
-        List<Pattern> utilitiesPatterns = new ArrayList<>();
-        utilitiesPatterns.add(Pattern.compile(".*water.*", Pattern.CASE_INSENSITIVE));
-        utilitiesPatterns.add(Pattern.compile(".*electric.*", Pattern.CASE_INSENSITIVE));
-        utilitiesPatterns.add(Pattern.compile(".*gas bill.*", Pattern.CASE_INSENSITIVE));
-        utilitiesPatterns.add(Pattern.compile(".*internet.*", Pattern.CASE_INSENSITIVE));
-        utilitiesPatterns.add(Pattern.compile(".*phone.*", Pattern.CASE_INSENSITIVE));
-        utilitiesPatterns.add(Pattern.compile(".*utility.*", Pattern.CASE_INSENSITIVE));
-        categoryPatterns.put("Utilities", utilitiesPatterns);
+    public Transaction classify(Transaction transaction) throws IOException {
+        // Skip if already classified
+        if (transaction.getCategory() != null && !transaction.getCategory().equals("Uncategorized")) {
+            return transaction;
+        }
+
+        if (isHolidayPeriod(transaction.getDate())) {
+            transaction.setCategory("Holiday");
+            return transaction;
+        }
+        String description = transaction.getDescription();
+
+        // Check user corrections first
+        if (userCorrections.containsKey(description)) {
+            transaction.setCategory(userCorrections.get(description));
+            return transaction;
+        }
+
+        // Call DeepSeek API for dynamic classification
+        String category = classifyWithDeepSeek(description);
+        if (category != null && !category.equals("Uncategorized")) {
+            transaction.setCategory(category);
+        } else {
+            transaction.setCategory("Uncategorized"); // Fallback
+        }
+
+        return transaction;
     }
-    
+
     /**
-     * Load user correction records
+     * Classify using AI API
+     */
+    private String classifyWithDeepSeek(String description) throws IOException {
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("model", "deepseek-chat"); // Use the appropriate model
+        requestBody.put("messages", new JSONObject[] {
+                new JSONObject()
+                        .put("role", "user")
+                        .put("content", "Classify the following transaction description into one of these categories: " +
+                        "Food, Transportation, Shopping, Entertainment, Utilities, Holiday, or Uncategorized. " +
+                        "Description: " + description + "\n\nReturn ONLY the category name.")
+        });
+
+        HttpURLConnection connection = (HttpURLConnection) new URL(DEEPSEEK_API_URL).openConnection();
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setRequestProperty("Authorization", "Bearer " + DEEPSEEK_API_KEY);
+        connection.setDoOutput(true);
+
+        // Send request
+        try (OutputStream os = connection.getOutputStream()) {
+            os.write(requestBody.toString().getBytes());
+        }
+
+        // Parse response
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+            StringBuilder response = new StringBuilder();
+            String line;
+            while ((line = br.readLine()) != null) {
+                response.append(line);
+            }
+
+            JSONObject jsonResponse = new JSONObject(response.toString());
+            String content = jsonResponse.getJSONArray("choices")
+                    .getJSONObject(0)
+                    .getJSONObject("message")
+                    .getString("content");
+
+            return content.trim(); // e.g., "Food" or "Transportation"
+        } catch (Exception e) {
+            System.err.println("DeepSeek API call failed: " + e.getMessage());
+            return "Uncategorized"; // Fallback on error
+        }
+    }
+
+
+    /**
+     * Record user correction (unchanged)
+     */
+    public void recordCorrection(Transaction transaction, String newCategory) {
+        String description = transaction.getDescription();
+        userCorrections.put(description, newCategory);
+
+        try (FileWriter writer = new FileWriter(CORRECTIONS_LOG_PATH, true)) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String timestamp = LocalDateTime.now().format(formatter);
+            writer.write(String.format("%s|%s|%s|%s\n",
+                    description,
+                    newCategory,
+                    transaction.getCategory(),
+                    timestamp));
+        } catch (IOException e) {
+            System.err.println("Failed to save correction: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Load user corrections (unchanged)
      */
     private void loadCorrections() {
         try {
@@ -104,83 +147,15 @@ public class AIClassifier {
                 for (String line : lines) {
                     String[] parts = line.split("\\|");
                     if (parts.length >= 2) {
-                        String description = parts[0].trim();
-                        String category = parts[1].trim();
-                        userCorrections.put(description, category);
+                        userCorrections.put(parts[0].trim(), parts[1].trim());
                     }
                 }
             }
         } catch (IOException e) {
-            System.err.println("Failed to load correction records: " + e.getMessage());
+            System.err.println("Failed to load corrections: " + e.getMessage());
         }
     }
-    
-    /**
-     * Classify a transaction
-     * @param transaction Transaction to classify
-     * @return Classified transaction
-     */
-    public Transaction classify(Transaction transaction) {
-        // If already classified and not "Uncategorized", don't classify
-        if (transaction.getCategory() != null && !transaction.getCategory().equals("Uncategorized")) {
-            return transaction;
-        }
-        
-        String description = transaction.getDescription();
-        
-        // First check user corrections
-        if (userCorrections.containsKey(description)) {
-            transaction.setCategory(userCorrections.get(description));
-            return transaction;
-        }
-        
-        // Apply classification rules
-        for (Map.Entry<String, List<Pattern>> entry : categoryPatterns.entrySet()) {
-            String category = entry.getKey();
-            List<Pattern> patterns = entry.getValue();
-            
-            for (Pattern pattern : patterns) {
-                if (pattern.matcher(description).matches()) {
-                    transaction.setCategory(category);
-                    return transaction;
-                }
-            }
-        }
-        
-        // Check if during Spring Festival period
-        if (isHolidayPeriod(transaction.getDate())) {
-            transaction.setCategory("Holiday");
-            return transaction;
-        }
-        
-        // If no matching rule, keep as "Uncategorized"
-        transaction.setCategory("Uncategorized");
-        return transaction;
-    }
-    
-    /**
-     * Record user correction
-     * @param transaction Original transaction
-     * @param newCategory New category
-     */
-    public void recordCorrection(Transaction transaction, String newCategory) {
-        String description = transaction.getDescription();
-        userCorrections.put(description, newCategory);
-        
-        // Save to log file
-        try (FileWriter writer = new FileWriter(CORRECTIONS_LOG_PATH, true)) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            String timestamp = LocalDateTime.now().format(formatter); // Using LocalDateTime instead of LocalDate
-            writer.write(String.format("%s|%s|%s|%s\n", 
-                    description, 
-                    newCategory, 
-                    transaction.getCategory(), // Original category
-                    timestamp));
-        } catch (IOException e) {
-            System.err.println("Failed to save correction record: " + e.getMessage());
-        }
-    }
-    
+
     /**
      * Check if date is during a holiday period
      * Simplified implementation, using sample logic
@@ -192,12 +167,12 @@ public class AIClassifier {
         if (date.getYear() == 2024) {
             LocalDate startDate = LocalDate.of(2024, 2, 4);
             LocalDate endDate = LocalDate.of(2024, 2, 24);
-            
+
             return !date.isBefore(startDate) && !date.isAfter(endDate);
         }
-        
+
         // TODO: Add more holiday date ranges, or use calendar library to calculate automatically
-        
+
         return false;
     }
-} 
+}
