@@ -660,7 +660,7 @@ public class LocalConsumptionPanel extends JPanel {
                 {"JD.com", "28%", "+12.2%", "Electronics, home appliances"},
                 {"Pinduoduo", "15%", "+24.8%", "Value shopping, groceries"},
                 {"Douyin", "8%", "+45.2%", "Fashion, cosmetics"},
-                {"Others", "7%", "+5.4%", "Niche markets"}
+                {"Others", "7%", "+%", "Niche markets"}
         };
 
         // Create platform components
