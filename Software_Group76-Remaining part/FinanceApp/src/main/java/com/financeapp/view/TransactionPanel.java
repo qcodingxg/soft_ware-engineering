@@ -46,7 +46,12 @@ public class TransactionPanel extends JPanel {
     private static final Color TABLE_HEADER_COLOR = new Color(52, 73, 94);
     private static final Color TABLE_ALTERNATE_COLOR = new Color(245, 248, 250);
     private static final Color SHADOW_COLOR = new Color(0, 0, 0, 20);
-    
+
+    private JPanel paginationPanel;
+    private JButton prevButton, nextButton;
+    private JLabel pageLabel;
+    private int currentPage = 1;
+    private int pageSize = 10;
     /**
      * Constructor
      * @param controller Transaction controller
@@ -378,12 +383,18 @@ public class TransactionPanel extends JPanel {
         JButton deleteButton = createGlassButton("Delete Selected", ERROR_COLOR);
         deleteButton.setIcon(UIManager.getIcon("FileChooser.detailsViewIcon"));
         deleteButton.addActionListener(e -> deleteSelectedTransaction());
-        
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+
+        paginationPanel = createPaginationControls();
+
+        JPanel buttonPanel = new JPanel(new BorderLayout());
         buttonPanel.setBackground(Color.WHITE);
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
-        buttonPanel.add(deleteButton);
-        
+
+        JPanel southPanel = new JPanel(new BorderLayout());
+        southPanel.add(paginationPanel, BorderLayout.CENTER);  // 分页控件居中
+        southPanel.add(deleteButton, BorderLayout.EAST);
+        buttonPanel.add(southPanel, BorderLayout.SOUTH);
+
         // Assemble all components
         JPanel contentPanel = new JPanel(new BorderLayout());
         contentPanel.setBackground(Color.WHITE);
@@ -878,29 +889,35 @@ public class TransactionPanel extends JPanel {
      * Update transaction list
      */
     public void updateTransactionList() {
-        // Clear search field
-        searchField.setText("");
-        
+
         // Clear table
         tableModel.setRowCount(0);
-        
-        // Add all transactions
+
+        // Get all data
+        List<Transaction> allTransactions = controller.getTransactions();
+        int totalItems = allTransactions.size();
+        int totalPages = (int) Math.ceil((double) totalItems / pageSize);
+
+        // Update the status of the pagination button
+        prevButton.setEnabled(currentPage > 1);
+        nextButton.setEnabled(currentPage < totalPages);
+        pageLabel.setText(String.format("Page %d/%d", currentPage, totalPages));
+
+        // Calculate the data range of the current page
+        int start = (currentPage - 1) * pageSize;
+        int end = Math.min(start + pageSize, totalItems);
+
+        // Add the data of the current page
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        for (Transaction transaction : controller.getTransactions()) {
-            // Format amount with appropriate sign
-            String formattedAmount = String.format("%.2f", transaction.getAmount());
-            
-            Object[] row = {
-                    transaction.getDate().format(formatter),
-                    transaction.getAmount(), // Store as Double for proper sorting
-                    transaction.getCategory(),
-                    transaction.getDescription()
-            };
-            tableModel.addRow(row);
+        for (int i = start; i < end; i++) {
+            Transaction t = allTransactions.get(i);
+            tableModel.addRow(new Object[]{
+                    t.getDate().format(formatter),
+                    t.getAmount(),
+                    t.getCategory(),
+                    t.getDescription()
+            });
         }
-        
-        // Reset filters
-        sorter.setRowFilter(null);
     }
     
     /**
@@ -955,5 +972,31 @@ public class TransactionPanel extends JPanel {
             g2d.drawRoundRect(x, y, width - 1, height - 1, radius, radius);
             g2d.dispose();
         }
+    }
+    private JPanel createPaginationControls() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
+        panel.setBackground(Color.WHITE);
+
+        prevButton = createStyledButton("Previous", SECONDARY_COLOR);
+        prevButton.setEnabled(false);
+        prevButton.addActionListener(e -> {
+            currentPage--;
+            updateTransactionList();
+        });
+
+        nextButton = createStyledButton("Next", SECONDARY_COLOR);
+        nextButton.addActionListener(e -> {
+            currentPage++;
+            updateTransactionList();
+        });
+
+        pageLabel = new JLabel("Page 1/1");
+        pageLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+
+        panel.add(prevButton);
+        panel.add(pageLabel);
+        panel.add(nextButton);
+
+        return panel;
     }
 } 
