@@ -42,6 +42,7 @@ public class ExpenseAlertPanel extends JPanel {
     private JButton saveSettingsButton;
     private JButton refreshButton;
     private JButton historyAlarmsButton;
+    private JButton detailsButton;
     private JCheckBox enableAlertsCheckbox;
     private JTextField globalThresholdField;
     private JTable categoryThresholdsTable;
@@ -109,6 +110,11 @@ public class ExpenseAlertPanel extends JPanel {
         historyAlarmsButton = createStyledButton("History Alarms");
         historyAlarmsButton.addActionListener(e -> showHistoryAlarms());
         refreshPanel.add(historyAlarmsButton);
+
+        // 新增Details按钮
+        detailsButton = createStyledButton("Details");
+        detailsButton.addActionListener(e -> showDetails());
+        refreshPanel.add(detailsButton);
 
         add(refreshPanel, BorderLayout.SOUTH);
 
@@ -417,7 +423,7 @@ public class ExpenseAlertPanel extends JPanel {
 
         for (String category : categoryArray) {
             boolean hasThreshold = categoryThresholds.containsKey(category);
-            String status = hasThreshold ? "yes" : "no";
+            String status = hasThreshold ? "✓" : "✗";
             model.addRow(new Object[]{category, status});
         }
 
@@ -471,7 +477,7 @@ public class ExpenseAlertPanel extends JPanel {
         double totalExpense = getTotalExpense();
         double historicalAverage = getHistoricalAverage();
         if (totalExpense > historicalAverage * 1.2) {
-            String message = "Total expense (" + totalExpense + ") exceeds historical average (" + historicalAverage + ") by 20%!";
+            String message = "Total expense (" + totalExpense + ") exceeds historical average (" + historicalAverage + ") over 20%!";
             alerts.add(alertService.createAlert(message, AlertLevel.CRITICAL, "Total Expense"));
         }
 
@@ -482,7 +488,7 @@ public class ExpenseAlertPanel extends JPanel {
             double expense = entry.getValue();
             double categoryHistoricalAverage = getCategoryHistoricalAverage(category);
             if (expense > categoryHistoricalAverage * 1.2) {
-                String message = "Category " + category + " expense (" + expense + ") exceeds historical average (" + categoryHistoricalAverage + ") by 20%!";
+                String message = "Category " + category + " expense (" + expense + ") exceeds historical average (" + categoryHistoricalAverage + ") over 20%!";
                 alerts.add(alertService.createAlert(message, AlertLevel.CRITICAL, category));
             }
         }
@@ -671,5 +677,37 @@ public class ExpenseAlertPanel extends JPanel {
             }
         });
         return button;
+    }
+
+    /**
+     * 显示详细信息
+     */
+    private void showDetails() {
+        Map<String, Double> categoryExpenses = getCategoryExpenses();
+        DefaultTableModel model = new DefaultTableModel(new String[]{"Category", "Threshold", "Actual Value", "Exceeded Amount"}, 0);
+
+        for (Map.Entry<String, Double> entry : categoryThresholds.entrySet()) {
+            String category = entry.getKey();
+            double threshold = entry.getValue();
+            double actualValue = categoryExpenses.getOrDefault(category, 0.0);
+            double exceededAmount = Math.max(0, actualValue - threshold);
+            model.addRow(new Object[]{category, threshold, actualValue, exceededAmount});
+        }
+
+        JTable table = new JTable(model);
+        table.setRowHeight(25);
+        table.getColumnModel().getColumn(0).setPreferredWidth(150);
+        table.getColumnModel().getColumn(1).setPreferredWidth(150);
+        table.getColumnModel().getColumn(2).setPreferredWidth(150);
+        table.getColumnModel().getColumn(3).setPreferredWidth(150);
+
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
+
+        JScrollPane scrollPane = new JScrollPane(table);
+        JOptionPane.showMessageDialog(this, scrollPane, "Category Details", JOptionPane.INFORMATION_MESSAGE);
     }
 }
