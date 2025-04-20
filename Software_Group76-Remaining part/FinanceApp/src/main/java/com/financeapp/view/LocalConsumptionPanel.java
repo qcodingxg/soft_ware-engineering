@@ -512,7 +512,7 @@ public class LocalConsumptionPanel extends JPanel {
                             entry.getValue());
                     g2d.setFont(new Font("Segoe UI", Font.PLAIN, 11));
                     g2d.setColor(new Color(60, 60, 60));
-                    drawTruncatedText(g2d, text, legendX + colorBlockSize + 12, yPos + 12, legendWidth - 30);
+                    drawTruncatedText(g2d, legendText, legendX + colorBlockSize + 12, yPos + 12, legendWidth - 30);
 
                     index++;
                 }
