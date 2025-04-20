@@ -407,6 +407,7 @@ public class LocalConsumptionPanel extends JPanel {
         return panel;
     }
 
+
     private JPanel createPaymentMethodPanel() {
         JPanel panel = createCardPanel("Payment Methods");
         panel.setLayout(new BorderLayout(10, 10));
