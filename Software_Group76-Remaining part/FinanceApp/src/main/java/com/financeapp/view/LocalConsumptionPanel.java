@@ -468,7 +468,51 @@ public class LocalConsumptionPanel extends JPanel {
                     Object[] sector = sectors.get(hoverIndex);
                     drawHoverTooltip(g2d, (String)sector[2], (Double)sector[3], hoverPoint);
                 }
+
+                // 新版图例绘制
+                drawModernLegend(g2d);
             }
+
+            // 现代化图例绘制方法
+            private void drawModernLegend(Graphics2D g2d) {
+                int legendX = getWidth() - 220;  // 右侧留出200px空间
+                int legendY = 50;
+                int itemHeight = 30;
+
+                // 图例背景
+                g2d.setColor(new Color(255, 255, 255, 220));
+                g2d.fillRoundRect(legendX - 10, legendY - 10, 200,
+                        PAYMENT_METHODS.size() * itemHeight + 20, 15, 15);
+                g2d.setColor(new Color(200, 200, 200, 100));
+                g2d.drawRoundRect(legendX - 10, legendY - 10, 200,
+                        PAYMENT_METHODS.size() * itemHeight + 20, 15, 15);
+
+                // 图例标题
+                g2d.setColor(new Color(51, 51, 51));
+                g2d.setFont(new Font("Segoe UI", Font.BOLD, 14));
+                g2d.drawString("Payment Methods", legendX, legendY);
+
+                // 图例条目
+                int index = 0;
+                for (Map.Entry<String, Double> entry : PAYMENT_METHODS.entrySet()) {
+                    int yPos = legendY + 30 + index * itemHeight;
+
+                    // 颜色块
+                    g2d.setColor(colors[index]);
+                    g2d.fillRoundRect(legendX, yPos, 20, 20, 5, 5);
+
+                    // 文本
+                    g2d.setColor(new Color(60, 60, 60));
+                    g2d.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+                    String legendText = String.format("%s (%.1f%%)",
+                            entry.getKey(),
+                            entry.getValue());
+                    g2d.drawString(legendText, legendX + 30, yPos + 15);
+
+                    index++;
+                }
+            }
+
 
             // 提示框绘制方法
             private void drawHoverTooltip(Graphics2D g2d, String label, double percent, Point pos) {
