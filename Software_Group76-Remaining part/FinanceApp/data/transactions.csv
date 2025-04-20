@@ -39,8 +39,8 @@
 2023-10-29,Savings,1000.00,Monthly savings deposit
 2023-10-30,Uncategorized,25.49,Uncategorized purchase
 2023-10-31,Miscellaneous,-83.75,Refund from store
-2024-10-07,earnings,+300,Money from work
-2024-12-25,gifts,-500,Spent on the gift
+2024-10-07,earnings,300.00,Money from work
+2024-12-25,gifts,-500.00,Spent on the gift
 2024-01-03,Housing,2500.00,Monthly rent
 2024-01-05,Utilities,150.35,Electricity bill
 2024-01-08,Education,350.00,Online course
@@ -241,5 +241,4 @@
 2025-04-17,Education,210.00,Workshop fee
 2025-04-19,Savings,1300.00,Retirement contribution
 2025-04-20,Gifts,220.00,Baby shower gift
-
-
+2025-04-20,Food,15.00,breakfast

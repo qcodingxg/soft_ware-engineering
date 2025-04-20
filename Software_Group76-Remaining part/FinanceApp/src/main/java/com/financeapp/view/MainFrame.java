@@ -595,9 +595,15 @@ public class MainFrame extends JFrame implements LoginPanel.LoginCallback, Regis
             UIManager.put("ProgressBar.arc", 8); // Progress bar corner radius
             UIManager.put("TextComponent.arc", 8); // Text component corner radius
             
-            // Set default font
-            Font defaultFont = new Font("Segoe UI", Font.PLAIN, 13);
+            // 改进字体设置，添加备选字体防止显示框框
+            // SansSerif是Java内置的逻辑字体，几乎所有系统都支持
+            // 设置字体族列表，优先使用Segoe UI，如果不可用则降级到其他常见字体
+            Font defaultFont = new Font("SansSerif", Font.PLAIN, 13);
             UIManager.put("defaultFont", defaultFont);
+            
+            // 设置字体回退机制
+            System.setProperty("swing.plaf.metal.userFont", "SansSerif");
+            System.setProperty("swing.plaf.metal.controlFont", "SansSerif");
             
             // Set anti-aliasing for better text rendering
             System.setProperty("awt.useSystemAAFontSettings", "on");

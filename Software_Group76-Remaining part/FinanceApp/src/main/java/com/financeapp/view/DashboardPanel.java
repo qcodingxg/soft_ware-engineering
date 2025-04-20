@@ -163,8 +163,8 @@ public class DashboardPanel extends JPanel {
         
         // Create date display
         LocalDate today = LocalDate.now();
-        JLabel dateLabel = new JLabel(today.format(DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy")));
-        dateLabel.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        JLabel dateLabel = new JLabel(today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        dateLabel.setFont(new Font("SansSerif", Font.PLAIN, 16));
         dateLabel.setForeground(TEXT_COLOR);
         rightPanel.add(dateLabel, BorderLayout.NORTH);
         

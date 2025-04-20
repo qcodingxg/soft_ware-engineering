@@ -1,6 +1,7 @@
 package com.financeapp.view;
 
 import com.financeapp.controller.AuthController;
+import com.financeapp.view.components.BackgroundPanel;
 
 import javax.swing.*;
 import javax.swing.border.*;
@@ -26,6 +27,9 @@ public class RegisterPanel extends JPanel {
     private JButton registerButton;
     private JButton backButton;
     
+    // Background panel
+    private BackgroundPanel backgroundPanel;
+    
     // Colors
     private static final Color PRIMARY_COLOR = new Color(41, 128, 185);
     private static final Color SECONDARY_COLOR = new Color(52, 152, 219);
@@ -33,6 +37,9 @@ public class RegisterPanel extends JPanel {
     private static final Color TEXT_COLOR = new Color(44, 62, 80);
     private static final Color ERROR_COLOR = new Color(231, 76, 60);
     private static final Color SUCCESS_COLOR = new Color(46, 204, 113);
+    
+    // Background image path
+    private static final String BACKGROUND_IMAGE_PATH = "image/background.png";
     
     /**
      * Register callback interface
@@ -57,14 +64,21 @@ public class RegisterPanel extends JPanel {
      * Initialize UI
      */
     private void initUI() {
-        setLayout(new GridBagLayout());
-        setBackground(BACKGROUND_COLOR);
+        setLayout(new BorderLayout());
+        
+        // Create background panel
+        backgroundPanel = new BackgroundPanel(BACKGROUND_IMAGE_PATH, true, BackgroundPanel.SCALED);
+        backgroundPanel.setLayout(new GridBagLayout());
         
         // Create registration form
         JPanel registerForm = createRegisterForm();
         
-        // Add to panel
-        add(registerForm, new GridBagConstraints());
+        // Add to panel with transparency
+        registerForm.setOpaque(false);
+        backgroundPanel.add(registerForm, new GridBagConstraints());
+        
+        // Add background panel to main panel
+        add(backgroundPanel, BorderLayout.CENTER);
     }
     
     /**
@@ -72,7 +86,7 @@ public class RegisterPanel extends JPanel {
      */
     private JPanel createRegisterForm() {
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBackground(BACKGROUND_COLOR);
+        panel.setBackground(new Color(BACKGROUND_COLOR.getRed(), BACKGROUND_COLOR.getGreen(), BACKGROUND_COLOR.getBlue(), 220));
         panel.setBorder(BorderFactory.createCompoundBorder(
             new LineBorder(PRIMARY_COLOR, 2),
             BorderFactory.createEmptyBorder(30, 30, 30, 30)
@@ -169,7 +183,7 @@ public class RegisterPanel extends JPanel {
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
-        buttonPanel.setBackground(BACKGROUND_COLOR);
+        buttonPanel.setOpaque(false);
         
         // Register button
         registerButton = createStyledButton("Register", SUCCESS_COLOR);

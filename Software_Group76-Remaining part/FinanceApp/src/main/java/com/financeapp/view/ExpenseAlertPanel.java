@@ -189,17 +189,17 @@ public class ExpenseAlertPanel extends JPanel {
 
         // 启用/禁用预警功能的复选框
         enableAlertsCheckbox = new JCheckBox("Enable Alerts", alertsEnabled);
-        enableAlertsCheckbox.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        enableAlertsCheckbox.setFont(new Font("SansSerif", Font.PLAIN, 14));
         enableAlertsCheckbox.setOpaque(false);
         panel.add(enableAlertsCheckbox);
 
         // 全局支出预警阈值设置
         JLabel globalThresholdLabel = new JLabel("Global Threshold (¥):");
-        globalThresholdLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        globalThresholdLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
         panel.add(globalThresholdLabel);
 
         globalThresholdField = new JTextField(String.valueOf(globalThreshold), 10);
-        globalThresholdField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        globalThresholdField.setFont(new Font("SansSerif", Font.PLAIN, 14));
         panel.add(globalThresholdField);
 
         return panel;
@@ -229,7 +229,7 @@ public class ExpenseAlertPanel extends JPanel {
 
         categoryThresholdsTable = new JTable(categoryThresholdsModel);
         categoryThresholdsTable.setRowHeight(25);
-        categoryThresholdsTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        categoryThresholdsTable.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 12));
         categoryThresholdsTable.getTableHeader().setBackground(SECONDARY_COLOR);
         categoryThresholdsTable.getTableHeader().setForeground(Color.WHITE);
         categoryThresholdsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -291,7 +291,7 @@ public class ExpenseAlertPanel extends JPanel {
         int nonNullAlertsCount = (int) alerts.stream().filter(Objects::nonNull).count();
         if (nonNullAlertsCount > 3) {
             JLabel remainingLabel = new JLabel("+" + (nonNullAlertsCount - 3) + " more alerts");
-            remainingLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+            remainingLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
             remainingLabel.setForeground(ERROR_COLOR);
             alertsContent.add(remainingLabel);
         }
@@ -311,19 +311,19 @@ public class ExpenseAlertPanel extends JPanel {
 
         // 警告图标
         JLabel iconLabel = new JLabel("⚠️");
-        iconLabel.setFont(new Font("Segoe UI", Font.PLAIN, 24));
+        iconLabel.setFont(new Font("SansSerif", Font.PLAIN, 24));
         iconLabel.setForeground(ERROR_COLOR);
         panel.add(iconLabel);
 
         // 预警文本
         JLabel messageLabel = new JLabel(alert.getMessage());
-        messageLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        messageLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
         messageLabel.setForeground(ERROR_COLOR);
         panel.add(messageLabel);
 
         // 日期
         JLabel dateLabel = new JLabel(alert.getTimestamp().toLocalDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        dateLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        dateLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
         dateLabel.setForeground(TEXT_COLOR);
         panel.add(dateLabel);
 
@@ -661,7 +661,7 @@ public class ExpenseAlertPanel extends JPanel {
      */
     private JButton createStyledButton(String text) {
         JButton button = new JButton(text);
-        button.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        button.setFont(new Font("SansSerif", Font.PLAIN, 14));
         button.setForeground(Color.WHITE);
         button.setBackground(PRIMARY_COLOR);
         button.setFocusPainted(false);

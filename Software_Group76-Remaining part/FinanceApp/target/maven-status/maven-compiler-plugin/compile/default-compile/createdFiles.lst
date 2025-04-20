@@ -10,6 +10,7 @@ com\financeapp\view\CategoryManagementPanel$2.class
 com\financeapp\view\DashboardPanel$ShadowBorder.class
 com\financeapp\view\TransactionPanel.class
 com\financeapp\view\CategoryManagementPanel$7.class
+com\financeapp\view\AIChatPanel$9.class
 com\financeapp\view\DashboardPanel$7.class
 com\financeapp\view\LocalConsumptionPanel$1$1.class
 com\financeapp\view\TransactionPanel$2.class
@@ -32,9 +33,11 @@ com\financeapp\model\AIClassifier.class
 com\financeapp\util\CSVHandler.class
 com\financeapp\view\MainFrame$StyledTabbedPaneUI.class
 com\financeapp\view\TransactionPanel$4.class
+com\financeapp\view\AIChatPanel$7.class
 com\financeapp\view\StatisticsPanel$GroupedBarChartComponent.class
 com\financeapp\view\MainFrame.class
 com\financeapp\view\AIChatPanel$2.class
+com\financeapp\view\components\BackgroundPanel.class
 com\financeapp\view\TransactionPanel$9.class
 com\financeapp\model\AlertService$Alert.class
 com\financeapp\view\LocalConsumptionPanel.class
@@ -46,6 +49,7 @@ com\financeapp\controller\TransactionController.class
 com\financeapp\view\TransactionPanel$3.class
 com\financeapp\model\BudgetCalculator.class
 com\financeapp\view\ExpenseAlertPanel$4.class
+com\financeapp\view\AIChatPanel$8.class
 com\financeapp\view\TransactionPanel$11.class
 com\financeapp\view\AIChatPanel$5.class
 com\financeapp\view\DashboardPanel$6.class
