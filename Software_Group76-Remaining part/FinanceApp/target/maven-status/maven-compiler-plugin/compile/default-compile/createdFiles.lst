@@ -4,12 +4,14 @@ com\financeapp\view\CategoryManagementPanel$RoundedLineBorder.class
 com\financeapp\view\LoginPanel$2.class
 com\financeapp\view\LocalConsumptionPanel$4.class
 com\financeapp\view\LocalConsumptionPanel$1.class
+com\financeapp\view\LocalConsumptionPanel$4$1.class
 com\financeapp\view\TransactionPanel$7.class
 com\financeapp\view\CategoryManagementPanel$2.class
 com\financeapp\view\DashboardPanel$ShadowBorder.class
 com\financeapp\view\TransactionPanel.class
 com\financeapp\view\CategoryManagementPanel$7.class
 com\financeapp\view\DashboardPanel$7.class
+com\financeapp\view\LocalConsumptionPanel$1$1.class
 com\financeapp\view\TransactionPanel$2.class
 com\financeapp\view\CategoryManagementPanel$ShadowBorder.class
 com\financeapp\view\components\ChatBubbleFactory$RoundedBorder.class
@@ -30,6 +32,7 @@ com\financeapp\model\AIClassifier.class
 com\financeapp\util\CSVHandler.class
 com\financeapp\view\MainFrame$StyledTabbedPaneUI.class
 com\financeapp\view\TransactionPanel$4.class
+com\financeapp\view\StatisticsPanel$GroupedBarChartComponent.class
 com\financeapp\view\MainFrame.class
 com\financeapp\view\AIChatPanel$2.class
 com\financeapp\view\TransactionPanel$9.class
@@ -42,8 +45,8 @@ com\financeapp\view\CategoryManagementPanel$9.class
 com\financeapp\controller\TransactionController.class
 com\financeapp\view\TransactionPanel$3.class
 com\financeapp\model\BudgetCalculator.class
-com\financeapp\view\ExpenseAlertPanel$ShadowBorder.class
-com\financeapp\view\StatisticsPanel$3.class
+com\financeapp\view\ExpenseAlertPanel$4.class
+com\financeapp\view\TransactionPanel$11.class
 com\financeapp\view\AIChatPanel$5.class
 com\financeapp\view\DashboardPanel$6.class
 com\financeapp\view\TransactionPanel$6.class
@@ -53,6 +56,7 @@ com\financeapp\view\DashboardPanel$3.class
 com\financeapp\view\components\ChatBubbleFactory.class
 com\financeapp\view\ExpenseAlertPanel.class
 com\financeapp\view\TransactionPanel$ShadowBorder.class
+com\financeapp\view\LocalConsumptionPanel$5.class
 com\financeapp\view\RegisterPanel$RegisterCallback.class
 com\financeapp\util\UserDAO.class
 com\financeapp\view\RegisterPanel$1.class
@@ -79,6 +83,7 @@ com\financeapp\view\MainFrame$1.class
 com\financeapp\view\TransactionPanel$RoundedLineBorder.class
 com\financeapp\view\DashboardPanel$8.class
 com\financeapp\view\StatisticsPanel$1.class
+com\financeapp\view\LocalConsumptionPanel$3$1.class
 com\financeapp\model\User.class
 com\financeapp\view\AIChatPanel$4.class
 com\financeapp\model\AlertService$GuiNotificationHandler.class
