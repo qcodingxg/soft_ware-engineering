@@ -168,7 +168,7 @@ public class StatisticsPanel extends JPanel {
         monthList.setBackground(Color.WHITE);
         monthList.setSelectedIndex(LocalDate.now().getMonthValue() - 1);
         JScrollPane monthScrollPane = new JScrollPane(monthList);
-        monthScrollPane.setPreferredSize(new Dimension(120, 40));
+        monthScrollPane.setPreferredSize(new Dimension(120, 80));
         panel.add(monthScrollPane);
 //        for (String month : englishMonths) {
 //            monthComboBox.addItem(month);
@@ -182,6 +182,8 @@ public class StatisticsPanel extends JPanel {
         // Query button
         JButton queryButton = createStyledButton("Search", PRIMARY_COLOR);
         queryButton.addActionListener(e -> updateStatistics());
+        //我想要在按钮上添加鼠标悬停效果，显示“使用ctrl键加单击选择多个选项”
+        queryButton.setToolTipText("Use Ctrl + Click to select multiple months");
         panel.add(queryButton);
         
         return panel;
