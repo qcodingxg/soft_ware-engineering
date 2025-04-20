@@ -131,17 +131,17 @@ public class LocalConsumptionPanel extends JPanel {
         panel.setOpaque(false);
         
         JLabel titleLabel = new JLabel("Chinese Consumption Patterns");
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 22));
         titleLabel.setForeground(PRIMARY_COLOR);
         panel.add(titleLabel, BorderLayout.WEST);
         
         JLabel subtitleLabel = new JLabel("Analysis of modern Chinese spending habits");
-        subtitleLabel.setFont(new Font("Segoe UI", Font.ITALIC, 14));
+        subtitleLabel.setFont(new Font("SansSerif", Font.ITALIC, 14));
         subtitleLabel.setForeground(SECONDARY_COLOR);
         panel.add(subtitleLabel, BorderLayout.CENTER);
         
         JButton refreshButton = new JButton("Refresh Analysis");
-        refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        refreshButton.setFont(new Font("SansSerif", Font.PLAIN, 12));
         refreshButton.setForeground(Color.BLACK);
         refreshButton.setBackground(Color.WHITE);
         refreshButton.setFocusPainted(false);
@@ -198,7 +198,7 @@ public class LocalConsumptionPanel extends JPanel {
                 g2d.drawLine(chartX, chartY, chartX, chartY + chartHeight); // Y轴
 
                 // 绘制X轴标签
-                g2d.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+                g2d.setFont(new Font("SansSerif", Font.PLAIN, 10));
                 for(int i=0; i<years.length; i++){
                     int x = chartX + (int)(i * (chartWidth/(years.length-1.0)));
                     String label = String.valueOf(years[i]);
@@ -227,7 +227,7 @@ public class LocalConsumptionPanel extends JPanel {
 
             private void drawYAxisLabels(Graphics2D g2d, int chartX, int chartY, int chartHeight, double maxValue) {
                 g2d.setColor(Color.DARK_GRAY);
-                g2d.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+                g2d.setFont(new Font("SansSerif", Font.PLAIN, 10));
 
                 // 计算刻度间隔
                 int majorStep = 50; // 每50B一个主刻度
@@ -255,7 +255,7 @@ public class LocalConsumptionPanel extends JPanel {
 
                 // 添加Y轴标题
                 g2d.rotate(Math.toRadians(-90), chartX - 40, chartY + chartHeight/2);
-                g2d.setFont(new Font("Segoe UI", Font.BOLD, 12));
+                g2d.setFont(new Font("SansSerif", Font.BOLD, 12));
                 g2d.drawString("Amount (Billion RMB)", chartX - 40, chartY + chartHeight/2);
                 g2d.rotate(Math.toRadians(90), chartX - 40, chartY + chartHeight/2);
             }
@@ -348,16 +348,16 @@ public class LocalConsumptionPanel extends JPanel {
         summaryPanel.setOpaque(false);
 
         JLabel trendLabel = new JLabel("Mobile Shopping Dominance");
-        trendLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        trendLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
         summaryPanel.add(trendLabel);
 
         JLabel growthLabel = new JLabel("Mobile Shopping Growth: +24.8% annually");
-        growthLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        growthLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
         growthLabel.setForeground(SUCCESS_COLOR);
         summaryPanel.add(growthLabel);
 
         JLabel statsLabel = new JLabel("Mobile accounts for 85% of all transactions");
-        statsLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        statsLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
         statsLabel.setForeground(SECONDARY_COLOR);
         summaryPanel.add(statsLabel);
 
@@ -391,9 +391,9 @@ public class LocalConsumptionPanel extends JPanel {
         }
         
         JTable categoryTable = new JTable(model);
-        categoryTable.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        categoryTable.setFont(new Font("SansSerif", Font.PLAIN, 12));
         categoryTable.setRowHeight(25);
-        categoryTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        categoryTable.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 12));
         categoryTable.setShowGrid(true);
         categoryTable.setGridColor(new Color(230, 230, 230));
         
@@ -492,8 +492,8 @@ public class LocalConsumptionPanel extends JPanel {
 
                 // 标题优化
                 g2d.setColor(new Color(51, 51, 51));
-                g2d.setFont(new Font("Segoe UI SemiBold", Font.BOLD, 12));
-                drawTruncatedText(g2d, "Payment Methods", legendX, legendY + 15, legendWidth - 20);
+                g2d.setFont(new Font("SansSerif", Font.BOLD, 14));
+                g2d.drawString("Payment Methods", legendX, legendY);
 
                 // 图例项布局
                 int index = 0;
@@ -502,11 +502,13 @@ public class LocalConsumptionPanel extends JPanel {
 
                     // 颜色块
                     g2d.setColor(colors[index]);
-                    g2d.fillRoundRect(legendX + 5, yPos, colorBlockSize, colorBlockSize, 4, 4);
+                    g2d.fillRoundRect(legendX, yPos, 20, 20, 5, 5);
 
-                    // 文字处理
-                    String text = String.format("%s %.1f%%",
-                            truncateText(entry.getKey(), 10),
+                    // 文本
+                    g2d.setColor(new Color(60, 60, 60));
+                    g2d.setFont(new Font("SansSerif", Font.PLAIN, 12));
+                    String legendText = String.format("%s (%.1f%%)",
+                            entry.getKey(),
                             entry.getValue());
                     g2d.setFont(new Font("Segoe UI", Font.PLAIN, 11));
                     g2d.setColor(new Color(60, 60, 60));
@@ -590,16 +592,16 @@ public class LocalConsumptionPanel extends JPanel {
 
         // 添加说明标签（保持原有代码不变）
         JLabel methodLabel = new JLabel("Mobile Payment");
-        methodLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        methodLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
         summaryPanel.add(methodLabel);
 
         JLabel mobileLabel = new JLabel("Alipay & WeChat Pay: 85% of transactions");
-        mobileLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        mobileLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
         mobileLabel.setForeground(PRIMARY_COLOR);
         summaryPanel.add(mobileLabel);
 
         JLabel cashLabel = new JLabel("Cash usage declined by 15% this year");
-        cashLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        cashLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
         cashLabel.setForeground(SECONDARY_COLOR);
         summaryPanel.add(cashLabel);
 
@@ -728,11 +730,11 @@ public class LocalConsumptionPanel extends JPanel {
         summaryPanel.setOpaque(false);
 
         JLabel festivalLabel = new JLabel("Shopping Festival Analysis");
-        festivalLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        festivalLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
         summaryPanel.add(festivalLabel);
 
         JLabel growthLabel = new JLabel("Total Spending: ¥450B annually");
-        growthLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        growthLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
         growthLabel.setForeground(SUCCESS_COLOR);
         summaryPanel.add(growthLabel);
 
@@ -778,7 +780,7 @@ public class LocalConsumptionPanel extends JPanel {
             platformPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(230, 230, 230)));
 
             JLabel nameLabel = new JLabel(platform[0]);
-            nameLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+            nameLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
             nameLabel.setForeground(PRIMARY_COLOR);
             nameLabel.setIcon(PLATFORM_ICONS.get(platform[0])); // 添加图标
             nameLabel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0)); // 调整图标和文字的间距
@@ -789,12 +791,12 @@ public class LocalConsumptionPanel extends JPanel {
             detailsPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5)); // 调整内边距
 
             JLabel marketShareLabel = new JLabel("Market Share: " + platform[1]);
-            marketShareLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+            marketShareLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
             marketShareLabel.setForeground(PRIMARY_COLOR);
             marketShareLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10)); // 调整间距
 
             JLabel growthLabel = new JLabel("Growth: " + platform[2]);
-            growthLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+            growthLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
             if (platform[2].startsWith("+")) {
                 growthLabel.setForeground(SUCCESS_COLOR);
             } else {
@@ -803,7 +805,7 @@ public class LocalConsumptionPanel extends JPanel {
             growthLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10)); // 调整间距
 
             JLabel categoryLabel = new JLabel("Focus: " + platform[3]);
-            categoryLabel.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+            categoryLabel.setFont(new Font("SansSerif", Font.ITALIC, 12));
             categoryLabel.setForeground(Color.GRAY); // 设置为灰色，以突出显示其他信息
             categoryLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10)); // 调整间距
 
@@ -869,11 +871,11 @@ public class LocalConsumptionPanel extends JPanel {
         summaryPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
 
         JLabel summaryLabel = new JLabel("Digital Service Integration");
-        summaryLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        summaryLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
         summaryPanel.add(summaryLabel);
 
         JLabel statsLabel = new JLabel("Average user accesses 4.2 digital services daily");
-        statsLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        statsLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
         statsLabel.setForeground(SECONDARY_COLOR);
         summaryPanel.add(statsLabel);
 
@@ -926,16 +928,16 @@ public class LocalConsumptionPanel extends JPanel {
         infoPanel.setOpaque(false);
 
         JLabel nameLabel = new JLabel(serviceName);
-        nameLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        nameLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
 
         JLabel usageLabel = new JLabel("Usage: " + penetration);
-        usageLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        usageLabel.setFont(new Font("SansSerif", Font.PLAIN, 11));
 
         JLabel frequencyLabel = new JLabel("Freq: " + frequency);
-        frequencyLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        frequencyLabel.setFont(new Font("SansSerif", Font.PLAIN, 11));
 
         JLabel descriptionLabel = new JLabel("Description: " + description);
-        descriptionLabel.setFont(new Font("Segoe UI", Font.ITALIC, 11));
+        descriptionLabel.setFont(new Font("SansSerif", Font.ITALIC, 11));
         descriptionLabel.setForeground(Color.GRAY);
 
         infoPanel.add(nameLabel);
@@ -958,7 +960,7 @@ public class LocalConsumptionPanel extends JPanel {
         ));
         
         JLabel titleLabel = new JLabel(title);
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
         titleLabel.setForeground(PRIMARY_COLOR);
         panel.add(titleLabel, BorderLayout.NORTH);
         

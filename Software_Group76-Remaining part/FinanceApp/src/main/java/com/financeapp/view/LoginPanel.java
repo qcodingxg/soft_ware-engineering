@@ -1,6 +1,7 @@
 package com.financeapp.view;
 
 import com.financeapp.controller.AuthController;
+import com.financeapp.view.components.BackgroundPanel;
 
 import javax.swing.*;
 import javax.swing.border.*;
@@ -23,6 +24,9 @@ public class LoginPanel extends JPanel {
     private JButton loginButton;
     private JButton registerButton;
     
+    // Background panel
+    private BackgroundPanel backgroundPanel;
+    
     // Colors
     private static final Color PRIMARY_COLOR = new Color(41, 128, 185);
     private static final Color SECONDARY_COLOR = new Color(52, 152, 219);
@@ -30,6 +34,9 @@ public class LoginPanel extends JPanel {
     private static final Color TEXT_COLOR = new Color(44, 62, 80);
     private static final Color ERROR_COLOR = new Color(231, 76, 60);
     private static final Color SUCCESS_COLOR = new Color(46, 204, 113);
+    
+    // Background image path
+    private static final String BACKGROUND_IMAGE_PATH = "image/background.png";
     
     /**
      * Login callback interface
@@ -54,14 +61,21 @@ public class LoginPanel extends JPanel {
      * Initialize UI
      */
     private void initUI() {
-        setLayout(new GridBagLayout());
-        setBackground(BACKGROUND_COLOR);
+        setLayout(new BorderLayout());
+        
+        // Create background panel
+        backgroundPanel = new BackgroundPanel(BACKGROUND_IMAGE_PATH, true, BackgroundPanel.SCALED);
+        backgroundPanel.setLayout(new GridBagLayout());
         
         // Create login form
         JPanel loginForm = createLoginForm();
         
-        // Add to panel
-        add(loginForm, new GridBagConstraints());
+        // Add to panel with transparency
+        loginForm.setOpaque(false);
+        backgroundPanel.add(loginForm, new GridBagConstraints());
+        
+        // Add background panel to main panel
+        add(backgroundPanel, BorderLayout.CENTER);
     }
     
     /**
@@ -69,7 +83,7 @@ public class LoginPanel extends JPanel {
      */
     private JPanel createLoginForm() {
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBackground(BACKGROUND_COLOR);
+        panel.setBackground(new Color(BACKGROUND_COLOR.getRed(), BACKGROUND_COLOR.getGreen(), BACKGROUND_COLOR.getBlue(), 220));
         panel.setBorder(BorderFactory.createCompoundBorder(
             new LineBorder(PRIMARY_COLOR, 2),
             BorderFactory.createEmptyBorder(30, 30, 30, 30)
@@ -127,7 +141,7 @@ public class LoginPanel extends JPanel {
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
-        buttonPanel.setBackground(BACKGROUND_COLOR);
+        buttonPanel.setOpaque(false);
         
         // Login button
         loginButton = createStyledButton("Login", PRIMARY_COLOR);

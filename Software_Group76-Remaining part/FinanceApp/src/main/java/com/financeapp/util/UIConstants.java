@@ -31,12 +31,12 @@ public class UIConstants {
     public static final Color INFO_COLOR = new Color(3, 169, 244);
     
     // Fonts
-    public static final Font TITLE_FONT = new Font("Segoe UI", Font.BOLD, 22);
-    public static final Font HEADER_FONT = new Font("Segoe UI", Font.BOLD, 18);
-    public static final Font SUBHEADER_FONT = new Font("Segoe UI", Font.BOLD, 16);
-    public static final Font BODY_FONT = new Font("Segoe UI", Font.PLAIN, 14);
-    public static final Font SMALL_FONT = new Font("Segoe UI", Font.PLAIN, 12);
-    public static final Font BUTTON_FONT = new Font("Segoe UI", Font.BOLD, 14);
+    public static final Font TITLE_FONT = new Font("SansSerif", Font.BOLD, 22);
+    public static final Font HEADER_FONT = new Font("SansSerif", Font.BOLD, 18);
+    public static final Font SUBHEADER_FONT = new Font("SansSerif", Font.BOLD, 16);
+    public static final Font BODY_FONT = new Font("SansSerif", Font.PLAIN, 14);
+    public static final Font SMALL_FONT = new Font("SansSerif", Font.PLAIN, 12);
+    public static final Font BUTTON_FONT = new Font("SansSerif", Font.BOLD, 14);
     
     // Borders and Padding
     public static final int PADDING = 16;

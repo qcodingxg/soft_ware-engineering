@@ -19,8 +19,8 @@ public class ChatBubbleFactory {
     private static final Color BOT_BUBBLE_COLOR = new Color(212, 230, 241); // 浅蓝色
     
     // 字体设置
-    private static final Font MESSAGE_FONT = new Font("Microsoft YaHei", Font.PLAIN, 15);
-    private static final Font LABEL_FONT = new Font("Microsoft YaHei", Font.BOLD, 13);
+    private static final Font MESSAGE_FONT = new Font("SansSerif", Font.PLAIN, 15);
+    private static final Font LABEL_FONT = new Font("SansSerif", Font.BOLD, 13);
     
     /**
      * 创建用户消息气泡（右侧对齐）
@@ -247,13 +247,13 @@ public class ChatBubbleFactory {
         
         // 创建标题标签
         JLabel titleLabel = new JLabel("AI Financial Advisor");
-        titleLabel.setFont(new Font("Microsoft YaHei", Font.BOLD, 18));
+        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
         titleLabel.setForeground(Color.WHITE);
         panel.add(titleLabel, BorderLayout.WEST);
         
         // 创建状态标签
         JLabel statusLabel = new JLabel("Online");
-        statusLabel.setFont(new Font("Microsoft YaHei", Font.PLAIN, 12));
+        statusLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
         statusLabel.setForeground(Color.WHITE);
         panel.add(statusLabel, BorderLayout.EAST);
         
@@ -279,7 +279,7 @@ public class ChatBubbleFactory {
         
         // 创建进度条标签
         JLabel progressLabel = new JLabel("Analyzing your transaction data... 📊");
-        progressLabel.setFont(new Font("Microsoft YaHei", Font.PLAIN, 14));
+        progressLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
         progressLabel.setForeground(TEXT_COLOR);
         
         // 创建进度条

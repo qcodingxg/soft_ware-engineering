@@ -119,7 +119,7 @@ public class AIChatPanel extends JPanel {
                 BorderFactory.createEmptyBorder(0, 0, 0, 0)));
         
         inputField = new JTextField();
-        inputField.setFont(new Font("Microsoft YaHei", Font.PLAIN, 15)); // 更大的字体
+        inputField.setFont(new Font("SansSerif", Font.PLAIN, 15)); // 更大的字体
         inputField.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEmptyBorder(0, 0, 0, 0),
                 BorderFactory.createEmptyBorder(10, 15, 10, 5))); // 更多的内边距
@@ -128,7 +128,7 @@ public class AIChatPanel extends JPanel {
         
         // 创建圆形发送按钮
         sendButton = new JButton("Send");
-        sendButton.setFont(new Font("Microsoft YaHei", Font.BOLD, 14));
+        sendButton.setFont(new Font("SansSerif", Font.BOLD, 14));
         sendButton.setBackground(PRIMARY_COLOR);
         sendButton.setForeground(Color.WHITE);
         sendButton.setFocusPainted(false);
@@ -197,7 +197,7 @@ public class AIChatPanel extends JPanel {
         panel.setBackground(BACKGROUND_COLOR);
         
         JLabel suggestLabel = new JLabel("Try asking: ");
-        suggestLabel.setFont(new Font("Microsoft YaHei", Font.BOLD, 13));
+        suggestLabel.setFont(new Font("SansSerif", Font.BOLD, 13));
         suggestLabel.setForeground(TEXT_COLOR);
         panel.add(suggestLabel);
         
@@ -214,7 +214,7 @@ public class AIChatPanel extends JPanel {
      */
     private JButton createSuggestionButton(String question) {
         JButton button = new JButton(question);
-        button.setFont(new Font("Microsoft YaHei", Font.PLAIN, 12));
+        button.setFont(new Font("SansSerif", Font.PLAIN, 12));
         button.setBackground(SUGGESTION_COLOR);
         button.setForeground(TEXT_COLOR);
         button.setBorderPainted(false);
