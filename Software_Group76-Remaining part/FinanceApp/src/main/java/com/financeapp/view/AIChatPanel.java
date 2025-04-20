@@ -51,13 +51,44 @@ public class AIChatPanel extends JPanel {
     private AIChatService chatService;
     
     // 推荐问题列表
-    private static final String[] SUGGESTED_QUESTIONS = {
-        "How do I create a monthly budget?",
+    private static final String[] ALL_SUGGESTED_QUESTIONS = {
+        "How to create a monthly budget?",
         "What's the best way to save for retirement?",
         "Should I invest in stocks or mutual funds?",
         "How much emergency fund should I have?",
-        "What are the benefits of a high-yield savings account?"
+        "What are the benefits of a high-yield savings account?",
+        "How to reduce my credit card debt?",
+        "What are the benefits of a high-yield savings account?",
+        "How to reduce my credit card debt?",
+        "What are the benefits of a high-yield savings account?",
+        "How to reduce my credit card debt?",
+        "What are the benefits of a high-yield savings account?",
+        "How to reduce my credit card debt?",
+        "What are the benefits of a high-yield savings account?",
+        "How to reduce my credit card debt?",
+        "How to start investing in finance?",
+        "How to optimize my income tax?",
+        "How to save for my child's education?",
+        "How to do a good financial planning for young people?",
+        "How to set a five-year financial goal?",
+        "How to evaluate my insurance needs?",
+        "How to manage multiple income sources?",
+        "How to build a good credit record?",
+        "What are the benefits of a high-yield savings account?",
+        "How to avoid impulse consumption?",
+        "How to do a good daily record?",
+        "How to evaluate investment risks?",
+        "How to plan my retirement savings?"
     };
+    
+    // 当前显示的推荐问题
+    private String[] currentSuggestedQuestions;
+    
+    // 每次显示的建议问题数量
+    private static final int SUGGESTION_DISPLAY_COUNT = 5;
+    
+    // 建议面板
+    private JPanel suggestionsPanel;
 
     /**
      * 创建AI聊天面板
@@ -97,6 +128,9 @@ public class AIChatPanel extends JPanel {
         chatPanel.add(scrollPane, BorderLayout.CENTER);
         add(chatPanel, BorderLayout.CENTER);
 
+        // 初始化当前显示的建议问题
+        refreshSuggestions();
+        
         // 创建底部面板，包括推荐问题和输入区
         JPanel bottomPanel = new JPanel(new BorderLayout(0, 10));
         bottomPanel.setBackground(BACKGROUND_COLOR);
@@ -193,20 +227,119 @@ public class AIChatPanel extends JPanel {
      * 创建推荐问题面板
      */
     private JPanel createSuggestionsPanel() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(BACKGROUND_COLOR);
         
-        JLabel suggestLabel = new JLabel("Try asking: ");
+        // 创建顶部面板，包含标签和刷新按钮
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setBackground(BACKGROUND_COLOR);
+        
+        JLabel suggestLabel = new JLabel("Try asking:");
         suggestLabel.setFont(new Font("SansSerif", Font.BOLD, 13));
         suggestLabel.setForeground(TEXT_COLOR);
-        panel.add(suggestLabel);
+        topPanel.add(suggestLabel, BorderLayout.WEST);
         
-        for (String question : SUGGESTED_QUESTIONS) {
-            JButton suggestionButton = createSuggestionButton(question);
-            panel.add(suggestionButton);
+        // 创建刷新按钮
+        JButton refreshButton = new JButton("Refresh");
+        refreshButton.setFont(new Font("SansSerif", Font.BOLD, 12));
+        refreshButton.setBackground(PRIMARY_COLOR);
+        refreshButton.setForeground(Color.WHITE);
+        refreshButton.setFocusPainted(false);
+        refreshButton.setBorderPainted(false);
+        refreshButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        refreshButton.setMargin(new Insets(3, 8, 3, 8));
+        refreshButton.setBorder(new RoundedBorder(15, PRIMARY_COLOR));
+        
+        // 添加刷新按钮鼠标悬停效果
+        refreshButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                refreshButton.setBackground(SECONDARY_COLOR);
+            }
+            
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                refreshButton.setBackground(PRIMARY_COLOR);
+            }
+        });
+        
+        // 添加刷新按钮点击事件
+        refreshButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                refreshSuggestions();
+            }
+        });
+        
+        topPanel.add(refreshButton, BorderLayout.EAST);
+        panel.add(topPanel, BorderLayout.NORTH);
+        
+        // 创建建议按钮面板
+        JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));
+        buttonsPanel.setBackground(BACKGROUND_COLOR);
+        
+        // 初始化当前显示的建议问题
+        if (currentSuggestedQuestions == null) {
+            refreshSuggestions();
         }
         
+        // 添加建议问题按钮
+        for (String question : currentSuggestedQuestions) {
+            JButton suggestionButton = createSuggestionButton(question);
+            buttonsPanel.add(suggestionButton);
+        }
+        
+        panel.add(buttonsPanel, BorderLayout.CENTER);
+        suggestionsPanel = panel; // 保存引用以便后续刷新
+        
         return panel;
+    }
+    
+    /**
+     * 刷新建议问题列表
+     */
+    private void refreshSuggestions() {
+        // 随机选择指定数量的问题
+        currentSuggestedQuestions = getRandomQuestions(ALL_SUGGESTED_QUESTIONS, SUGGESTION_DISPLAY_COUNT);
+        
+        // 如果建议面板已存在，则更新它
+        if (suggestionsPanel != null) {
+            // 获取按钮面板
+            JPanel buttonsPanel = (JPanel) suggestionsPanel.getComponent(1);
+            buttonsPanel.removeAll();
+            
+            // 添加新的建议按钮
+            for (String question : currentSuggestedQuestions) {
+                JButton suggestionButton = createSuggestionButton(question);
+                buttonsPanel.add(suggestionButton);
+            }
+            
+            // 刷新UI
+            buttonsPanel.revalidate();
+            buttonsPanel.repaint();
+        }
+    }
+    
+    /**
+     * 从问题列表中随机选择指定数量的问题
+     */
+    private String[] getRandomQuestions(String[] allQuestions, int count) {
+        // 创建问题索引列表
+        List<Integer> indices = new ArrayList<>();
+        for (int i = 0; i < allQuestions.length; i++) {
+            indices.add(i);
+        }
+        
+        // 随机打乱顺序
+        java.util.Collections.shuffle(indices);
+        
+        // 选择前count个问题
+        int actualCount = Math.min(count, allQuestions.length);
+        String[] result = new String[actualCount];
+        
+        for (int i = 0; i < actualCount; i++) {
+            result[i] = allQuestions[indices.get(i)];
+        }
+        
+        return result;
     }
     
     /**
@@ -294,7 +427,7 @@ public class AIChatPanel extends JPanel {
                 setInputEnabled(true);
                 
             } catch (Exception e) {
-                System.err.println("发送交易数据失败: " + e.getMessage());
+                System.err.println("Failed to send transaction data: " + e.getMessage());
                 e.printStackTrace();
                 
                 // 停止进度条并恢复输入
@@ -415,6 +548,9 @@ public class AIChatPanel extends JPanel {
                 JPanel bottomPanel = new JPanel(new BorderLayout(0, 10));
                 bottomPanel.setBackground(BACKGROUND_COLOR);
                 bottomPanel.setBorder(new EmptyBorder(5, 0, 0, 0));
+                
+                // 刷新一次建议问题
+                refreshSuggestions();
                 
                 // 创建推荐问题面板
                 JPanel suggestionsPanel = createSuggestionsPanel();

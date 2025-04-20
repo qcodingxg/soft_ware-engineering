@@ -40,6 +40,9 @@ This is the ready-to-run version of the Personal Finance Management System. This
 
 - `run_finance_app.bat` - Windows launch script
 - `Quick Start Guide.txt` - Brief guide for running the application
+- `bin/` - Binary files
+- `Windows/` - Windows-specific resources
+- `data/` - Shared data directory
 
 ## Source Code Version (Software_Group76-Remaining part)
 
@@ -56,6 +59,8 @@ This is the development version containing all source code of the Personal Finan
 - **Expense Alerts**: Monitor unusual spending patterns and provide alerts
 - **Localized Financial Analysis**: Analyze consumption patterns based on geographic location
 - **Budget Calculator**: Provide intelligent budget suggestions and analysis
+- **Data Visualization**: Interactive charts and graphs to visualize spending patterns
+- **Multi-user Support**: Secure user authentication and profile management
 
 ### System Requirements for Development
 
@@ -63,6 +68,7 @@ This is the development version containing all source code of the Personal Finan
 - Swing GUI library (part of the Java standard library)
 - JUnit 5 (for running tests)
 - External dependencies: org.json (for JSON processing)
+- Maven (for dependency management)
 
 ### Directory Structure
 
@@ -110,7 +116,9 @@ FinanceApp/
 │       └── java/
 │           └── com/
 │               └── financeapp/       # Test classes
-│                   └── TransactionTest.java
+│                   ├── TransactionTest.java         # Transaction tests
+│                   ├── UserTest.java                # User authentication tests
+│                   └── BudgetCalculatorTest.java    # Budget calculator tests
 ├── data/                          # Data directory
 │   ├── transactions.csv          # Transaction records
 │   ├── users.csv                 # User information
@@ -198,11 +206,39 @@ FinanceApp/
 - **CSV Storage**: Uses CSV files to store transaction records and user information
 - **User Authentication**: Supports basic user registration and login functionality
 - **Data Import/Export**: Supports importing transaction records from CSV files
+- **Data Validation**: Validates input data to ensure integrity and consistency
 
 ### UI Design
 - **Modern Interface**: Employs modern UI design for a pleasant user experience
 - **Responsive Layout**: Adapts to different screen sizes and resolutions
 - **Interactive Components**: Provides interactive charts and visualization components
+- **User-Friendly Controls**: Intuitive controls and navigation for ease of use
+
+## Architecture
+
+### MVC Pattern
+The application follows the Model-View-Controller (MVC) architecture pattern:
+- **Model**: Contains business logic and data structures (Transaction, User, etc.)
+- **View**: Provides the user interface (panels, frames, and components)
+- **Controller**: Handles user input and updates the model and view accordingly
+
+### Service Layer
+- Acts as an intermediary between controllers and models
+- Provides higher-level operations and business logic
+- Includes services like TransactionService and AIChatService
+- Implements business rules and transaction logic
+
+### Data Access Layer
+- Manages data persistence and retrieval
+- Implements data access objects (DAOs) like UserDAO
+- Handles CSV file operations through CSVHandler
+- Ensures data integrity and consistency
+
+### Components and Modularity
+- Each component is designed to be modular and reusable
+- Clear separation of concerns between different layers
+- Event-driven communication between components
+- Loose coupling between modules for better maintainability
 
 ## Development Roadmap
 
@@ -215,6 +251,8 @@ FinanceApp/
 - Expand AI advisor capabilities to support more financial scenarios
 - Add data backup and recovery features
 - Implement financial goal setting and tracking
+- Integrate with online banking services (future enhancement)
+- Add cloud synchronization capabilities
 
 ## Contribution Guidelines
 
@@ -229,4 +267,4 @@ This project is licensed under the MIT License.
 
 ## Development Team
 
-Software Engineering Group 76 
+Software Engineering Group 76 - 2024/2025 

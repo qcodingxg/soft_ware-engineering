@@ -13,6 +13,7 @@ A comprehensive personal finance management system for recording and analyzing p
 - **Expense Alerts**: Monitor unusual spending patterns and provide alerts
 - **Localized Financial Analysis**: Analyze consumption patterns based on geographic location
 - **Budget Calculator**: Provide intelligent budget suggestions and analysis
+- **Data Visualization**: Interactive charts and graphs to visualize spending patterns
 
 ## System Requirements
 
@@ -67,7 +68,9 @@ FinanceApp/
 │       └── java/
 │           └── com/
 │               └── financeapp/       # Test classes
-│                   └── TransactionTest.java
+│                   ├── TransactionTest.java         # Transaction tests
+│                   ├── UserTest.java                # User authentication tests
+│                   └── BudgetCalculatorTest.java    # Budget calculator tests
 ├── data/                          # Data directory
 │   ├── transactions.csv          # Transaction records
 │   ├── users.csv                 # User information
@@ -155,11 +158,13 @@ FinanceApp/
 - **CSV Storage**: Uses CSV files to store transaction records and user information
 - **User Authentication**: Supports basic user registration and login functionality
 - **Data Import/Export**: Supports importing transaction records from CSV files
+- **Data Validation**: Validates input data to ensure integrity and consistency
 
 ### UI Design
 - **Modern Interface**: Employs modern UI design for a pleasant user experience
 - **Responsive Layout**: Adapts to different screen sizes and resolutions
 - **Interactive Components**: Provides interactive charts and visualization components
+- **User-Friendly Controls**: Intuitive controls and navigation for ease of use
 
 ## Development Roadmap
 
@@ -172,6 +177,7 @@ FinanceApp/
 - Expand AI advisor capabilities to support more financial scenarios
 - Add data backup and recovery features
 - Implement financial goal setting and tracking
+- Integrate with online banking services (future enhancement)
 
 ## Contribution Guidelines
 
@@ -186,4 +192,4 @@ This project is licensed under the MIT License.
 
 ## Development Team
 
-Software Engineering Group 76 
+Software Engineering Group 76 - 2024/2025
