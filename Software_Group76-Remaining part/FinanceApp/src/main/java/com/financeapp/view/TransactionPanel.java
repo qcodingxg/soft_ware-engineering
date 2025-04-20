@@ -849,39 +849,52 @@ public class TransactionPanel extends JPanel {
      * Delete selected transaction
      */
     private void deleteSelectedTransaction() {
-        int selectedViewRow = transactionTable.getSelectedRow();
-        if (selectedViewRow >= 0) {
+        int[] selectedRows = transactionTable.getSelectedRows();
+        if (selectedRows.length == 0) {
+            JOptionPane.showMessageDialog(this,
+                    "Please select at least one transaction to delete",
+                    "No Selection",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Are you sure you want to delete " + selectedRows.length + " selected transactions?",
+                "Confirm Deletion",
+                JOptionPane.YES_NO_OPTION  // 修正常量名
+        );
+
+        if (confirm == JOptionPane.YES_OPTION) {  // 修正常量名
             try {
-                // Convert view row index to model row index
-                int selectedModelRow = transactionTable.convertRowIndexToModel(selectedViewRow);
-                Transaction transaction = controller.getTransactions().get(selectedModelRow);
-                
-                int confirm = JOptionPane.showConfirmDialog(this, 
-                        "Are you sure you want to delete the selected transaction record?", 
-                        "Confirm Delete", 
-                        JOptionPane.YES_NO_OPTION);
-                
-                if (confirm == JOptionPane.YES_OPTION) {
-                    controller.deleteTransaction(transaction);
-                    updateTransactionList();
+                List<Transaction> toDelete = new ArrayList<>();
+                for (int viewRow : selectedRows) {
+                    int modelRow = transactionTable.convertRowIndexToModel(viewRow);
+                    toDelete.add(controller.getTransactions().get(modelRow));
                 }
-                
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(this, 
-                        "Transaction delete failed: " + e.getMessage(), 
-                        "Error", 
-                        JOptionPane.ERROR_MESSAGE);
-            } catch (IndexOutOfBoundsException e) {
-                JOptionPane.showMessageDialog(this,
-                        "Error finding selected transaction. Please try again.",
+
+                // 调用批量删除方法（需确保controller有对应方法）
+                controller.deleteTransactions(toDelete);  // 方法名改为复数形式
+
+                // 重置到第一页
+                currentPage = 1;
+                updateTransactionList();
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Successfully deleted " + selectedRows.length + " transactions",
+                        "Success",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Deletion failed: " + ex.getMessage(),
                         "Error",
-                        JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.ERROR_MESSAGE
+                );
             }
-        } else {
-            JOptionPane.showMessageDialog(this, 
-                    "Please select the transaction record to delete", 
-                    "Information", 
-                    JOptionPane.INFORMATION_MESSAGE);
         }
     }
     

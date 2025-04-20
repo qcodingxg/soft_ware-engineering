@@ -139,4 +139,10 @@ public class TransactionController {
     public SimpleBudgetCalculator getBudgetCalculator() {
         return budgetCalculator;
     }
+    // 在 TransactionController 类中添加
+    public void deleteTransactions(List<Transaction> transactions) throws IOException {
+        for (Transaction t : transactions) {
+            deleteTransaction(t); // 复用原有单条删除逻辑
+        }
+    }
 } 
