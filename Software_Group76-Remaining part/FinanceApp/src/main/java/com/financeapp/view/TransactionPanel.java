@@ -862,10 +862,10 @@ public class TransactionPanel extends JPanel {
                 this,
                 "Are you sure you want to delete " + selectedRows.length + " selected transactions?",
                 "Confirm Deletion",
-                JOptionPane.YES_NO_OPTION  // 修正常量名
+                JOptionPane.YES_NO_OPTION
         );
 
-        if (confirm == JOptionPane.YES_OPTION) {  // 修正常量名
+        if (confirm == JOptionPane.YES_OPTION) {
             try {
                 List<Transaction> toDelete = new ArrayList<>();
                 for (int viewRow : selectedRows) {
@@ -873,10 +873,10 @@ public class TransactionPanel extends JPanel {
                     toDelete.add(controller.getTransactions().get(modelRow));
                 }
 
-                // 调用批量删除方法（需确保controller有对应方法）
-                controller.deleteTransactions(toDelete);  // 方法名改为复数形式
 
-                // 重置到第一页
+                controller.deleteTransactions(toDelete);
+
+                // to page1
                 currentPage = 1;
                 updateTransactionList();
 
