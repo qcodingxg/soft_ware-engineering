@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
@@ -343,7 +344,16 @@ public class ExpenseAlertPanel extends JPanel {
             }
         }
         JScrollPane scrollPane = new JScrollPane(textArea);
-        JOptionPane.showMessageDialog(this, scrollPane, "All Alerts", JOptionPane.INFORMATION_MESSAGE);
+
+        JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "All Alerts", false);
+        dialog.add(scrollPane);
+
+        // 设置对话框宽度为内容的最佳宽度，高度固定
+        dialog.setSize(scrollPane.getPreferredSize().width + 50, 300);
+        dialog.setResizable(false); // 禁止调整宽度
+
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
     }
 
     /**
@@ -373,7 +383,15 @@ public class ExpenseAlertPanel extends JPanel {
         mainPanel.add(scrollPane, BorderLayout.CENTER);
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
-        JOptionPane.showMessageDialog(this, mainPanel, "History Alarms", JOptionPane.INFORMATION_MESSAGE);
+        JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "History Alarms", false);
+        dialog.add(mainPanel);
+
+        // 设置对话框宽度为内容的最佳宽度，高度固定
+        dialog.setSize(scrollPane.getPreferredSize().width + 50, 300);
+        dialog.setResizable(false); // 禁止调整宽度
+
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
     }
 
     /**
@@ -474,23 +492,11 @@ public class ExpenseAlertPanel extends JPanel {
         List<Alert> alerts = new ArrayList<>();
 
         // 检测总支出是否超过历史平均值的20%
-        double totalExpense = getTotalExpense();
-        double historicalAverage = getHistoricalAverage();
+        double totalExpense = getCurrentMonthExpense();
+        double historicalAverage = getHistoricalMonthlyAverageExcludingCurrentMonth();
         if (totalExpense > historicalAverage * 1.2) {
-            String message = "Total expense (" + totalExpense + ") exceeds historical average (" + historicalAverage + ") over 20%!";
+            String message = "Current month expense (" + totalExpense + ") exceeds historical monthly average (" + historicalAverage + ") over 20%!";
             alerts.add(alertService.createAlert(message, AlertLevel.CRITICAL, "Total Expense"));
-        }
-
-        // 检测各类别支出是否超过历史平均值的20%
-        Map<String, Double> categoryExpenses = getCategoryExpenses();
-        for (Map.Entry<String, Double> entry : categoryExpenses.entrySet()) {
-            String category = entry.getKey();
-            double expense = entry.getValue();
-            double categoryHistoricalAverage = getCategoryHistoricalAverage(category);
-            if (expense > categoryHistoricalAverage * 1.2) {
-                String message = "Category " + category + " expense (" + expense + ") exceeds historical average (" + categoryHistoricalAverage + ") over 20%!";
-                alerts.add(alertService.createAlert(message, AlertLevel.CRITICAL, category));
-            }
         }
 
         // 检测支出是否超过设定的阈值
@@ -501,7 +507,7 @@ public class ExpenseAlertPanel extends JPanel {
         for (Map.Entry<String, Double> entry : categoryThresholds.entrySet()) {
             String category = entry.getKey();
             double threshold = entry.getValue();
-            double expense = categoryExpenses.getOrDefault(category, 0.0);
+            double expense = getCategoryExpensesCurrentMonth().getOrDefault(category, 0.0);
             if (expense > threshold) {
                 String message = "Category " + category + " expense (" + expense + ") exceeds threshold (" + threshold + ")!";
                 alerts.add(alertService.createAlert(message, AlertLevel.CRITICAL, category));
@@ -512,63 +518,67 @@ public class ExpenseAlertPanel extends JPanel {
     }
 
     /**
-     * 获取总支出
-     * 借助 transactionController 获取所有交易，然后对交易金额求和得出总支出。
-     * @return 总支出
+     * 获取当前月的总支出
      */
-    private double getTotalExpense() {
+    private double getCurrentMonthExpense() {
+        LocalDate currentDate = LocalDate.now();
+        Month currentMonth = currentDate.getMonth();
+        int currentYear = currentDate.getYear();
+
         List<Transaction> transactions = transactionController.getTransactions();
         return transactions.stream()
+                .filter(t -> t.getDate().getMonth() == currentMonth && t.getDate().getYear() == currentYear)
                 .mapToDouble(Transaction::getAmount)
                 .sum();
     }
 
     /**
-     * 获取历史平均支出
-     * 利用 transactionController 获取所有交易，计算这些交易金额的平均值得到历史平均支出。
-     * @return 历史平均支出
+     * 获取历史月度平均支出，不包含当前月
      */
-    private double getHistoricalAverage() {
+    private double getHistoricalMonthlyAverageExcludingCurrentMonth() {
+        LocalDate currentDate = LocalDate.now();
+        Month currentMonth = currentDate.getMonth();
+        int currentYear = currentDate.getYear();
+
         List<Transaction> transactions = transactionController.getTransactions();
-        if (transactions.isEmpty()) {
+
+        // 过滤掉当前月的交易
+        List<Transaction> historicalTransactions = transactions.stream()
+                .filter(t -> !(t.getDate().getMonth() == currentMonth && t.getDate().getYear() == currentYear))
+                .collect(Collectors.toList());
+
+        if (historicalTransactions.isEmpty()) {
             return 0;
         }
-        return transactions.stream()
-                .mapToDouble(Transaction::getAmount)
-                .average()
-                .orElse(0);
+
+        // 计算每个月的总支出
+        Map<String, Double> monthlyExpenses = new HashMap<>();
+        for (Transaction transaction : historicalTransactions) {
+            LocalDate date = transaction.getDate();
+            String monthKey = date.getYear() + "-" + date.getMonthValue();
+            monthlyExpenses.put(monthKey, monthlyExpenses.getOrDefault(monthKey, 0.0) + transaction.getAmount());
+        }
+
+        // 计算月度平均支出
+        if (monthlyExpenses.isEmpty()) {
+            return 0;
+        }
+        return monthlyExpenses.values().stream().mapToDouble(Double::doubleValue).average().orElse(0);
     }
 
     /**
-     * 获取各类别的支出
-     * 通过 transactionController 获取所有交易，按交易类别分组并对金额求和，得到各类别的支出。
-     * @return 各类别的支出
+     * 获取当前月各类别的支出
      */
-    private Map<String, Double> getCategoryExpenses() {
+    private Map<String, Double> getCategoryExpensesCurrentMonth() {
+        LocalDate currentDate = LocalDate.now();
+        Month currentMonth = currentDate.getMonth();
+        int currentYear = currentDate.getYear();
+
         List<Transaction> transactions = transactionController.getTransactions();
         return transactions.stream()
+                .filter(t -> t.getDate().getMonth() == currentMonth && t.getDate().getYear() == currentYear)
                 .collect(Collectors.groupingBy(Transaction::getCategory,
                         Collectors.summingDouble(Transaction::getAmount)));
-    }
-
-    /**
-     * 获取某类别的历史平均支出
-     * 依据传入的类别，从 transactionController 获取所有交易中该类别的交易，计算这些交易金额的平均值得到该类别的历史平均支出。
-     * @param category 类别
-     * @return 某类别的历史平均支出
-     */
-    private double getCategoryHistoricalAverage(String category) {
-        List<Transaction> transactions = transactionController.getTransactions();
-        List<Transaction> categoryTransactions = transactions.stream()
-                .filter(t -> t.getCategory().equals(category))
-                .collect(Collectors.toList());
-        if (categoryTransactions.isEmpty()) {
-            return 0;
-        }
-        return categoryTransactions.stream()
-                .mapToDouble(Transaction::getAmount)
-                .average()
-                .orElse(0);
     }
 
     /**
@@ -683,7 +693,7 @@ public class ExpenseAlertPanel extends JPanel {
      * 显示详细信息
      */
     private void showDetails() {
-        Map<String, Double> categoryExpenses = getCategoryExpenses();
+        Map<String, Double> categoryExpenses = getCategoryExpensesCurrentMonth();
         DefaultTableModel model = new DefaultTableModel(new String[]{"Category", "Threshold", "Actual Value", "Exceeded Amount"}, 0);
 
         for (Map.Entry<String, Double> entry : categoryThresholds.entrySet()) {
@@ -708,6 +718,15 @@ public class ExpenseAlertPanel extends JPanel {
         }
 
         JScrollPane scrollPane = new JScrollPane(table);
-        JOptionPane.showMessageDialog(this, scrollPane, "Category Details", JOptionPane.INFORMATION_MESSAGE);
+
+        JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Category Details", false);
+        dialog.add(scrollPane);
+
+        // 设置对话框宽度为内容的最佳宽度，高度固定
+        dialog.setSize(scrollPane.getPreferredSize().width + 50, 400);
+        dialog.setResizable(false); // 禁止调整宽度
+
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
     }
 }
