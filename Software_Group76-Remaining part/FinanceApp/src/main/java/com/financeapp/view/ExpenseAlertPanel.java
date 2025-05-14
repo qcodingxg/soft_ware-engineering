@@ -450,6 +450,9 @@ public class ExpenseAlertPanel extends JPanel {
         table.getColumnModel().getColumn(0).setPreferredWidth(150);
         table.getColumnModel().getColumn(1).setPreferredWidth(50);
 
+        // 允许多选
+        table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(JLabel.CENTER);
         table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
@@ -464,11 +467,19 @@ public class ExpenseAlertPanel extends JPanel {
                 int selectedRow = table.getSelectedRows()[i];
                 String category = (String) model.getValueAt(selectedRow, 0);
                 selectedCategories.add(category);
-            }
-            for (String category : selectedCategories) {
+
+                // 立即从可选类别中移除（无论是否保存设置）
+                categoryThresholds.put(category, 0.0);
                 categoryThresholdsModel.addRow(new Object[]{category, 0.0});
             }
-            saveCategoryThresholds();
+
+            // 显示添加成功消息
+            if (!selectedCategories.isEmpty()) {
+                JOptionPane.showMessageDialog(this,
+                        "Categories added successfully. Please save settings to persist changes.",
+                        "Success",
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
         }
     }
 
