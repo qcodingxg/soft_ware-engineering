@@ -1,0 +1,201 @@
+Date,Category,Amount,Description
+2025-05-09,Healthcare,149.13,Doctor visit
+2025-05-05,Shopping,455.91,Books
+2025-05-30,Shopping,127.62,Home decor
+2025-05-25,Books,35.31,Textbook
+2025-05-13,Dining,43.24,Lunch
+2025-05-16,Education,624.66,Tuition fee
+2025-05-26,Healthcare,384.73,Doctor visit
+2025-05-19,Pets,40.79,Vet visit
+2025-05-20,Travel,3384.78,Tour
+2025-05-18,Coffee,9.25,Cappuccino
+2025-05-15,Food,53.44,Restaurant dinner
+2025-05-17,Coffee,10.53,Pastry
+2025-05-29,Books,31.83,Magazine
+2025-05-15,Books,17.81,Comic
+2025-05-25,Dining,69.2,Breakfast
+2025-05-30,Books,22.36,Magazine
+2025-05-22,Beauty,187.05,Makeup
+2025-05-27,Coffee,6.14,Coffee beans
+2025-05-25,Gifts,62.43,Holiday gift
+2025-05-10,Books,22.25,Novel
+2025-05-31,Education,282.36,Tutoring
+2025-05-24,Travel,4542.83,Tour
+2025-05-07,Travel,4850.74,Rental car
+2025-05-20,Electronics,1658.97,Smartphone
+2025-05-22,Fitness,115.88,Yoga class
+2025-05-11,Dining,179.62,Breakfast
+2025-05-10,Utilities,200.98,Phone bill
+2025-05-04,Electronics,900.75,Charger
+2025-05-27,Transportation,80.93,Gas
+2025-05-07,Fitness,98.78,Personal trainer
+2025-05-04,Travel,3100.17,Hotel
+2025-05-03,Grocery,170.6,Snacks
+2025-05-15,Clothing,200.46,Jeans
+2025-05-01,Gifts,29.41,Holiday gift
+2025-05-26,Transportation,6.82,Train ticket
+2025-05-02,Coffee,8.87,Specialty coffee
+2025-05-13,Pets,55.12,Grooming
+2025-05-16,Dining,160.93,Lunch
+2025-05-19,Electronics,1479.11,Smartphone
+2025-05-01,Sports,152.24,Gear
+2025-05-05,Coffee,4.5,Cappuccino
+2025-05-12,Pets,23.37,Grooming
+2025-05-31,Grocery,150.3,Vegetables
+2025-05-25,Coffee,12.25,Specialty coffee
+2025-05-25,Healthcare,244.57,Dental care
+2025-05-06,Utilities,202.5,Internet
+2025-05-24,Shopping,188.94,Electronics
+2025-05-16,Travel,2703.7,Flight ticket
+2025-05-01,Pets,79.72,Toys
+2025-05-09,Housing,1508.18,Mortgage
+2025-05-29,Utilities,145.74,Phone bill
+2025-05-19,Travel,3704.36,Hotel
+2025-05-03,Electronics,1174.24,Headphones
+2025-05-14,Utilities,84.33,Water bill
+2025-05-31,Housing,1749.68,Home insurance
+2025-05-14,Books,41.25,Self-help
+2025-05-07,Utilities,154.96,Internet
+2025-05-02,Coffee,11.4,Specialty coffee
+2025-05-26,Shopping,296.37,Books
+2025-05-27,Dining,80.63,Brunch
+2025-05-03,Travel,959.92,Flight ticket
+2025-05-09,Shopping,96.96,Electronics
+2025-05-24,Food,133.0,Fast food
+2025-05-18,Clothing,190.51,Jacket
+2025-05-30,Travel,1140.48,Souvenirs
+2025-05-12,Transportation,92.61,Ride-sharing service
+2025-05-13,Fitness,107.77,Yoga class
+2025-05-17,Fitness,82.45,Yoga class
+2025-05-30,Entertainment,76.52,Theater
+2025-05-07,Food,34.1,Restaurant dinner
+2025-05-19,Electronics,1613.87,Camera
+2025-05-13,Shopping,197.29,Books
+2025-05-19,Electronics,175.69,Headphones
+2025-05-08,Grocery,89.28,Vegetables
+2025-05-16,Utilities,101.93,Water bill
+2025-05-20,Shopping,279.87,Electronics
+2025-05-06,Fitness,63.71,Workout gear
+2025-05-25,Fitness,43.4,Personal trainer
+2025-05-07,Utilities,141.41,Gas bill
+2025-05-14,Electronics,1544.39,Camera
+2025-05-08,Housing,2656.1,Rent payment
+2025-05-06,Sports,100.46,Sports equipment
+2025-05-14,Gifts,122.49,Thank you
+2025-05-07,Entertainment,295.98,Movie tickets
+2025-05-08,Gifts,21.38,Thank you
+2025-05-28,Education,302.8,Books
+2025-05-29,Coffee,14.94,Pastry
+2025-05-14,Clothing,134.42,Jacket
+2025-05-24,Clothing,143.42,T-shirt
+2025-05-19,Grocery,182.22,Snacks
+2025-05-02,Healthcare,301.47,Pharmacy purchase
+2025-05-29,Sports,133.38,Sports equipment
+2025-05-17,Clothing,155.58,Jacket
+2025-05-22,Food,80.93,Cafe lunch
+2025-05-30,Education,936.56,Books
+2025-05-07,Pets,74.64,Grooming
+2025-05-13,Travel,4418.66,Tour
+2025-05-20,Coffee,12.2,Coffee beans
+2025-05-04,Fitness,122.96,Personal trainer
+2025-05-29,Books,38.98,Novel
+2025-05-20,Shopping,383.61,Home decor
+2025-05-02,Gifts,67.47,Birthday gift
+2025-05-15,Beauty,183.52,Spa day
+2025-05-01,Dining,182.97,Lunch
+2025-05-22,Housing,2014.21,Mortgage
+2025-05-23,Shopping,241.86,Home decor
+2025-05-20,Entertainment,98.18,Concert
+2025-05-06,Clothing,55.02,New shoes
+2025-05-20,Pets,11.49,Toys
+2025-05-27,Beauty,27.71,Skincare
+2025-05-20,Utilities,265.04,Internet
+2025-05-03,Electronics,1128.32,Smartphone
+2025-05-07,Food,104.25,Sushi
+2025-05-29,Transportation,56.39,Ride-sharing service
+2025-05-01,Education,851.17,Stationery
+2025-05-01,Travel,4719.51,Hotel
+2025-05-28,Beauty,107.04,Spa day
+2025-05-02,Pets,37.33,Pet food
+2025-05-21,Shopping,53.11,Grocery
+2025-05-27,Utilities,299.45,Phone bill
+2025-05-22,Grocery,157.76,Fruits
+2025-05-27,Utilities,85.49,Water bill
+2025-05-29,Beauty,129.06,Spa day
+2025-05-21,Housing,1274.77,Rent payment
+2025-05-30,Sports,199.07,Tickets
+2025-05-15,Fitness,144.75,Workout gear
+2025-05-14,Shopping,202.9,Grocery
+2025-05-06,Gifts,123.89,Birthday gift
+2025-05-29,Travel,775.75,Hotel
+2025-05-14,Education,784.53,Online course
+2025-05-11,Clothing,74.41,Jacket
+2025-05-12,Housing,2400.36,Property tax
+2025-05-10,Electronics,1176.62,Charger
+2025-05-02,Gifts,145.09,Anniversary
+2025-05-10,Travel,3160.1,Hotel
+2025-05-03,Transportation,56.44,Bus fare
+2025-05-31,Coffee,4.54,Daily coffee
+2025-05-13,Beauty,197.63,Haircut
+2025-05-25,Fitness,58.68,Yoga class
+2025-05-31,Gifts,105.58,Wedding
+2025-05-28,Travel,1043.12,Rental car
+2025-05-20,Entertainment,233.93,Theater
+2025-05-19,Travel,2893.56,Souvenirs
+2025-05-19,Education,657.63,Tutoring
+2025-05-13,Shopping,461.02,Electronics
+2025-05-01,Entertainment,211.1,Amusement park
+2025-05-18,Healthcare,395.22,Dental care
+2025-05-26,Grocery,112.49,Weekly groceries
+2025-05-16,Dining,150.48,Lunch
+2025-05-13,Entertainment,274.11,Theater
+2025-05-01,Travel,3214.99,Hotel
+2025-05-24,Education,179.74,Online course
+2025-05-02,Beauty,189.34,Skincare
+2025-05-25,Food,116.73,Restaurant dinner
+2025-05-05,Healthcare,107.62,Pharmacy purchase
+2025-05-27,Transportation,92.53,Train ticket
+2025-05-23,Grocery,124.74,Fruits
+2025-05-01,Housing,1935.68,Mortgage
+2025-05-23,Utilities,220.63,Water bill
+2025-05-05,Travel,509.54,Rental car
+2025-05-05,Books,49.06,Self-help
+2025-05-21,Utilities,160.11,Gas bill
+2025-05-12,Food,90.33,Takeout
+2025-05-31,Food,73.81,Fast food
+2025-05-04,Food,86.88,Sushi
+2025-05-14,Transportation,98.51,Bus fare
+2025-05-20,Clothing,64.45,T-shirt
+2025-05-16,Utilities,131.66,Gas bill
+2025-05-17,Books,13.2,Textbook
+2025-05-14,Travel,4951.7,Hotel
+2025-05-09,Shopping,302.55,Electronics
+2025-05-13,Fitness,124.58,Gym membership
+2025-05-09,Beauty,113.64,Makeup
+2025-05-07,Entertainment,133.42,Amusement park
+2025-05-16,Gifts,164.38,Thank you
+2025-05-11,Housing,2639.41,Home insurance
+2025-05-26,Electronics,1116.15,Charger
+2025-05-13,Food,21.81,Takeout
+2025-05-27,Utilities,102.01,Electricity bill
+2025-05-28,Housing,919.14,Rent payment
+2025-05-08,Healthcare,321.45,Dental care
+2025-05-20,Gifts,187.11,Birthday gift
+2025-05-18,Travel,2694.33,Tour
+2025-05-15,Travel,1770.41,Rental car
+2025-05-29,Utilities,119.26,Electricity bill
+2025-05-26,Gifts,174.97,Birthday gift
+2025-05-26,Sports,176.74,Sports equipment
+2025-05-22,Electronics,1665.05,Charger
+2025-05-18,Education,299.0,Stationery
+2025-05-06,Dining,123.2,Brunch
+2025-05-08,Healthcare,335.94,Doctor visit
+2025-05-11,Books,14.46,Textbook
+2025-05-30,Entertainment,196.07,Concert
+2025-05-12,Coffee,7.2,Coffee beans
+2025-05-10,Grocery,119.05,Fruits
+2025-05-23,Dining,197.15,Lunch
+2025-05-14,Pets,96.43,Grooming
+2025-05-25,Grocery,131.59,Snacks
+2025-05-22,Coffee,11.15,Cappuccino
+2025-05-06,Fitness,66.31,Yoga class
