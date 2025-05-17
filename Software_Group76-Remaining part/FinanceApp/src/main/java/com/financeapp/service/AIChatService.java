@@ -1,6 +1,7 @@
 package com.financeapp.service;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -8,16 +9,16 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.io.File;
 import java.util.stream.Collectors;
-import org.json.JSONObject;
+
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * 处理与AI聊天API的所有交互
  */
 public class AIChatService {
-    private static final String API_KEY = "sk-92f9dba0310242988bafce610d4664be"; // 请替换为您的API密钥
+    private static final String API_KEY = "sk-1b18b92f15b84a2a98b510300e8fbc28"; // 请替换为您的API密钥
     private static final String API_URL = "https://api.deepseek.com/v1/chat/completions";
     private static final String SYSTEM_PROMPT = "你是一位专业的个人财务顾问，名为'财智助手'。你的专长包括：" +
             "1. 个人预算规划与支出追踪\n" +
