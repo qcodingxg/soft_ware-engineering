@@ -161,7 +161,7 @@ public class AIClassifier {
      * Simplified implementation, using sample logic
      * TODO: Use professional calendar library
      */
-    private boolean isHolidayPeriod(LocalDate date) {
+    boolean isHolidayPeriod(LocalDate date) {
         // This is just an example, in practice should use a proper calendar library
         // For demonstration, assume that 2024 Spring Festival is Feb 10 (lunar new year), range from Feb 4 to Feb 24
         if (date.getYear() == 2024) {
