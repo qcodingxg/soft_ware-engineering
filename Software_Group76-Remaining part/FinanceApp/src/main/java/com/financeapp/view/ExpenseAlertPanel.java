@@ -13,6 +13,8 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -34,7 +36,7 @@ import java.util.Properties;
 public class ExpenseAlertPanel extends JPanel {
 
     private final TransactionController transactionController;
-    private final AlertService alertService;
+    private AlertService alertService = null;
 
     // UI Components
     private JPanel topAlertPanel;
@@ -94,27 +96,27 @@ public class ExpenseAlertPanel extends JPanel {
         setBackground(BACKGROUND_COLOR);
         setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        // 顶部警报显示区
+        // Top alert display area
         topAlertPanel = createTopAlertPanel();
         add(topAlertPanel, BorderLayout.NORTH);
 
-        // 底部设置区
+        // Bottom settings area
         bottomSettingsPanel = createBottomSettingsPanel();
         add(bottomSettingsPanel, BorderLayout.CENTER);
 
-        // 右上角刷新按钮
+        // Refresh button in the top right corner
         refreshButton = createStyledButton("Refresh Alerts");
         refreshButton.addActionListener(e -> updateExpenseAlerts());
         JPanel refreshPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         refreshPanel.setOpaque(false);
         refreshPanel.add(refreshButton);
 
-        // 新增历史警报按钮
+        // New history alarms button
         historyAlarmsButton = createStyledButton("History Alarms");
         historyAlarmsButton.addActionListener(e -> showHistoryAlarms());
         refreshPanel.add(historyAlarmsButton);
 
-        // 新增Details按钮
+        // New Details button
         detailsButton = createStyledButton("Details");
         detailsButton.addActionListener(e -> showDetails());
         refreshPanel.add(detailsButton);
@@ -126,14 +128,14 @@ public class ExpenseAlertPanel extends JPanel {
     }
 
     /**
-     * 创建顶部警报显示区
+     * Create the top alert display area
      */
     private JPanel createTopAlertPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
         panel.setBackground(BACKGROUND_COLOR);
 
-        // 警报内容面板
+        // Alert content panel
         JPanel alertsContent = new JPanel();
         alertsContent.setLayout(new BoxLayout(alertsContent, BoxLayout.Y_AXIS));
         alertsContent.setOpaque(false);
@@ -142,7 +144,7 @@ public class ExpenseAlertPanel extends JPanel {
         alertsScrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
         panel.add(alertsScrollPane, BorderLayout.CENTER);
 
-        // 右下角查看全部警报按钮
+        // View all alerts button in the bottom right corner
         viewAllAlertsButton = createStyledButton("View All Alerts");
         viewAllAlertsButton.addActionListener(e -> showAllAlerts());
 
@@ -155,22 +157,22 @@ public class ExpenseAlertPanel extends JPanel {
     }
 
     /**
-     * 创建底部设置区
+     * Create the bottom settings area
      */
     private JPanel createBottomSettingsPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout(15, 15));
         panel.setBackground(BACKGROUND_COLOR);
 
-        // 全局设置部分
+        // Global settings section
         globalSettingsPanel = createGlobalSettingsPanel();
         panel.add(globalSettingsPanel, BorderLayout.NORTH);
 
-        // 类别阈值设置部分
+        // Category threshold settings section
         categoryThresholdsPanel = createCategoryThresholdsPanel();
         panel.add(categoryThresholdsPanel, BorderLayout.CENTER);
 
-        // 右下角保存设置按钮
+        // Save settings button in the bottom right corner
         saveSettingsButton = createStyledButton("Save Settings");
         saveSettingsButton.addActionListener(e -> saveSettings());
 
@@ -183,20 +185,20 @@ public class ExpenseAlertPanel extends JPanel {
     }
 
     /**
-     * 创建全局设置部分
+     * Create the global settings section
      */
     private JPanel createGlobalSettingsPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout(FlowLayout.LEFT));
         panel.setOpaque(false);
 
-        // 启用/禁用预警功能的复选框
+        // Checkbox to enable/disable alerts
         enableAlertsCheckbox = new JCheckBox("Enable Alerts", alertsEnabled);
         enableAlertsCheckbox.setFont(new Font("SansSerif", Font.PLAIN, 14));
         enableAlertsCheckbox.setOpaque(false);
         panel.add(enableAlertsCheckbox);
 
-        // 全局支出预警阈值设置
+        // Global expense alert threshold setting
         JLabel globalThresholdLabel = new JLabel("Global Threshold (¥):");
         globalThresholdLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
         panel.add(globalThresholdLabel);
@@ -209,19 +211,19 @@ public class ExpenseAlertPanel extends JPanel {
     }
 
     /**
-     * 创建类别阈值设置部分
+     * Create the category threshold settings section
      */
     private JPanel createCategoryThresholdsPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout(15, 15));
         panel.setOpaque(false);
 
-        // 表格形式展示各类别的预警阈值
+        // Display category thresholds in a table
         String[] columns = {"Category", "Threshold (¥)"};
         categoryThresholdsModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column == 1; // 只有阈值列可编辑
+                return column == 1; // Only the threshold column is editable
             }
 
             @Override
@@ -241,7 +243,7 @@ public class ExpenseAlertPanel extends JPanel {
         categoryThresholdsTable.getColumnModel().getColumn(0).setPreferredWidth(150); // Category
         categoryThresholdsTable.getColumnModel().getColumn(1).setPreferredWidth(100); // Threshold
 
-        // 设置单元格居中显示
+        // Set cell content to be centered
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(JLabel.CENTER);
         categoryThresholdsTable.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
@@ -251,7 +253,7 @@ public class ExpenseAlertPanel extends JPanel {
         scrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
         panel.add(scrollPane, BorderLayout.CENTER);
 
-        // 添加和删除类别按钮
+        // Buttons to add and remove categories
         addCategoryButton = createStyledButton("Add Category");
         addCategoryButton.addActionListener(e -> addCategory());
 
@@ -269,17 +271,17 @@ public class ExpenseAlertPanel extends JPanel {
     }
 
     /**
-     * 更新支出预警信息
+     * Update expense alert information
      */
     private void updateExpenseAlerts() {
-        // 检测预警
+        // Check for alerts
         List<Alert> alerts = checkAlerts();
 
-        // 清空顶部警报显示区
+        // Clear the top alert display area
         JPanel alertsContent = (JPanel) ((JScrollPane) topAlertPanel.getComponent(0)).getViewport().getView();
         alertsContent.removeAll();
 
-        // 最多显示3条最新预警
+        // Display at most 3 latest alerts
         int count = 0;
         for (Alert alert : alerts) {
             if (alert != null && count < 3) {
@@ -290,7 +292,7 @@ public class ExpenseAlertPanel extends JPanel {
             }
         }
 
-        // 如果预警超过3条，显示剩余预警数量
+        // If there are more than 3 alerts, display the number of remaining alerts
         int nonNullAlertsCount = (int) alerts.stream().filter(Objects::nonNull).count();
         if (nonNullAlertsCount > 3) {
             JLabel remainingLabel = new JLabel("+" + (nonNullAlertsCount - 3) + " more alerts");
@@ -304,7 +306,7 @@ public class ExpenseAlertPanel extends JPanel {
     }
 
     /**
-     * 创建单个预警面板
+     * Create a single alert panel
      */
     private JPanel createAlertPanel(Alert alert) {
         JPanel panel = new JPanel();
@@ -312,19 +314,19 @@ public class ExpenseAlertPanel extends JPanel {
         panel.setBackground(CARD_BG_COLOR);
         panel.setBorder(BorderFactory.createLineBorder(ERROR_COLOR));
 
-        // 警告图标
+        // Warning icon
         JLabel iconLabel = new JLabel("⚠️");
         iconLabel.setFont(new Font("SansSerif", Font.PLAIN, 24));
         iconLabel.setForeground(ERROR_COLOR);
         panel.add(iconLabel);
 
-        // 预警文本
+        // Alert text
         JLabel messageLabel = new JLabel(alert.getMessage());
         messageLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
         messageLabel.setForeground(ERROR_COLOR);
         panel.add(messageLabel);
 
-        // 日期
+        // Date
         JLabel dateLabel = new JLabel(alert.getTimestamp().toLocalDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         dateLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
         dateLabel.setForeground(TEXT_COLOR);
@@ -334,10 +336,10 @@ public class ExpenseAlertPanel extends JPanel {
     }
 
     /**
-     * 查看全部警报
+     * View all alerts
      */
     private void showAllAlerts() {
-        // 实现查看全部警报的逻辑
+        // Implement the logic to view all alerts
         List<Alert> alerts = checkAlerts();
         JTextArea textArea = new JTextArea();
         for (Alert alert : alerts) {
@@ -350,16 +352,16 @@ public class ExpenseAlertPanel extends JPanel {
         JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "All Alerts", false);
         dialog.add(scrollPane);
 
-        // 设置对话框宽度为内容的最佳宽度，高度固定
+        // Set the dialog width to the optimal width of the content and fix the height
         dialog.setSize(scrollPane.getPreferredSize().width + 50, 300);
-        dialog.setResizable(false); // 禁止调整宽度
+        dialog.setResizable(false); // Disable width adjustment
 
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
     }
 
     /**
-     * 显示历史警报
+     * Show historical alarms
      */
     private void showHistoryAlarms() {
         List<Alert> allAlerts = alertService.getAllAlerts();
@@ -388,19 +390,19 @@ public class ExpenseAlertPanel extends JPanel {
         JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "History Alarms", false);
         dialog.add(mainPanel);
 
-        // 设置对话框宽度为内容的最佳宽度，高度固定
+        // Set the dialog width to the optimal width of the content and fix the height
         dialog.setSize(scrollPane.getPreferredSize().width + 50, 300);
-        dialog.setResizable(false); // 禁止调整宽度
+        dialog.setResizable(false); // Disable width adjustment
 
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
     }
 
     /**
-     * 保存设置
+     * Save settings
      */
     private void saveSettings() {
-        // 保存全局设置
+        // Save global settings
         alertsEnabled = enableAlertsCheckbox.isSelected();
         try {
             globalThreshold = Double.parseDouble(globalThresholdField.getText());
@@ -409,13 +411,13 @@ public class ExpenseAlertPanel extends JPanel {
             return;
         }
 
-        // 更新categoryThresholds映射
+        // Update the categoryThresholds map
         for (int i = 0; i < categoryThresholdsModel.getRowCount(); i++) {
             String category = (String) categoryThresholdsModel.getValueAt(i, 0);
             Object thresholdObj = categoryThresholdsModel.getValueAt(i, 1);
 
-            // 处理未设置的阈值
-            if ("未设置".equals(thresholdObj) || thresholdObj == null || thresholdObj.toString().trim().isEmpty()) {
+            // Handle unset thresholds
+            if ("Not Set".equals(thresholdObj) || thresholdObj == null || thresholdObj.toString().trim().isEmpty()) {
                 categoryThresholds.put(category, null);
             } else {
                 try {
@@ -431,13 +433,13 @@ public class ExpenseAlertPanel extends JPanel {
             }
         }
 
-        // 保存到文件
+        // Save to file
         saveCategoryThresholds();
 
-        // 刷新警报
+        // Refresh alerts
         updateExpenseAlerts();
 
-        // 显示保存成功
+        // Show save success message
         JOptionPane.showMessageDialog(this,
                 "Settings saved successfully!",
                 "Success",
@@ -445,7 +447,7 @@ public class ExpenseAlertPanel extends JPanel {
     }
 
     /**
-     * 添加类别
+     * Add a category
      */
     private void addCategory() {
         List<Transaction> transactions = transactionController.getTransactions();
@@ -455,7 +457,7 @@ public class ExpenseAlertPanel extends JPanel {
                 .filter(category -> !category.isEmpty())
                 .collect(Collectors.toSet());
 
-        // 排除已经添加过的类别
+        // Exclude already added categories
         allCategories.removeAll(categoryThresholds.keySet());
 
         if (allCategories.isEmpty()) {
@@ -504,9 +506,9 @@ public class ExpenseAlertPanel extends JPanel {
             }
 
             if (!selectedCategories.isEmpty()) {
-                // 为每个选中的类别设置阈值
+                // Set thresholds for each selected category
                 for (String category : selectedCategories) {
-                    // 弹出对话框设置阈值
+                    // Pop up a dialog to set the threshold
                     String input = JOptionPane.showInputDialog(
                             this,
                             "Set threshold for category '" + category + "':",
@@ -514,14 +516,14 @@ public class ExpenseAlertPanel extends JPanel {
                             JOptionPane.QUESTION_MESSAGE
                     );
 
-                    if (input != null) { // 用户点击了OK
+                    if (input != null) { // User clicked OK
                         input = input.trim();
                         if (input.isEmpty()) {
-                            categoryThresholds.put(category, null); // 未设置阈值
+                            categoryThresholds.put(category, null); // Unset threshold
                         } else {
                             try {
                                 double threshold = Double.parseDouble(input);
-                                // 保留两位小数
+                                // Keep two decimal places
                                 threshold = Math.round(threshold * 100.0) / 100.0;
                                 categoryThresholds.put(category, threshold);
                             } catch (NumberFormatException e) {
@@ -534,15 +536,15 @@ public class ExpenseAlertPanel extends JPanel {
                                 categoryThresholds.put(category, 0.0);
                             }
                         }
-                    } else { // 用户点击了Cancel
-                        categoryThresholds.put(category, null); // 未设置阈值
+                    } else { // User clicked Cancel
+                        categoryThresholds.put(category, null); // Unset threshold
                     }
                 }
 
-                // 更新阈值表格
+                // Update the threshold table
                 updateThresholdTable();
 
-                // 提示用户保存设置
+                // Prompt the user to save settings
                 JOptionPane.showMessageDialog(this,
                         "Categories added. Please save settings to apply changes.",
                         "Info",
@@ -552,7 +554,7 @@ public class ExpenseAlertPanel extends JPanel {
     }
 
     /**
-     * 删除类别
+     * Remove a category
      */
     private void removeCategory() {
         int selectedRow = categoryThresholdsTable.getSelectedRow();
@@ -565,41 +567,41 @@ public class ExpenseAlertPanel extends JPanel {
     }
 
     /**
-     * 检测预警
+     * Check for alerts
      */
     private List<Alert> checkAlerts() {
         List<Alert> alerts = new ArrayList<>();
 
-        // 检测总支出是否超过历史平均值的20%
+        // Check if the total expense exceeds 20% of the historical average
         double totalExpense = getCurrentMonthExpense();
         double historicalAverage = getHistoricalMonthlyAverageExcludingCurrentMonth();
         if (alertsEnabled && totalExpense > historicalAverage * 1.2) {
-            // 使用String.format确保两位小数
+            // Use String.format to ensure two decimal places
             String message = "Current month expense (" + String.format("%.2f", totalExpense) +
                     ") exceeds historical monthly average (" + String.format("%.2f", historicalAverage) +
                     ") by over 20%!";
             alerts.add(alertService.createAlert(message, AlertLevel.CRITICAL, "Total Expense"));
         }
 
-        // 检测支出是否超过设定的阈值
+        // Check if the total expense exceeds the set global threshold
         if (alertsEnabled && totalExpense > globalThreshold) {
-            // 使用String.format确保两位小数
+            // Use String.format to ensure two decimal places
             String message = "Total expense (" + String.format("%.2f", totalExpense) +
                     ") exceeds global threshold (" + String.format("%.2f", globalThreshold) + ")!";
             alerts.add(alertService.createAlert(message, AlertLevel.CRITICAL, "Total Expense"));
         }
 
-        // 检查类别阈值
+        // Check category thresholds
         for (Map.Entry<String, Double> entry : categoryThresholds.entrySet()) {
             String category = entry.getKey();
             Double threshold = entry.getValue();
 
-            // 跳过未设置阈值的类别
+            // Skip categories with unset thresholds
             if (threshold == null || threshold <= 0) continue;
 
             double expense = getCategoryExpensesCurrentMonth().getOrDefault(category, 0.0);
             if (expense > threshold) {
-                // 使用String.format确保两位小数
+                // Use String.format to ensure two decimal places
                 String message = "Expense for category " + category + " (" +
                         String.format("%.2f", expense) + ") exceeds the threshold (" +
                         String.format("%.2f", threshold) + ")!";
@@ -611,7 +613,7 @@ public class ExpenseAlertPanel extends JPanel {
     }
 
     /**
-     * 获取当前月的总支出
+     * Get the total expense for the current month
      */
     private double getCurrentMonthExpense() {
         LocalDate currentDate = LocalDate.now();
@@ -626,7 +628,7 @@ public class ExpenseAlertPanel extends JPanel {
     }
 
     /**
-     * 获取历史月度平均支出，不包含当前月
+     * Get the historical monthly average expense, excluding the current month
      */
     private double getHistoricalMonthlyAverageExcludingCurrentMonth() {
         LocalDate currentDate = LocalDate.now();
@@ -635,7 +637,7 @@ public class ExpenseAlertPanel extends JPanel {
 
         List<Transaction> transactions = transactionController.getTransactions();
 
-        // 过滤掉当前月的交易
+        // Filter out transactions from the current month
         List<Transaction> historicalTransactions = transactions.stream()
                 .filter(t -> !(t.getDate().getMonth() == currentMonth && t.getDate().getYear() == currentYear))
                 .collect(Collectors.toList());
@@ -644,7 +646,7 @@ public class ExpenseAlertPanel extends JPanel {
             return 0;
         }
 
-        // 计算每个月的总支出
+        // Calculate the total expense for each month
         Map<String, Double> monthlyExpenses = new HashMap<>();
         for (Transaction transaction : historicalTransactions) {
             LocalDate date = transaction.getDate();
@@ -652,7 +654,7 @@ public class ExpenseAlertPanel extends JPanel {
             monthlyExpenses.put(monthKey, monthlyExpenses.getOrDefault(monthKey, 0.0) + transaction.getAmount());
         }
 
-        // 计算月度平均支出
+        // Calculate the monthly average expense
         if (monthlyExpenses.isEmpty()) {
             return 0;
         }
@@ -660,7 +662,7 @@ public class ExpenseAlertPanel extends JPanel {
     }
 
     /**
-     * 获取当前月各类别的支出
+     * Get the expenses for each category in the current month
      */
     private Map<String, Double> getCategoryExpensesCurrentMonth() {
         LocalDate currentDate = LocalDate.now();
@@ -675,21 +677,21 @@ public class ExpenseAlertPanel extends JPanel {
     }
 
     /**
-     * 加载设置
+     * Load settings
      */
-    private void loadSettings() {
+    protected void loadSettings() {
         Properties properties = new Properties();
         try (InputStream input = new FileInputStream(SETTINGS_FILE)) {
             properties.load(input);
 
-            // 加载全局阈值
+            // Load the global threshold
             String globalThresholdStr = properties.getProperty("globalThreshold");
             if (globalThresholdStr != null) {
                 globalThreshold = Double.parseDouble(globalThresholdStr);
                 globalThresholdField.setText(String.valueOf(globalThreshold));
             }
 
-            // 加载类别阈值
+            // Load category thresholds
             categoryThresholds.clear();
             for (String key : properties.stringPropertyNames()) {
                 if (key.startsWith("categoryThreshold.")) {
@@ -699,34 +701,34 @@ public class ExpenseAlertPanel extends JPanel {
                 }
             }
 
-            // 重新填充表格数据
+            // Repopulate the table data
             categoryThresholdsModel.setRowCount(0);
             for (Map.Entry<String, Double> entry : categoryThresholds.entrySet()) {
                 categoryThresholdsModel.addRow(new Object[]{entry.getKey(), entry.getValue()});
             }
 
         } catch (IOException | NumberFormatException e) {
-            // 如果文件不存在或格式错误，使用默认设置
+            // If the file does not exist or has an incorrect format, use default settings
             e.printStackTrace();
         }
     }
 
     /**
-     * 保存类别阈值设置
+     * Save category threshold settings
      */
     private void saveCategoryThresholds() {
         Properties properties = new Properties();
 
-        // 格式化全局阈值
+        // Format the global threshold
         properties.setProperty("globalThreshold", String.format("%.2f", globalThreshold));
         properties.setProperty("alertsEnabled", String.valueOf(alertsEnabled));
 
-        // 格式化类别阈值
+        // Format category thresholds
         for (Map.Entry<String, Double> entry : categoryThresholds.entrySet()) {
             String category = entry.getKey();
             Double threshold = entry.getValue();
 
-            // 确保保存为两位小数格式
+            // Ensure to save in two decimal places format
             properties.setProperty("categoryThreshold." + category,
                     threshold != null ? String.format("%.2f", threshold) : "");
         }
@@ -739,7 +741,7 @@ public class ExpenseAlertPanel extends JPanel {
     }
 
     /**
-     * 加载类别阈值
+     * Load category thresholds
      */
     private void loadCategoryThresholds() {
         Properties properties = new Properties();
@@ -752,7 +754,7 @@ public class ExpenseAlertPanel extends JPanel {
                     String category = key.substring("categoryThreshold.".length());
                     String value = properties.getProperty(key);
 
-                    // 处理未设置的阈值
+                    // Handle unset thresholds
                     if ("null".equalsIgnoreCase(value) || value.trim().isEmpty()) {
                         categoryThresholds.put(category, null);
                     } else {
@@ -767,7 +769,7 @@ public class ExpenseAlertPanel extends JPanel {
                 }
             }
 
-            // 更新表格显示
+            // Update the table display
             updateThresholdTable();
 
         } catch (IOException e) {
@@ -782,7 +784,7 @@ public class ExpenseAlertPanel extends JPanel {
             String category = entry.getKey();
             Double threshold = entry.getValue();
 
-            // 直接在显示时格式化
+            // Format directly when displaying
             String displayValue = threshold != null ?
                     String.format("%.2f", threshold) : "Not Set";
             categoryThresholdsModel.addRow(new Object[]{category, displayValue});
@@ -790,9 +792,9 @@ public class ExpenseAlertPanel extends JPanel {
     }
 
     /**
-     * 创建美化后的按钮
-     * @param text 按钮文本
-     * @return 美化后的按钮
+     * Create a stylized button
+     * @param text Button text
+     * @return A stylized button
      */
     private JButton createStyledButton(String text) {
         JButton button = new JButton(text);
@@ -802,12 +804,12 @@ public class ExpenseAlertPanel extends JPanel {
         button.setFocusPainted(false);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         button.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
-        button.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
+        button.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent evt) {
                 button.setBackground(SECONDARY_COLOR);
             }
 
-            public void mouseExited(java.awt.event.MouseEvent evt) {
+            public void mouseExited(MouseEvent evt) {
                 button.setBackground(PRIMARY_COLOR);
             }
         });
@@ -815,7 +817,7 @@ public class ExpenseAlertPanel extends JPanel {
     }
 
     /**
-     * 显示详细信息
+     * Show detailed information
      */
     private void showDetails() {
         Map<String, Double> categoryExpenses = getCategoryExpensesCurrentMonth();
@@ -827,7 +829,7 @@ public class ExpenseAlertPanel extends JPanel {
             Double threshold = entry.getValue();
             double actualValue = categoryExpenses.getOrDefault(category, 0.0);
 
-            // 直接格式化所有显示值
+            // Format all display values directly
             String thresholdDisplay = threshold != null ?
                     String.format("%.2f", threshold) : "Not Set";
             String actualDisplay = String.format("%.2f", actualValue);
@@ -857,11 +859,83 @@ public class ExpenseAlertPanel extends JPanel {
         JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Category Details", false);
         dialog.add(scrollPane);
 
-        // 设置对话框宽度为内容的最佳宽度，高度固定
+        // Set the dialog width to the optimal width of the content and fix the height
         dialog.setSize(scrollPane.getPreferredSize().width + 50, 400);
-        dialog.setResizable(false); // 禁止调整宽度
+        dialog.setResizable(false); // Disable width adjustment
 
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
+    }
+    // Add a public method in the ExpenseAlertPanel class
+    public double getCurrentMonthExpenseForTest() {
+        return getCurrentMonthExpense();
+    }
+    // Add in the ExpenseAlertPanel class
+    public ExpenseAlertPanel(TransactionController controller, boolean loadSettings) {
+        this.transactionController = controller;
+        if (loadSettings) {
+            initUI(); // Initialize the UI, which will call loadSettings()
+        }
+    }
+    // The following are all newly added test codes to verify the correctness of the program
+    // Add the following method in the ExpenseAlertPanel class
+    public void setCategoryThreshold(String category, double threshold) {
+        categoryThresholds.put(category, threshold);
+    }
+
+    public void updateExpenseData() {
+        // Recalculate the expenses for all categories and check the thresholds
+        Map<String, Double> categoryExpenses = calculateCategoryExpenses();
+        for (String category : categoryExpenses.keySet()) {
+            double expense = categoryExpenses.get(category);
+            double threshold = categoryThresholds.getOrDefault(category, Double.MAX_VALUE);
+            categoryOverThreshold.put(category, expense > threshold);
+        }
+    }
+
+    // Add in the ExpenseAlertPanel class
+    private Map<String, Boolean> categoryOverThreshold = new HashMap<>();
+
+    // Add a public access method
+    public boolean isCategoryOverThreshold(String category) {
+        return categoryOverThreshold.getOrDefault(category, false);
+    }
+
+    // Method to update the threshold status
+    private void checkCategoryThresholds() {
+        Map<String, Double> categoryExpenses = calculateCategoryExpenses();
+        for (String category : categoryExpenses.keySet()) {
+            double expense = categoryExpenses.get(category);
+            double threshold = categoryThresholds.getOrDefault(category, Double.MAX_VALUE);
+            categoryOverThreshold.put(category, expense > threshold);
+        }
+    }
+    // Add in the ExpenseAlertPanel class
+    private Map<String, Double> calculateCategoryExpenses() {
+        Map<String, Double> categoryExpenses = new HashMap<>();
+        LocalDate now = LocalDate.now();
+
+        for (Transaction transaction : transactionController.getTransactions()) {
+            LocalDate date = transaction.getDate();
+            // Filter transactions for the current month
+            if (date.getYear() == now.getYear() && date.getMonth() == now.getMonth()) {
+                String category = transaction.getCategory();
+                double amount = transaction.getAmount();
+                categoryExpenses.put(category, categoryExpenses.getOrDefault(category, 0.0) + amount);
+            }
+        }
+        return categoryExpenses;
+    }
+    // Add in the ExpenseAlertPanel class
+    public boolean hasCategoryThreshold(String category) {
+        return categoryThresholds.containsKey(category);
+    }
+
+    public double getCategoryThreshold(String category) {
+        return categoryThresholds.getOrDefault(category, 0.0);
+    }
+
+    public void removeCategoryThreshold(String category) {
+        categoryThresholds.remove(category);
     }
 }
