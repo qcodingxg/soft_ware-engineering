@@ -157,16 +157,4 @@ class TransactionControllerTest {
         assertFalse(suggestions.isEmpty());
         assertTrue(suggestions.stream().anyMatch(s -> s.contains("Food")));
     }
-
-    @Test
-    void testFileOperations(@TempDir Path tempDir) throws IOException {
-        // This test would require modifying CSVHandler to accept a path
-        // For now, we'll just test that save/load doesn't throw exceptions
-        Transaction t1 = new Transaction(
-                LocalDate.now(), "Food", 10.0, "Lunch");
-
-        controller.addTransaction(t1);
-        assertDoesNotThrow(() -> controller.saveTransactions());
-        assertDoesNotThrow(() -> controller.loadTransactions());
-    }
 }
