@@ -3,6 +3,7 @@ package com.financeapp.controller;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.UUID;
 
 import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,7 +25,7 @@ import com.financeapp.model.User;
 public class AuthControllerTest {
 
     private AuthController authController;
-    private static final String TEST_USERNAME = "testuser";
+    private String testUsername;
     private static final String TEST_PASSWORD = "password123";
     private static final String TEST_FULLNAME = "Test User";
     private static final String TEST_EMAIL = "test@example.com";
@@ -38,6 +39,9 @@ public class AuthControllerTest {
      */
     @BeforeEach
     public void setUp() throws IOException {
+        // Generate a unique username for each test to avoid conflicts
+        testUsername = "testuser_" + UUID.randomUUID().toString().substring(0, 8);
+        
         // Create a temporary data directory
         Path dataDir = tempDir.resolve("data");
         Files.createDirectories(dataDir);
@@ -64,11 +68,11 @@ public class AuthControllerTest {
     @Test
     public void testRegisterValidUser() throws IOException {
         // Register a new user
-        User user = authController.register(TEST_USERNAME, TEST_PASSWORD, TEST_FULLNAME, TEST_EMAIL);
+        User user = authController.register(testUsername, TEST_PASSWORD, TEST_FULLNAME, TEST_EMAIL);
         
         // Verify user was created with correct data
         assertNotNull(user);
-        assertEquals(TEST_USERNAME, user.getUsername());
+        assertEquals(testUsername, user.getUsername());
         assertEquals(TEST_FULLNAME, user.getFullName());
         assertEquals(TEST_EMAIL, user.getEmail());
         assertNotNull(user.getPasswordHash());
@@ -97,7 +101,7 @@ public class AuthControllerTest {
     public void testRegisterShortPassword() {
         // Try to register with short password
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            authController.register(TEST_USERNAME, "12345", TEST_FULLNAME, TEST_EMAIL);
+            authController.register(testUsername, "12345", TEST_FULLNAME, TEST_EMAIL);
         });
         
         // Verify exception message
@@ -110,11 +114,11 @@ public class AuthControllerTest {
     @Test
     public void testRegisterDuplicateUsername() throws IOException {
         // Register first user
-        authController.register(TEST_USERNAME, TEST_PASSWORD, TEST_FULLNAME, TEST_EMAIL);
+        authController.register(testUsername, TEST_PASSWORD, TEST_FULLNAME, TEST_EMAIL);
         
         // Try to register with same username
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            authController.register(TEST_USERNAME, "different123", "Another User", "another@example.com");
+            authController.register(testUsername, "different123", "Another User", "another@example.com");
         });
         
         // Verify exception message
@@ -127,16 +131,16 @@ public class AuthControllerTest {
     @Test
     public void testLoginSuccess() throws IOException {
         // Register a user
-        authController.register(TEST_USERNAME, TEST_PASSWORD, TEST_FULLNAME, TEST_EMAIL);
+        authController.register(testUsername, TEST_PASSWORD, TEST_FULLNAME, TEST_EMAIL);
         
         // Login with correct credentials
-        boolean loginResult = authController.login(TEST_USERNAME, TEST_PASSWORD);
+        boolean loginResult = authController.login(testUsername, TEST_PASSWORD);
         
         // Verify login was successful
         assertTrue(loginResult);
         assertTrue(authController.isLoggedIn());
         assertNotNull(authController.getCurrentUser());
-        assertEquals(TEST_USERNAME, authController.getCurrentUser().getUsername());
+        assertEquals(testUsername, authController.getCurrentUser().getUsername());
         assertNotNull(authController.getCurrentUser().getLastLoginAt());
     }
     
@@ -146,10 +150,10 @@ public class AuthControllerTest {
     @Test
     public void testLoginWrongPassword() throws IOException {
         // Register a user
-        authController.register(TEST_USERNAME, TEST_PASSWORD, TEST_FULLNAME, TEST_EMAIL);
+        authController.register(testUsername, TEST_PASSWORD, TEST_FULLNAME, TEST_EMAIL);
         
         // Try to login with wrong password
-        boolean loginResult = authController.login(TEST_USERNAME, "wrongpassword");
+        boolean loginResult = authController.login(testUsername, "wrongpassword");
         
         // Verify login failed
         assertFalse(loginResult);
@@ -177,8 +181,8 @@ public class AuthControllerTest {
     @Test
     public void testLogout() throws IOException {
         // Register and login a user
-        authController.register(TEST_USERNAME, TEST_PASSWORD, TEST_FULLNAME, TEST_EMAIL);
-        authController.login(TEST_USERNAME, TEST_PASSWORD);
+        authController.register(testUsername, TEST_PASSWORD, TEST_FULLNAME, TEST_EMAIL);
+        authController.login(testUsername, TEST_PASSWORD);
         
         // Verify user is logged in
         assertTrue(authController.isLoggedIn());
@@ -197,8 +201,8 @@ public class AuthControllerTest {
     @Test
     public void testChangePassword() throws IOException {
         // Register and login a user
-        authController.register(TEST_USERNAME, TEST_PASSWORD, TEST_FULLNAME, TEST_EMAIL);
-        authController.login(TEST_USERNAME, TEST_PASSWORD);
+        authController.register(testUsername, TEST_PASSWORD, TEST_FULLNAME, TEST_EMAIL);
+        authController.login(testUsername, TEST_PASSWORD);
         
         // Change password
         String newPassword = "newpassword123";
@@ -211,11 +215,11 @@ public class AuthControllerTest {
         authController.logout();
         
         // Try to login with old password
-        boolean oldLoginResult = authController.login(TEST_USERNAME, TEST_PASSWORD);
+        boolean oldLoginResult = authController.login(testUsername, TEST_PASSWORD);
         assertFalse(oldLoginResult);
         
         // Try to login with new password
-        boolean newLoginResult = authController.login(TEST_USERNAME, newPassword);
+        boolean newLoginResult = authController.login(testUsername, newPassword);
         assertTrue(newLoginResult);
     }
     
@@ -225,8 +229,8 @@ public class AuthControllerTest {
     @Test
     public void testChangePasswordWrongCurrentPassword() throws IOException {
         // Register and login a user
-        authController.register(TEST_USERNAME, TEST_PASSWORD, TEST_FULLNAME, TEST_EMAIL);
-        authController.login(TEST_USERNAME, TEST_PASSWORD);
+        authController.register(testUsername, TEST_PASSWORD, TEST_FULLNAME, TEST_EMAIL);
+        authController.login(testUsername, TEST_PASSWORD);
         
         // Try to change password with wrong current password
         boolean changeResult = authController.changePassword("wrongpassword", "newpassword123");
@@ -241,8 +245,8 @@ public class AuthControllerTest {
     @Test
     public void testUpdateProfile() throws IOException {
         // Register and login a user
-        authController.register(TEST_USERNAME, TEST_PASSWORD, TEST_FULLNAME, TEST_EMAIL);
-        authController.login(TEST_USERNAME, TEST_PASSWORD);
+        authController.register(testUsername, TEST_PASSWORD, TEST_FULLNAME, TEST_EMAIL);
+        authController.login(testUsername, TEST_PASSWORD);
         
         // Update profile
         String newFullName = "Updated Name";
