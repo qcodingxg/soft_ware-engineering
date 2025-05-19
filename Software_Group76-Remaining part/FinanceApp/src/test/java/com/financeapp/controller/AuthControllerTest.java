@@ -18,8 +18,8 @@ import org.junit.jupiter.api.io.TempDir;
 import com.financeapp.model.User;
 
 /**
- * 测试AuthController类
- * 测试用户注册、登录和其他身份验证操作
+ * Tests for AuthController class
+ * Tests user registration, login, and other authentication operations
  */
 public class AuthControllerTest {
 
@@ -33,40 +33,40 @@ public class AuthControllerTest {
     Path tempDir;
     
     /**
-     * 每次测试前的设置
-     * 创建临时数据目录并初始化AuthController
+     * Setup before each test
+     * Creates a temporary data directory and initializes the AuthController
      */
     @BeforeEach
     public void setUp() throws IOException {
-        // 创建临时数据目录
+        // Create a temporary data directory
         Path dataDir = tempDir.resolve("data");
         Files.createDirectories(dataDir);
         
-        // 设置系统属性以使用临时目录
+        // Set the system property to use the temporary directory
         System.setProperty("user.dir", tempDir.toString());
         
-        // 初始化AuthController
+        // Initialize AuthController
         authController = new AuthController();
     }
     
     /**
-     * 每次测试后的清理
+     * Cleanup after each test
      */
     @AfterEach
     public void tearDown() {
-        // 重置系统属性
+        // Reset system property
         System.clearProperty("user.dir");
     }
     
     /**
-     * 测试使用有效数据注册用户
+     * Test user registration with valid data
      */
     @Test
     public void testRegisterValidUser() throws IOException {
-        // 注册新用户
+        // Register a new user
         User user = authController.register(TEST_USERNAME, TEST_PASSWORD, TEST_FULLNAME, TEST_EMAIL);
         
-        // 验证用户是否创建成功且数据正确
+        // Verify user was created with correct data
         assertNotNull(user);
         assertEquals(TEST_USERNAME, user.getUsername());
         assertEquals(TEST_FULLNAME, user.getFullName());
@@ -77,62 +77,62 @@ public class AuthControllerTest {
     }
     
     /**
-     * 测试使用空用户名注册
+     * Test user registration with empty username
      */
     @Test
     public void testRegisterEmptyUsername() {
-        // 尝试使用空用户名注册
+        // Try to register with empty username
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             authController.register("", TEST_PASSWORD, TEST_FULLNAME, TEST_EMAIL);
         });
         
-        // 验证异常消息
+        // Verify exception message
         assertTrue(exception.getMessage().contains("Username cannot be empty"));
     }
     
     /**
-     * 测试使用过短密码注册
+     * Test user registration with short password
      */
     @Test
     public void testRegisterShortPassword() {
-        // 尝试使用过短密码注册
+        // Try to register with short password
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             authController.register(TEST_USERNAME, "12345", TEST_FULLNAME, TEST_EMAIL);
         });
         
-        // 验证异常消息
+        // Verify exception message
         assertTrue(exception.getMessage().contains("Password must be at least 6 characters"));
     }
     
     /**
-     * 测试使用重复用户名注册
+     * Test user registration with duplicate username
      */
     @Test
     public void testRegisterDuplicateUsername() throws IOException {
-        // 注册第一个用户
+        // Register first user
         authController.register(TEST_USERNAME, TEST_PASSWORD, TEST_FULLNAME, TEST_EMAIL);
         
-        // 尝试使用相同用户名注册
+        // Try to register with same username
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             authController.register(TEST_USERNAME, "different123", "Another User", "another@example.com");
         });
         
-        // 验证异常消息
+        // Verify exception message
         assertTrue(exception.getMessage().contains("Username already exists"));
     }
     
     /**
-     * 测试成功登录
+     * Test successful login
      */
     @Test
     public void testLoginSuccess() throws IOException {
-        // 注册用户
+        // Register a user
         authController.register(TEST_USERNAME, TEST_PASSWORD, TEST_FULLNAME, TEST_EMAIL);
         
-        // 使用正确凭据登录
+        // Login with correct credentials
         boolean loginResult = authController.login(TEST_USERNAME, TEST_PASSWORD);
         
-        // 验证登录成功
+        // Verify login was successful
         assertTrue(loginResult);
         assertTrue(authController.isLoggedIn());
         assertNotNull(authController.getCurrentUser());
@@ -141,115 +141,115 @@ public class AuthControllerTest {
     }
     
     /**
-     * 测试使用错误密码登录
+     * Test login with incorrect password
      */
     @Test
     public void testLoginWrongPassword() throws IOException {
-        // 注册用户
+        // Register a user
         authController.register(TEST_USERNAME, TEST_PASSWORD, TEST_FULLNAME, TEST_EMAIL);
         
-        // 尝试使用错误密码登录
+        // Try to login with wrong password
         boolean loginResult = authController.login(TEST_USERNAME, "wrongpassword");
         
-        // 验证登录失败
+        // Verify login failed
         assertFalse(loginResult);
         assertFalse(authController.isLoggedIn());
         assertNull(authController.getCurrentUser());
     }
     
     /**
-     * 测试使用不存在的用户名登录
+     * Test login with non-existent username
      */
     @Test
     public void testLoginNonExistentUser() throws IOException {
-        // 尝试使用不存在的用户名登录
+        // Try to login with non-existent username
         boolean loginResult = authController.login("nonexistentuser", TEST_PASSWORD);
         
-        // 验证登录失败
+        // Verify login failed
         assertFalse(loginResult);
         assertFalse(authController.isLoggedIn());
         assertNull(authController.getCurrentUser());
     }
     
     /**
-     * 测试登出功能
+     * Test logout functionality
      */
     @Test
     public void testLogout() throws IOException {
-        // 注册并登录用户
+        // Register and login a user
         authController.register(TEST_USERNAME, TEST_PASSWORD, TEST_FULLNAME, TEST_EMAIL);
         authController.login(TEST_USERNAME, TEST_PASSWORD);
         
-        // 验证用户已登录
+        // Verify user is logged in
         assertTrue(authController.isLoggedIn());
         
-        // 登出
+        // Logout
         authController.logout();
         
-        // 验证用户已登出
+        // Verify user is logged out
         assertFalse(authController.isLoggedIn());
         assertNull(authController.getCurrentUser());
     }
     
     /**
-     * 测试更改密码功能
+     * Test change password functionality
      */
     @Test
     public void testChangePassword() throws IOException {
-        // 注册并登录用户
+        // Register and login a user
         authController.register(TEST_USERNAME, TEST_PASSWORD, TEST_FULLNAME, TEST_EMAIL);
         authController.login(TEST_USERNAME, TEST_PASSWORD);
         
-        // 更改密码
+        // Change password
         String newPassword = "newpassword123";
         boolean changeResult = authController.changePassword(TEST_PASSWORD, newPassword);
         
-        // 验证密码更改成功
+        // Verify password change was successful
         assertTrue(changeResult);
         
-        // 登出
+        // Logout
         authController.logout();
         
-        // 尝试使用旧密码登录
+        // Try to login with old password
         boolean oldLoginResult = authController.login(TEST_USERNAME, TEST_PASSWORD);
         assertFalse(oldLoginResult);
         
-        // 尝试使用新密码登录
+        // Try to login with new password
         boolean newLoginResult = authController.login(TEST_USERNAME, newPassword);
         assertTrue(newLoginResult);
     }
     
     /**
-     * 测试使用错误的当前密码更改密码
+     * Test change password with incorrect current password
      */
     @Test
     public void testChangePasswordWrongCurrentPassword() throws IOException {
-        // 注册并登录用户
+        // Register and login a user
         authController.register(TEST_USERNAME, TEST_PASSWORD, TEST_FULLNAME, TEST_EMAIL);
         authController.login(TEST_USERNAME, TEST_PASSWORD);
         
-        // 尝试使用错误的当前密码更改密码
+        // Try to change password with wrong current password
         boolean changeResult = authController.changePassword("wrongpassword", "newpassword123");
         
-        // 验证密码更改失败
+        // Verify password change failed
         assertFalse(changeResult);
     }
     
     /**
-     * 测试更新个人资料功能
+     * Test update profile functionality
      */
     @Test
     public void testUpdateProfile() throws IOException {
-        // 注册并登录用户
+        // Register and login a user
         authController.register(TEST_USERNAME, TEST_PASSWORD, TEST_FULLNAME, TEST_EMAIL);
         authController.login(TEST_USERNAME, TEST_PASSWORD);
         
-        // 更新个人资料
+        // Update profile
         String newFullName = "Updated Name";
         String newEmail = "updated@example.com";
         authController.updateProfile(newFullName, newEmail);
         
-        // 验证个人资料已更新
+        // Verify profile was updated
         assertEquals(newFullName, authController.getCurrentUser().getFullName());
         assertEquals(newEmail, authController.getCurrentUser().getEmail());
     }
