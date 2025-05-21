@@ -2,7 +2,6 @@ package com.financeapp.view;
 
 import com.financeapp.controller.TransactionController;
 import com.financeapp.model.Transaction;
-import com.financeapp.view.ExpenseAlertPanel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -112,15 +111,35 @@ public class ExpenseAlertPanelTest {
 
     @Test
     public void testSetNegativeThreshold() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            expenseAlertPanel.setCategoryThreshold("Dining", -100.0);
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            expenseAlertPanel.setCategoryThreshold("Food", -100.0);
         });
+        assertEquals("Threshold cannot be negative", exception.getMessage());
     }
 
     @Test
     public void testSetNullCategory() {
-        assertThrows(NullPointerException.class, () -> {
-            expenseAlertPanel.setCategoryThreshold(null, 1000.0);
-        });
+        // Verify no threshold exists for test category before invocation
+        assertFalse(expenseAlertPanel.hasCategoryThreshold("TestCategory"));
+
+        try {
+            // Invoke method with null category, expecting exception
+            expenseAlertPanel.setCategoryThreshold(null, 100.0);
+
+            // Fail test if no exception is thrown
+            fail("Expected IllegalArgumentException when category is null");
+        } catch (IllegalArgumentException e) {
+            // Validate exception message (optional)
+            assertEquals("Category cannot be null or empty", e.getMessage());
+        }
+
+        // Verify no threshold was created after exception
+        assertFalse(expenseAlertPanel.hasCategoryThreshold("TestCategory"),
+                "Null category should not create any threshold entry");
     }
 }
+
+
+
+
+

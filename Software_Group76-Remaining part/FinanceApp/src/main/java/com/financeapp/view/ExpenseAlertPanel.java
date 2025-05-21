@@ -519,25 +519,29 @@ public class ExpenseAlertPanel extends JPanel {
                     if (input != null) { // User clicked OK
                         input = input.trim();
                         if (input.isEmpty()) {
-                            categoryThresholds.put(category, null); // Unset threshold
+                            // Remove the category threshold if input is empty
+                            categoryThresholds.remove(category);
                         } else {
                             try {
                                 double threshold = Double.parseDouble(input);
-                                // Keep two decimal places
+                                // Round to two decimal places
                                 threshold = Math.round(threshold * 100.0) / 100.0;
-                                categoryThresholds.put(category, threshold);
+
+                                // Validate and set the threshold using the main method
+                                setCategoryThreshold(category, threshold);
                             } catch (NumberFormatException e) {
                                 JOptionPane.showMessageDialog(
                                         this,
-                                        "Invalid threshold value. Using 0.00 as default.",
+                                        "Invalid threshold value. Please enter a valid number.",
                                         "Input Error",
-                                        JOptionPane.WARNING_MESSAGE
+                                        JOptionPane.ERROR_MESSAGE
                                 );
-                                categoryThresholds.put(category, 0.0);
+                                // Do not set threshold, allow user to retry
                             }
                         }
                     } else { // User clicked Cancel
-                        categoryThresholds.put(category, null); // Unset threshold
+                        // Remove the category threshold if user cancels
+                        categoryThresholds.remove(category);
                     }
                 }
 
@@ -877,11 +881,45 @@ public class ExpenseAlertPanel extends JPanel {
             initUI(); // Initialize the UI, which will call loadSettings()
         }
     }
-    // The following are all newly added test codes to verify the correctness of the program
-    // Add the following method in the ExpenseAlertPanel class
+
+    /**
+     * Sets the expense threshold for a specific category.
+     * Displays a warning dialog if input is invalid.
+     *
+     * @param category The category name (e.g., "Dining", "Shopping").
+     * @param threshold The maximum allowed expense for the category.
+     *                  Must be non-negative.
+     * @throws IllegalArgumentException if category is null or empty,
+     *         or threshold is negative (for non-UI callers).
+     */
     public void setCategoryThreshold(String category, double threshold) {
+        // Validate inputs and show warnings
+        if (category == null || category.isEmpty()) {
+            showErrorDialog("Category name cannot be empty");
+            throw new IllegalArgumentException("Category cannot be null or empty");
+        }
+
+        if (threshold < 0) {
+            showErrorDialog("Threshold cannot be negative");
+            throw new IllegalArgumentException("Threshold cannot be negative");
+        }
+
+        // Store the valid threshold
         categoryThresholds.put(category, threshold);
     }
+
+    /**
+     * Helper method to display error dialogs.
+     */
+    private void showErrorDialog(String message) {
+        JOptionPane.showMessageDialog(
+                null,
+                message,
+                "Input Error",
+                JOptionPane.ERROR_MESSAGE
+        );
+    }
+
 
     public void updateExpenseData() {
         // Recalculate the expenses for all categories and check the thresholds
