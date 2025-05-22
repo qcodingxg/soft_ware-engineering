@@ -26,7 +26,7 @@ public class AIClassifier {
     private final Map<String, String> userCorrections;
     private static final String CORRECTIONS_LOG_PATH = "./data/corrections.log";
     private static final String DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions";
-    private static final String DEEPSEEK_API_KEY = "sk-c352d996488d417aa5643d871887a0ff";
+    private static final String DEEPSEEK_API_KEY = "sk-1b18b92f15b84a2a98b510300e8fbc28";
 
     /**
      * Initialize classifier
