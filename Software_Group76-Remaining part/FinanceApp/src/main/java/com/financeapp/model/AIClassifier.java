@@ -73,7 +73,7 @@ public class AIClassifier {
     /**
      * Classify using AI API
      */
-    private String classifyWithDeepSeek(String description) throws IOException {
+    public String classifyWithDeepSeek(String description) throws IOException {
         JSONObject requestBody = new JSONObject();
         requestBody.put("model", "deepseek-chat"); // Use the appropriate model
         requestBody.put("messages", new JSONObject[] {
