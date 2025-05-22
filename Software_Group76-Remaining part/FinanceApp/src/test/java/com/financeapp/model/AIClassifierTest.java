@@ -16,10 +16,7 @@ class AIClassifierTest {
 
     private AIClassifier classifier;
     private Transaction transaction;
-
-    @TempDir
-    Path tempDir;
-
+    
     @BeforeEach
     void setUp() {
         classifier = new AIClassifier();
