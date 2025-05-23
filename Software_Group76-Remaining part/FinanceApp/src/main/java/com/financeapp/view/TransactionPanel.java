@@ -610,7 +610,7 @@ public class TransactionPanel extends JPanel {
     /**
      * Add transaction
      */
-    private void addTransaction() {
+    void addTransaction() {
         try {
             LocalDate date = validateDate();
             double amount = validateAmount();
@@ -665,7 +665,7 @@ public class TransactionPanel extends JPanel {
     }
 
 
-    private void suggestCategory() {
+    void suggestCategory() {
         String description = descriptionField.getText().trim();
         if (description.isEmpty()) {
             showMessage("Please enter description first", "Info", JOptionPane.INFORMATION_MESSAGE);
@@ -801,7 +801,7 @@ public class TransactionPanel extends JPanel {
      * @return Transaction list
      * @throws IOException If IO error occurs during reading
      */
-    private List<Transaction> readCSVFile(File file) throws IOException {
+    List<Transaction> readCSVFile(File file) throws IOException {
         List<Transaction> transactions = new ArrayList<>();
         List<String> errors = new ArrayList<>();
         int lineNumber = 0;
@@ -848,7 +848,7 @@ public class TransactionPanel extends JPanel {
     /**
      * Delete selected transaction
      */
-    private void deleteSelectedTransaction() {
+    void deleteSelectedTransaction() {
         int[] selectedRows = transactionTable.getSelectedRows();
         if (selectedRows.length == 0) {
             JOptionPane.showMessageDialog(this,
@@ -1012,4 +1012,11 @@ public class TransactionPanel extends JPanel {
 
         return panel;
     }
+
+    public TransactionPanel(TransactionController controller, AIClassifier classifier) {
+        this.controller = controller;
+        this.classifier = classifier;
+        initUI();
+    }
+
 } 
