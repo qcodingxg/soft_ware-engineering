@@ -28,14 +28,14 @@ import org.junit.jupiter.api.io.TempDir;
 public class AIChatServiceTest {
 
     private AIChatService aiChatService;
-    
+
     @TempDir
     Path tempDir;
-    
+
     private Path dataDir;
     private Path transactionsFile;
     private String originalUserDir;
-    
+
     /**
      * Setup before each test
      * Creates temporary data directory and test transaction data file
@@ -44,22 +44,24 @@ public class AIChatServiceTest {
     public void setUp() throws IOException {
         // Save original user directory
         originalUserDir = System.getProperty("user.dir");
-        
+
         // Create temporary data directory
         dataDir = tempDir.resolve("data");
         Files.createDirectories(dataDir);
-        
+
         // Create test transaction data file
         transactionsFile = dataDir.resolve("transactions.csv");
         createTestTransactionsFile(transactionsFile.toFile());
-        
+
         // Set system property to use temporary directory
         System.setProperty("user.dir", tempDir.toString());
-        
-        // Initialize AIChatService
+
+        // Initialize AIChatService and load test data
         aiChatService = new AIChatService();
+        // Load test transaction data from the temporary file
+        aiChatService.loadTransactionsData(transactionsFile.toString());
     }
-    
+
     /**
      * Cleanup after each test
      */
@@ -68,7 +70,7 @@ public class AIChatServiceTest {
         // Restore original user directory
         System.setProperty("user.dir", originalUserDir);
     }
-    
+
     /**
      * Create test transaction data file
      */
@@ -76,7 +78,9 @@ public class AIChatServiceTest {
         try (FileWriter writer = new FileWriter(file)) {
             // Write CSV header
             writer.write("日期,分类,金额,备注\n");
-            // Write some test transaction data
+            // Write test transaction data that matches the test expectations
+            writer.write("2025-03-18,Food,300.00,Electric bill\n");
+            writer.write("2025-03-18,Uncategorized,8908.00,Initial deposit\n");
             writer.write("2023-01-01,Food,25.50,Restaurant dinner\n");
             writer.write("2023-01-02,Transport,10.00,Bus ticket\n");
             writer.write("2023-01-03,Shopping,150.00,Clothes\n");
@@ -84,7 +88,7 @@ public class AIChatServiceTest {
             writer.write("2023-01-05,Income,2000.00,Salary\n");
         }
     }
-    
+
     /**
      * Test loading transaction data
      */
@@ -94,13 +98,13 @@ public class AIChatServiceTest {
         String transactionsData = aiChatService.getTransactionsData();
         assertNotNull(transactionsData);
         assertFalse(transactionsData.isEmpty());
-        
+
         // Verify transaction data content
         assertTrue(transactionsData.contains("日期,分类,金额,备注"));
         assertTrue(transactionsData.contains("2025-03-18,Food,300.00,Electric bill"));
         assertTrue(transactionsData.contains("2025-03-18,Uncategorized,8908.00,Initial deposit"));
     }
-    
+
     /**
      * Test AI response (non-streaming)
      * Note: This is an integration test that requires a valid API key
@@ -112,28 +116,28 @@ public class AIChatServiceTest {
         try {
             // Send a simple financial question
             String response = aiChatService.getAIResponse("What is the best way to save money?");
-            
+
             // Verify response is not empty
             assertNotNull(response);
             assertFalse(response.isEmpty());
-            
+
             // Since AI responses are non-deterministic, we can only do basic validations
             // Check if response contains some expected keywords
             assertTrue(
-                response.contains("save") || 
-                response.contains("saving") || 
-                response.contains("budget") || 
+                response.contains("save") ||
+                response.contains("saving") ||
+                response.contains("budget") ||
                 response.contains("financial") ||
                 response.contains("money"),
                 "Response should contain finance-related keywords"
             );
-            
+
         } catch (Exception e) {
             // Skip test if API call fails (e.g., invalid API key)
             assumeTrue(false, "Skipping test: " + e.getMessage());
         }
     }
-    
+
     /**
      * Test transaction data analysis
      * Note: This is an integration test that requires a valid API key
@@ -145,28 +149,28 @@ public class AIChatServiceTest {
         try {
             // Analyze transaction data
             String analysis = aiChatService.analyzeTransactionData();
-            
+
             // Verify analysis result is not empty
             assertNotNull(analysis);
             assertFalse(analysis.isEmpty());
-            
+
             // Check if analysis result contains some expected keywords
             assertTrue(
-                analysis.contains("transaction") || 
-                analysis.contains("financial") || 
-                analysis.contains("budget") || 
+                analysis.contains("transaction") ||
+                analysis.contains("financial") ||
+                analysis.contains("budget") ||
                 analysis.contains("income") ||
                 analysis.contains("expense") ||
                 analysis.contains("advice"),
                 "Analysis result should contain financial analysis keywords"
             );
-            
+
         } catch (Exception e) {
             // Skip test if API call fails
             assumeTrue(false, "Skipping test: " + e.getMessage());
         }
     }
-    
+
     /**
      * Test streaming AI response
      * Note: This is an integration test that requires a valid API key
@@ -177,12 +181,12 @@ public class AIChatServiceTest {
     public void testGetAIResponseStreaming() throws InterruptedException {
         // Use CountDownLatch to wait for async response completion
         CountDownLatch latch = new CountDownLatch(1);
-        
+
         // Store response content and errors
         AtomicReference<StringBuilder> contentRef = new AtomicReference<>(new StringBuilder());
         AtomicReference<Exception> errorRef = new AtomicReference<>();
         List<String> responseChunks = new ArrayList<>();
-        
+
         // Create response handler
         AIChatService.StreamResponseHandler handler = new AIChatService.StreamResponseHandler() {
             @Override
@@ -190,54 +194,54 @@ public class AIChatServiceTest {
                 contentRef.get().append(content);
                 responseChunks.add(content);
             }
-            
+
             @Override
             public void onError(Exception e) {
                 errorRef.set(e);
                 latch.countDown();
             }
-            
+
             @Override
             public void onComplete() {
                 latch.countDown();
             }
         };
-        
+
         // Send streaming request
         aiChatService.getAIResponseStreaming("How can I create a monthly budget?", handler);
-        
+
         // Wait for response to complete (max 30 seconds)
         boolean completed = latch.await(30, TimeUnit.SECONDS);
-        
+
         // Check for errors
         if (errorRef.get() != null) {
             // Skip test if API call fails
             assumeTrue(false, "Skipping test: " + errorRef.get().getMessage());
             return;
         }
-        
+
         // Verify response completed
         assertTrue(completed, "Streaming response should complete before timeout");
-        
+
         // Verify response content
         String fullContent = contentRef.get().toString();
         assertNotNull(fullContent);
         assertFalse(fullContent.isEmpty());
-        
+
         // Verify multiple response chunks were received
         assertFalse(responseChunks.isEmpty(), "Should receive at least one response chunk");
-        
+
         // Check if response contains some expected keywords
         assertTrue(
-            fullContent.contains("budget") || 
-            fullContent.contains("financial") || 
-            fullContent.contains("income") || 
+            fullContent.contains("budget") ||
+            fullContent.contains("financial") ||
+            fullContent.contains("income") ||
             fullContent.contains("expense") ||
             fullContent.contains("money"),
             "Response should contain budget-related keywords"
         );
     }
-    
+
     /**
      * Test invalid API key scenario
      * Disabled by default as it requires modifying the AIChatService class
@@ -248,21 +252,21 @@ public class AIChatServiceTest {
         // Create an AIChatService instance with invalid API key
         // Note: This requires modifying the AIChatService class to support custom API keys
         // Since the current implementation doesn't support this, we skip this test
-        
+
         // If AIChatService supports custom API keys, the following code could be used:
         /*
         AIChatService invalidService = new AIChatService("invalid-api-key");
-        
+
         try {
             String response = invalidService.getAIResponse("Test question");
-            assertTrue(response.contains("cannot connect") || response.contains("error"), 
+            assertTrue(response.contains("cannot connect") || response.contains("error"),
                     "Should return error message when using invalid API key");
         } catch (Exception e) {
-            assertTrue(e.getMessage().contains("unauthorized") || 
+            assertTrue(e.getMessage().contains("unauthorized") ||
                        e.getMessage().contains("invalid") ||
                        e.getMessage().contains("error"),
                     "Should throw relevant exception when using invalid API key");
         }
         */
     }
-} 
+}

@@ -37,62 +37,72 @@ public class AIChatService {
             "- 提醒用户重要的财务决策应咨询专业人士\n" +
             "- 所有回答均使用英文\n\n" +
             "当用户提出非财务相关问题时，礼貌地将话题引导回财务领域。";
-    
+
     // 交易数据文件路径
     private static final String TRANSACTIONS_CSV_PATH = "data/transactions.csv";
-    
+
     // 存储交易数据内容
     private String transactionsData;
-    
+
     // 接口定义: 用于处理流式响应
     public interface StreamResponseHandler {
         void onResponseChunk(String content);
         void onError(Exception e);
         void onComplete();
     }
-    
+
     public AIChatService() {
         loadTransactionsData();
     }
-    
+
     /**
      * 加载交易数据从CSV文件
      */
     private void loadTransactionsData() {
+        loadTransactionsData(TRANSACTIONS_CSV_PATH);
+    }
+
+    /**
+     * 加载交易数据从指定的CSV文件路径
+     * @param csvPath CSV文件路径
+     */
+    public void loadTransactionsData(String csvPath) {
         try {
-            // 从项目根目录读取文件
-            File file = new File(TRANSACTIONS_CSV_PATH);
+            // 从指定路径读取文件
+            File file = new File(csvPath);
             if (!file.exists()) {
                 // 尝试从绝对路径读取
                 String absolutePath = new File("").getAbsolutePath();
-                file = new File(absolutePath + File.separator + TRANSACTIONS_CSV_PATH);
-                
+                file = new File(absolutePath + File.separator + csvPath);
+
                 if (!file.exists()) {
-                    System.err.println("交易数据文件未找到: " + TRANSACTIONS_CSV_PATH);
+                    System.err.println("交易数据文件未找到: " + csvPath);
+                    transactionsData = null;
                     return;
                 }
             }
-            
+
             // 读取文件内容
             transactionsData = Files.readAllLines(Paths.get(file.getAbsolutePath()))
                 .stream()
                 .collect(Collectors.joining("\n"));
-                
-            System.out.println("成功加载交易数据");
-            
+
+            System.out.println("成功加载交易数据从: " + file.getAbsolutePath());
+
         } catch (Exception e) {
             System.err.println("加载交易数据失败: " + e.getMessage());
             e.printStackTrace();
+            transactionsData = null;
         }
     }
-    
+
     /**
      * 获取交易数据的内容
      */
     public String getTransactionsData() {
         return transactionsData;
     }
-    
+
     /**
      * 发送交易数据到AI，获取财务分析
      */
@@ -100,15 +110,15 @@ public class AIChatService {
         if (transactionsData == null || transactionsData.isEmpty()) {
             return "No transaction data available for analysis.";
         }
-        
+
         // 创建提示词，要求AI基于交易数据生成财务建议
-        String message = "Please analyze the user's financial situation based on the following transaction data and provide 3-5 specific financial advice. These data are the user's latest transaction records. Please ensure your response includes the following parts: 1. A brief summary of the user's financial situation; 2. 3-5 specific and targeted financial advice. The format should be concise and clear.\n\n" + 
+        String message = "Please analyze the user's financial situation based on the following transaction data and provide 3-5 specific financial advice. These data are the user's latest transaction records. Please ensure your response includes the following parts: 1. A brief summary of the user's financial situation; 2. 3-5 specific and targeted financial advice. The format should be concise and clear.\n\n" +
                         "Transaction data (CSV format):\n" + transactionsData;
-        
+
         // 获取AI响应（使用完整响应而非流式输出）
         return getAIResponse(message);
     }
-    
+
     /**
      * 获取非流式AI响应（用于初始交易数据分析）
      */
@@ -123,22 +133,22 @@ public class AIChatService {
         // 构建请求体
         JSONObject requestBody = new JSONObject();
         requestBody.put("model", "deepseek-chat");
-        
+
         // 创建消息数组
         JSONArray messagesArray = new JSONArray();
-        
+
         // 添加系统提示词
         JSONObject systemMessage = new JSONObject();
         systemMessage.put("role", "system");
         systemMessage.put("content", SYSTEM_PROMPT);
         messagesArray.put(systemMessage);
-        
+
         // 添加用户消息
         JSONObject userMessage = new JSONObject();
         userMessage.put("role", "user");
         userMessage.put("content", message);
         messagesArray.put(userMessage);
-        
+
         requestBody.put("messages", messagesArray);
         requestBody.put("temperature", 0.7);
         requestBody.put("max_tokens", 1000);
@@ -173,7 +183,7 @@ public class AIChatService {
             return "Sorry, I cannot understand the AI service response. Error information: " + e.getMessage();
         }
     }
-    
+
     /**
      * 获取流式AI响应
      */
@@ -190,23 +200,23 @@ public class AIChatService {
                 // 构建请求体
                 JSONObject requestBody = new JSONObject();
                 requestBody.put("model", "deepseek-chat");
-                
+
                 // 创建消息数组
                 JSONArray messagesArray = new JSONArray();
-                
+
                 // 添加系统提示词
                 JSONObject systemMessage = new JSONObject();
                 systemMessage.put("role", "system");
-                systemMessage.put("content", SYSTEM_PROMPT + (transactionsData != null && !transactionsData.isEmpty() ? 
+                systemMessage.put("content", SYSTEM_PROMPT + (transactionsData != null && !transactionsData.isEmpty() ?
                         "\n\nI have analyzed the user's transaction data, and I understand their financial situation. Please provide more targeted advice based on this information." : ""));
                 messagesArray.put(systemMessage);
-                
+
                 // 添加用户消息
                 JSONObject userMessage = new JSONObject();
                 userMessage.put("role", "user");
                 userMessage.put("content", message);
                 messagesArray.put(userMessage);
-                
+
                 requestBody.put("messages", messagesArray);
                 requestBody.put("temperature", 0.7);
                 requestBody.put("max_tokens", 1000);
@@ -229,7 +239,7 @@ public class AIChatService {
                             if (data.equals("[DONE]")) {
                                 break;
                             }
-                            
+
                             try {
                                 JSONObject jsonResponse = new JSONObject(data);
                                 JSONArray choices = jsonResponse.getJSONArray("choices");
@@ -248,7 +258,7 @@ public class AIChatService {
                             }
                         }
                     }
-                    
+
                     // 处理完成
                     handler.onComplete();
                 }
@@ -258,4 +268,4 @@ public class AIChatService {
             }
         }).start();
     }
-} 
+}

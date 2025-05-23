@@ -16,3 +16,21 @@ d04d8793-2efe-4cf0-b5f2-62538f4bf5a4,Category Shopping expense (2750.73) exceeds
 a9fc1510-22bb-485c-98aa-bd4b64221ae0,Category Fitness expense (198.0) exceeds historical average (99.0) over 20%!,CRITICAL,2025-05-19 00:00:00,Fitness,false
 d94d3498-ab3f-42af-8d24-391fb2182308,Category Food expense (851.0) exceeds historical average (212.75) over 20%!,CRITICAL,2025-05-19 00:00:00,Food,false
 4d309a32-3951-400e-8124-5451c768f2a9,Total expense (61889.39) exceeds global threshold (5000.0)!,CRITICAL,2025-05-19 00:00:00,Total Expense,false
+6a7140a2-5eaa-4999-a8a2-52518b4f8a0d,Total expense (61889.39) exceeds historical average (1547.23475) over 20%!,CRITICAL,2025-05-23 00:00:00,Total Expense,false
+faadc4d9-9926-4be5-8b48-e68fa0ab2eaa,Category Savings expense (2000.0) exceeds historical average (1000.0) over 20%!,CRITICAL,2025-05-23 00:00:00,Savings,false
+be8cde0d-4f78-4262-bebd-38b82d1c64bb,Category Entertainment expense (170.0) exceeds historical average (85.0) over 20%!,CRITICAL,2025-05-23 00:00:00,Entertainment,false
+68af8ea3-ef63-4543-9950-b59db511bd18,Category Subscriptions expense (31.98) exceeds historical average (15.99) over 20%!,CRITICAL,2025-05-23 00:00:00,Subscriptions,false
+5212ee5a-7448-47b5-92ea-214971e3f0b0,Category Transportation expense (91.5) exceeds historical average (45.75) over 20%!,CRITICAL,2025-05-23 00:00:00,Transportation,false
+5934faab-ee4f-447a-a4fa-a4df96bc2ae1,Category Income expense (17000.0) exceeds historical average (8500.0) over 20%!,CRITICAL,2025-05-23 00:00:00,Income,false
+32c02c93-f764-4c67-8aa9-5e5c221b5926,Category Uncategorized expense (17866.98) exceeds historical average (4466.745) over 20%!,CRITICAL,2025-05-23 00:00:00,Uncategorized,false
+941d2bc1-6ee3-47e6-af8f-f620ada8dd19,Category Housing expense (5000.0) exceeds historical average (2500.0) over 20%!,CRITICAL,2025-05-23 00:00:00,Housing,false
+c961ef44-cefa-479f-90c3-c1230bc04ce7,Category Travel expense (3600.0) exceeds historical average (1800.0) over 20%!,CRITICAL,2025-05-23 00:00:00,Travel,false
+990db5c0-f68a-4cc2-b385-e006a7ccfd03,Category Utilities expense (300.7) exceeds historical average (150.35) over 20%!,CRITICAL,2025-05-23 00:00:00,Utilities,false
+78dc742c-7056-42a8-88fb-a0616369fdf2,Category Education expense (700.0) exceeds historical average (350.0) over 20%!,CRITICAL,2025-05-23 00:00:00,Education,false
+6631d366-c30d-49d0-9f73-ee655ae6230e,Category Insurance expense (900.0) exceeds historical average (450.0) over 20%!,CRITICAL,2025-05-23 00:00:00,Insurance,false
+4a38b938-be99-4316-8091-8b075c956a29,Category Healthcare expense (440.0) exceeds historical average (220.0) over 20%!,CRITICAL,2025-05-23 00:00:00,Healthcare,false
+17f17948-8bf3-49e2-a0c4-6ad2f8632c88,Category Gifts expense (157.0) exceeds historical average (78.5) over 20%!,CRITICAL,2025-05-23 00:00:00,Gifts,false
+f62f3e47-11cf-4866-b05d-650446fa09b2,Category Shopping expense (2750.73) exceeds historical average (916.91) over 20%!,CRITICAL,2025-05-23 00:00:00,Shopping,false
+c01fcecc-a402-4fef-9713-a781fe30ca37,Category Fitness expense (198.0) exceeds historical average (99.0) over 20%!,CRITICAL,2025-05-23 00:00:00,Fitness,false
+a0a671f2-811d-4d12-93ec-f1a78150fd9f,Category Food expense (851.0) exceeds historical average (212.75) over 20%!,CRITICAL,2025-05-23 00:00:00,Food,false
+1ed58a0f-c451-4b11-941a-69245fa85545,Total expense (61889.39) exceeds global threshold (5000.0)!,CRITICAL,2025-05-23 00:00:00,Total Expense,false
