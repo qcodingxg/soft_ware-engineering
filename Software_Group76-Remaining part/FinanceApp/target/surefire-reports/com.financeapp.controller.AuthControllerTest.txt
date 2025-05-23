@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.financeapp.controller.AuthControllerTest
 -------------------------------------------------------------------------------
-Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.303 s -- in com.financeapp.controller.AuthControllerTest
+Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.362 s -- in com.financeapp.controller.AuthControllerTest
