@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.financeapp.controller.AuthControllerTest" time="0.362" tests="11" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.financeapp.controller.AuthControllerTest" time="0.303" tests="11" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="24"/>
     <property name="sun.cpu.isalist" value="amd64"/>
     <property name="sun.jnu.encoding" value="GBK"/>
-    <property name="java.class.path" value="E:\Project\soft_ware-engineering\Software_Group76-Remaining part\FinanceApp\target\test-classes;E:\Project\soft_ware-engineering\Software_Group76-Remaining part\FinanceApp\target\classes;C:\Users\Xuan\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.9.2\junit-jupiter-api-5.9.2.jar;C:\Users\Xuan\.m2\repository\org\opentest4j\opentest4j\1.2.0\opentest4j-1.2.0.jar;C:\Users\Xuan\.m2\repository\org\junit\platform\junit-platform-commons\1.9.2\junit-platform-commons-1.9.2.jar;C:\Users\Xuan\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\Xuan\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.9.2\junit-jupiter-engine-5.9.2.jar;C:\Users\Xuan\.m2\repository\org\junit\platform\junit-platform-engine\1.9.2\junit-platform-engine-1.9.2.jar;C:\Users\Xuan\.m2\repository\org\json\json\20231013\json-20231013.jar;C:\Users\Xuan\.m2\repository\com\formdev\flatlaf\3.2.1\flatlaf-3.2.1.jar;C:\Users\Xuan\.m2\repository\com\formdev\flatlaf-extras\3.2.1\flatlaf-extras-3.2.1.jar;C:\Users\Xuan\.m2\repository\com\github\weisj\jsvg\1.1.0\jsvg-1.1.0.jar;"/>
+    <property name="java.class.path" value="E:\Project\soft_ware-engineering\Software_Group76-Remaining part\FinanceApp\target\test-classes;E:\Project\soft_ware-engineering\Software_Group76-Remaining part\FinanceApp\target\classes;D:\APP\App_code\Java\Apache\MAVEN—local repository\org\junit\jupiter\junit-jupiter-api\5.9.2\junit-jupiter-api-5.9.2.jar;D:\APP\App_code\Java\Apache\MAVEN—local repository\org\opentest4j\opentest4j\1.2.0\opentest4j-1.2.0.jar;D:\APP\App_code\Java\Apache\MAVEN—local repository\org\junit\platform\junit-platform-commons\1.9.2\junit-platform-commons-1.9.2.jar;D:\APP\App_code\Java\Apache\MAVEN—local repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;D:\APP\App_code\Java\Apache\MAVEN—local repository\org\junit\jupiter\junit-jupiter-engine\5.9.2\junit-jupiter-engine-5.9.2.jar;D:\APP\App_code\Java\Apache\MAVEN—local repository\org\junit\platform\junit-platform-engine\1.9.2\junit-platform-engine-1.9.2.jar;D:\APP\App_code\Java\Apache\MAVEN—local repository\org\json\json\20231013\json-20231013.jar;D:\APP\App_code\Java\Apache\MAVEN—local repository\org\mockito\mockito-core\4.11.0\mockito-core-4.11.0.jar;D:\APP\App_code\Java\Apache\MAVEN—local repository\net\bytebuddy\byte-buddy\1.12.19\byte-buddy-1.12.19.jar;D:\APP\App_code\Java\Apache\MAVEN—local repository\net\bytebuddy\byte-buddy-agent\1.12.19\byte-buddy-agent-1.12.19.jar;D:\APP\App_code\Java\Apache\MAVEN—local repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;D:\APP\App_code\Java\Apache\MAVEN—local repository\com\formdev\flatlaf\3.2.1\flatlaf-3.2.1.jar;D:\APP\App_code\Java\Apache\MAVEN—local repository\com\formdev\flatlaf-extras\3.2.1\flatlaf-extras-3.2.1.jar;D:\APP\App_code\Java\Apache\MAVEN—local repository\com\github\weisj\jsvg\1.1.0\jsvg-1.1.0.jar;D:\APP\App_code\Java\Apache\MAVEN—local repository\commons-collections\commons-collections\3.2.2\commons-collections-3.2.2.jar;D:\APP\App_code\Java\Apache\MAVEN—local repository\org\codehaus\plexus\plexus-interpolation\1.27\plexus-interpolation-1.27.jar;"/>
     <property name="java.vm.vendor" value="Oracle Corporation"/>
     <property name="sun.arch.data.model" value="64"/>
     <property name="user.variant" value=""/>
@@ -12,13 +12,12 @@
     <property name="user.timezone" value="Asia/Shanghai"/>
     <property name="os.name" value="Windows 11"/>
     <property name="java.vm.specification.version" value="24"/>
-    <property name="user.country" value="CN"/>
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="CN"/>
     <property name="sun.boot.library.path" value="D:\APP\App_code\Java\jdk-24\bin"/>
-    <property name="sun.java.command" value="C:\Users\Xuan\AppData\Local\Temp\surefire4872525576672525657\surefirebooter-20250519222615867_3.jar C:\Users\Xuan\AppData\Local\Temp\surefire4872525576672525657 2025-05-19T22-26-15_602-jvmRun1 surefire-20250519222615867_1tmp surefire_0-20250519222615867_2tmp"/>
+    <property name="sun.java.command" value="C:\Users\Xuan\AppData\Local\Temp\surefire4339660726437171101\surefirebooter-20250523183033071_3.jar C:\Users\Xuan\AppData\Local\Temp\surefire4339660726437171101 2025-05-23T18-30-32_929-jvmRun1 surefire-20250523183033071_1tmp surefire_0-20250523183033071_2tmp"/>
     <property name="jdk.debug" value="release"/>
-    <property name="test" value="com.financeapp.controller.AuthControllerTest"/>
-    <property name="surefire.test.class.path" value="E:\Project\soft_ware-engineering\Software_Group76-Remaining part\FinanceApp\target\test-classes;E:\Project\soft_ware-engineering\Software_Group76-Remaining part\FinanceApp\target\classes;C:\Users\Xuan\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.9.2\junit-jupiter-api-5.9.2.jar;C:\Users\Xuan\.m2\repository\org\opentest4j\opentest4j\1.2.0\opentest4j-1.2.0.jar;C:\Users\Xuan\.m2\repository\org\junit\platform\junit-platform-commons\1.9.2\junit-platform-commons-1.9.2.jar;C:\Users\Xuan\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\Xuan\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.9.2\junit-jupiter-engine-5.9.2.jar;C:\Users\Xuan\.m2\repository\org\junit\platform\junit-platform-engine\1.9.2\junit-platform-engine-1.9.2.jar;C:\Users\Xuan\.m2\repository\org\json\json\20231013\json-20231013.jar;C:\Users\Xuan\.m2\repository\com\formdev\flatlaf\3.2.1\flatlaf-3.2.1.jar;C:\Users\Xuan\.m2\repository\com\formdev\flatlaf-extras\3.2.1\flatlaf-extras-3.2.1.jar;C:\Users\Xuan\.m2\repository\com\github\weisj\jsvg\1.1.0\jsvg-1.1.0.jar;"/>
+    <property name="surefire.test.class.path" value="E:\Project\soft_ware-engineering\Software_Group76-Remaining part\FinanceApp\target\test-classes;E:\Project\soft_ware-engineering\Software_Group76-Remaining part\FinanceApp\target\classes;D:\APP\App_code\Java\Apache\MAVEN—local repository\org\junit\jupiter\junit-jupiter-api\5.9.2\junit-jupiter-api-5.9.2.jar;D:\APP\App_code\Java\Apache\MAVEN—local repository\org\opentest4j\opentest4j\1.2.0\opentest4j-1.2.0.jar;D:\APP\App_code\Java\Apache\MAVEN—local repository\org\junit\platform\junit-platform-commons\1.9.2\junit-platform-commons-1.9.2.jar;D:\APP\App_code\Java\Apache\MAVEN—local repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;D:\APP\App_code\Java\Apache\MAVEN—local repository\org\junit\jupiter\junit-jupiter-engine\5.9.2\junit-jupiter-engine-5.9.2.jar;D:\APP\App_code\Java\Apache\MAVEN—local repository\org\junit\platform\junit-platform-engine\1.9.2\junit-platform-engine-1.9.2.jar;D:\APP\App_code\Java\Apache\MAVEN—local repository\org\json\json\20231013\json-20231013.jar;D:\APP\App_code\Java\Apache\MAVEN—local repository\org\mockito\mockito-core\4.11.0\mockito-core-4.11.0.jar;D:\APP\App_code\Java\Apache\MAVEN—local repository\net\bytebuddy\byte-buddy\1.12.19\byte-buddy-1.12.19.jar;D:\APP\App_code\Java\Apache\MAVEN—local repository\net\bytebuddy\byte-buddy-agent\1.12.19\byte-buddy-agent-1.12.19.jar;D:\APP\App_code\Java\Apache\MAVEN—local repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;D:\APP\App_code\Java\Apache\MAVEN—local repository\com\formdev\flatlaf\3.2.1\flatlaf-3.2.1.jar;D:\APP\App_code\Java\Apache\MAVEN—local repository\com\formdev\flatlaf-extras\3.2.1\flatlaf-extras-3.2.1.jar;D:\APP\App_code\Java\Apache\MAVEN—local repository\com\github\weisj\jsvg\1.1.0\jsvg-1.1.0.jar;D:\APP\App_code\Java\Apache\MAVEN—local repository\commons-collections\commons-collections\3.2.2\commons-collections-3.2.2.jar;D:\APP\App_code\Java\Apache\MAVEN—local repository\org\codehaus\plexus\plexus-interpolation\1.27\plexus-interpolation-1.27.jar;"/>
     <property name="sun.cpu.endian" value="little"/>
     <property name="user.home" value="C:\Users\Xuan"/>
     <property name="user.language" value="zh"/>
@@ -31,7 +30,7 @@
     <property name="line.separator" value="&#10;"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
-    <property name="surefire.real.class.path" value="C:\Users\Xuan\AppData\Local\Temp\surefire4872525576672525657\surefirebooter-20250519222615867_3.jar"/>
+    <property name="surefire.real.class.path" value="C:\Users\Xuan\AppData\Local\Temp\surefire4339660726437171101\surefirebooter-20250523183033071_3.jar"/>
     <property name="user.script" value=""/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="24.0.1+9-30"/>
@@ -42,8 +41,7 @@
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
     <property name="file.encoding" value="UTF-8"/>
     <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM"/>
-    <property name="maven.ext.class.path" value="C:\Users\Xuan\.cursor\extensions\oracle.oracle-java-24.0.0\nbcode\java\maven-nblib\netbeans-eventspy.jar"/>
-    <property name="localRepository" value="C:\Users\Xuan\.m2\repository"/>
+    <property name="localRepository" value="D:\APP\App_code\Java\Apache\MAVEN—local repository"/>
     <property name="java.vendor.url.bug" value="https://bugreport.java.com/bugreport/"/>
     <property name="java.io.tmpdir" value="C:\Users\Xuan\AppData\Local\Temp\"/>
     <property name="java.version" value="24.0.1"/>
@@ -51,7 +49,7 @@
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
     <property name="sun.os.patch.level" value=""/>
     <property name="native.encoding" value="GBK"/>
-    <property name="java.library.path" value="D:\APP\App_code\Java\jdk-24\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;D:\APP\App_code\Anaconda3\condabin;F:\VMware\VMware Workstation\bin\;C:\Program Files\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Users\Administrator\AppData\Local\Microsoft\WindowsApps;C:\Recovery\OEM\Backup\;C:\Program Files\dotnet\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA app\NvDLISR;C:\Recovery\OEM\Backup\;D:\APP\App_code\Java\jdk-24\bin;D:\APP\App_code\Java\Apache\apache-maven-3.9.9\bin;D:\APP\App_code\Git\cmd;C:\Users\Xuan\AppData\Roaming\Python\Python312\Scripts;D:\APP\App_code\Anaconda3;D:\APP\App_code\Anaconda3\Scripts;D:\APP\App_code\Anaconda3\Library\bin;D:\APP\App_code\Anaconda3\Library\usr\bin;D:\APP\App_code\Anaconda3\Library\mingw-w64\bin;D:\APP\App_code\nodejs\;D:\APP\App_code\nodejs;D:\APP\App_code\nodejs\node_global;D:\APP\App_code\nodejs\node_cache;C:\Users\Xuan\AppData\Local\Microsoft\WindowsApps;D:\APP\App_code\IDE\Microsoft VS Code\bin;D:\APP\App_code\Java\Apache\apache-maven-3.9.9\bin;D:\APP\App_code\IDE\IntelliJ IDEA 2025.1\bin;;D:\APP\App_code\IDE\cursor\resources\app\bin;C:\Users\Xuan\AppData\Roaming\Python\Python312\Scripts;D:\APP\App_code\nodejs;D:\APP\App_code\nodejs\node_global;D:\APP\App_code\nodejs\node_cache;;."/>
+    <property name="java.library.path" value="D:\APP\App_code\Java\jdk-24\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;D:\APP\App_code\Anaconda3;D:\APP\App_code\Anaconda3\Library\mingw-w64\bin;D:\APP\App_code\Anaconda3\Library\usr\bin;D:\APP\App_code\Anaconda3\Library\bin;D:\APP\App_code\Anaconda3\Scripts;D:\APP\App_code\Anaconda3\bin;D:\APP\App_code\Anaconda3\condabin;F:\VMware\VMware Workstation\bin;C:\Program Files\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\WINDOWS\System32\OpenSSH;C:\Users\Administrator\AppData\Local\Microsoft\WindowsApps;C:\Recovery\OEM\Backup;C:\Program Files\dotnet;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA app\NvDLISR;C:\Recovery\OEM\Backup;D:\APP\App_code\Java\jdk-24\bin;D:\APP\App_code\Java\Apache\apache-maven-3.9.9\bin;D:\APP\App_code\Git\cmd;C:\Users\Xuan\AppData\Roaming\Python\Python312\Scripts;D:\APP\App_code\Anaconda3;D:\APP\App_code\Anaconda3\Scripts;D:\APP\App_code\Anaconda3\Library\bin;D:\APP\App_code\Anaconda3\Library\usr\bin;D:\APP\App_code\Anaconda3\Library\mingw-w64\bin;D:\APP\App_code\nodejs;D:\APP\App_code\nodejs;D:\APP\App_code\nodejs\node_global;D:\APP\App_code\nodejs\node_cache;d:\APP\App_code\IDE\Trae\bin;C:\Users\Xuan\AppData\Local\Microsoft\WindowsApps;D:\APP\App_code\IDE\Microsoft VS Code\bin;D:\APP\App_code\Java\Apache\apache-maven-3.9.9\bin;D:\APP\App_code\IDE\IntelliJ IDEA 2025.1\bin;.;D:\APP\App_code\IDE\cursor\resources\app\bin;C:\Users\Xuan\AppData\Roaming\Python\Python312\Scripts;D:\APP\App_code\nodejs;D:\APP\App_code\nodejs\node_global;D:\APP\App_code\nodejs\node_cache;.;."/>
     <property name="java.vm.info" value="mixed mode, sharing"/>
     <property name="stderr.encoding" value="GBK"/>
     <property name="java.vendor" value="Oracle Corporation"/>
@@ -59,15 +57,15 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="68.0"/>
   </properties>
-  <testcase name="testRegisterValidUser" classname="com.financeapp.controller.AuthControllerTest" time="0.14"/>
-  <testcase name="testLoginSuccess" classname="com.financeapp.controller.AuthControllerTest" time="0.038"/>
-  <testcase name="testLoginNonExistentUser" classname="com.financeapp.controller.AuthControllerTest" time="0.03"/>
-  <testcase name="testChangePasswordWrongCurrentPassword" classname="com.financeapp.controller.AuthControllerTest" time="0.007"/>
-  <testcase name="testRegisterDuplicateUsername" classname="com.financeapp.controller.AuthControllerTest" time="0.022"/>
-  <testcase name="testChangePassword" classname="com.financeapp.controller.AuthControllerTest" time="0.021"/>
-  <testcase name="testUpdateProfile" classname="com.financeapp.controller.AuthControllerTest" time="0.025"/>
-  <testcase name="testLoginWrongPassword" classname="com.financeapp.controller.AuthControllerTest" time="0.021"/>
-  <testcase name="testRegisterShortPassword" classname="com.financeapp.controller.AuthControllerTest" time="0.016"/>
-  <testcase name="testRegisterEmptyUsername" classname="com.financeapp.controller.AuthControllerTest" time="0.004"/>
-  <testcase name="testLogout" classname="com.financeapp.controller.AuthControllerTest" time="0.004"/>
+  <testcase name="testRegisterValidUser" classname="com.financeapp.controller.AuthControllerTest" time="0.133"/>
+  <testcase name="testLoginSuccess" classname="com.financeapp.controller.AuthControllerTest" time="0.025"/>
+  <testcase name="testLoginNonExistentUser" classname="com.financeapp.controller.AuthControllerTest" time="0.019"/>
+  <testcase name="testChangePasswordWrongCurrentPassword" classname="com.financeapp.controller.AuthControllerTest" time="0.011"/>
+  <testcase name="testRegisterDuplicateUsername" classname="com.financeapp.controller.AuthControllerTest" time="0.017"/>
+  <testcase name="testChangePassword" classname="com.financeapp.controller.AuthControllerTest" time="0.017"/>
+  <testcase name="testUpdateProfile" classname="com.financeapp.controller.AuthControllerTest" time="0.017"/>
+  <testcase name="testLoginWrongPassword" classname="com.financeapp.controller.AuthControllerTest" time="0.016"/>
+  <testcase name="testRegisterShortPassword" classname="com.financeapp.controller.AuthControllerTest" time="0.015"/>
+  <testcase name="testRegisterEmptyUsername" classname="com.financeapp.controller.AuthControllerTest" time="0.005"/>
+  <testcase name="testLogout" classname="com.financeapp.controller.AuthControllerTest" time="0.005"/>
 </testsuite>
