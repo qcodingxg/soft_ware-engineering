@@ -161,6 +161,35 @@ public class AIClassifier {
      * Simplified implementation, using sample logic
      * TODO: Use professional calendar library
      */
+    private static final Map<Integer, List<HolidayPeriod>> HOLIDAY_PERIODS = new HashMap<>();
+    static {
+        // 2024 年春节假期：2月4日–2月24日
+        HOLIDAY_PERIODS.put(2024, List.of(
+                new HolidayPeriod(LocalDate.of(2024, 2, 4),
+                        LocalDate.of(2024, 2, 24))
+        ));
+        // TODO: 如果需要，后续可以继续 put(2025, List.of(...)) 或从配置文件加载
+    }
+
+    // 内部类：代表一个连续的假期区间
+    private static class HolidayPeriod {
+        private final LocalDate start;
+        private final LocalDate end;
+
+        HolidayPeriod(LocalDate start, LocalDate end) {
+            this.start = start;
+            this.end = end;
+        }
+
+        boolean contains(LocalDate date) {
+            return !date.isBefore(start) && !date.isAfter(end);
+        }
+    }
+    // ======= 新增结束 =======
+
+    /**
+     * 检查给定日期是否落在任何已知假期区间内
+     */
     private boolean isHolidayPeriod(LocalDate date) {
         // This is just an example, in practice should use a proper calendar library
         // For demonstration, assume that 2024 Spring Festival is Feb 10 (lunar new year), range from Feb 4 to Feb 24
