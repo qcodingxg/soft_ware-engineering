@@ -610,7 +610,7 @@ public class TransactionPanel extends JPanel {
     /**
      * Add transaction
      */
-    void addTransaction() {
+    public void addTransaction() {
         try {
             LocalDate date = validateDate();
             double amount = validateAmount();
@@ -665,7 +665,7 @@ public class TransactionPanel extends JPanel {
     }
 
 
-    void suggestCategory() {
+    public void suggestCategory() {
         String description = descriptionField.getText().trim();
         if (description.isEmpty()) {
             showMessage("Please enter description first", "Info", JOptionPane.INFORMATION_MESSAGE);
@@ -801,7 +801,7 @@ public class TransactionPanel extends JPanel {
      * @return Transaction list
      * @throws IOException If IO error occurs during reading
      */
-    List<Transaction> readCSVFile(File file) throws IOException {
+    public List<Transaction> readCSVFile(File file) throws IOException {
         List<Transaction> transactions = new ArrayList<>();
         List<String> errors = new ArrayList<>();
         int lineNumber = 0;
@@ -848,7 +848,8 @@ public class TransactionPanel extends JPanel {
     /**
      * Delete selected transaction
      */
-    void deleteSelectedTransaction() {
+    public void deleteSelectedTransaction() {
+        // 检查是否有选中行
         int[] selectedRows = transactionTable.getSelectedRows();
         if (selectedRows.length == 0) {
             JOptionPane.showMessageDialog(this,
@@ -858,28 +859,31 @@ public class TransactionPanel extends JPanel {
             return;
         }
 
+        // 显示确认对话框
         int confirm = JOptionPane.showConfirmDialog(
                 this,
-                "Are you sure you want to delete " + selectedRows.length + " selected transactions?",
+                "Are you surte you want to delete " + selectedRows.length + " selected transactions?",
                 "Confirm Deletion",
                 JOptionPane.YES_NO_OPTION
         );
 
         if (confirm == JOptionPane.YES_OPTION) {
-            try {
+            try {// 准备要删除的交易列表
+
                 List<Transaction> toDelete = new ArrayList<>();
+                // 转换视图行索引为模型行索引
                 for (int viewRow : selectedRows) {
                     int modelRow = transactionTable.convertRowIndexToModel(viewRow);
                     toDelete.add(controller.getTransactions().get(modelRow));
                 }
-
-
+                // 通过控制器删除交易
                 controller.deleteTransactions(toDelete);
 
                 // to page1
                 currentPage = 1;
+                //更新表格显示
                 updateTransactionList();
-
+                // 显示成功消息
                 JOptionPane.showMessageDialog(
                         this,
                         "Successfully deleted " + selectedRows.length + " transactions",
@@ -888,6 +892,7 @@ public class TransactionPanel extends JPanel {
                 );
 
             } catch (IOException ex) {
+                // 处理删除失败情况
                 JOptionPane.showMessageDialog(
                         this,
                         "Deletion failed: " + ex.getMessage(),
